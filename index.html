@@ -1507,18 +1507,10 @@ body{
       <div class="load-prog-txt" id="load-prog-txt">준비 중...</div>
     </div>
     <div class="load-steps">
-      <div class="load-step active" id="ls1"><span class="step-ico">⏳</span><span>이야기 구조 &amp; 목차 생성 중...</span></div>
-      <div class="load-step" id="ls2"><span class="step-ico">⏳</span><span>챕터 1 집필 중...</span></div>
-      <div class="load-step" id="ls3"><span class="step-ico">⏳</span><span>챕터 2 집필 중...</span></div>
-      <div class="load-step" id="ls4"><span class="step-ico">⏳</span><span>챕터 3 집필 중...</span></div>
-      <div class="load-step" id="ls5"><span class="step-ico">⏳</span><span>챕터 4 집필 중...</span></div>
-      <div class="load-step" id="ls6"><span class="step-ico">⏳</span><span>챕터 5 집필 중...</span></div>
-      <div class="load-step" id="ls7"><span class="step-ico">⏳</span><span>챕터 6 집필 중...</span></div>
-      <div class="load-step" id="ls8"><span class="step-ico">⏳</span><span>챕터 7 집필 중...</span></div>
-      <div class="load-step" id="ls9"><span class="step-ico">⏳</span><span>챕터 8 집필 중...</span></div>
-      <div class="load-step" id="ls10"><span class="step-ico">⏳</span><span>챕터 9 집필 중...</span></div>
-      <div class="load-step" id="ls11"><span class="step-ico">⏳</span><span>챕터 10 집필 중...</span></div>
-      <div class="load-step" id="ls12"><span class="step-ico">⏳</span><span>마무리 및 감수 중...</span></div>
+      <div class="load-step active" id="ls1"><span class="step-ico">⏳</span><span>이야기 구조 설계 중...</span></div>
+      <div class="load-step" id="ls2"><span class="step-ico">⏳</span><span>챕터 제목 완성 중...</span></div>
+      <div class="load-step" id="ls3"><span class="step-ico">⏳</span><span>챕터 1 집필 중...</span></div>
+      <div class="load-step" id="ls4"><span class="step-ico">⏳</span><span>완성!</span></div>
     </div>
   </div>
 </div>
@@ -1526,69 +1518,69 @@ body{
 <!-- ══════════ STORY PAGE ══════════ -->
 <div id="page-story" class="page">
 
-  <!-- 1. Story Title -->
+  <!-- Story Header -->
   <div class="story-hdr" id="story-hdr">
     <div class="story-badge2">📖 나만의 AI 스토리북</div>
     <h1 class="story-main-title" id="s-title">이야기 제목</h1>
     <div class="story-author-line" id="s-author">주인공의 이야기</div>
   </div>
 
-  <!-- 2. Chapter quick-nav (filled by JS) -->
-  <div id="story-ch-nav" class="story-ch-nav" style="display:none"></div>
+  <!-- Section A: Chapter 1 (filled by JS) -->
+  <div class="ch-sec" id="ch1-section" style="max-width:760px;margin:0 auto;padding:40px 24px 40px;"></div>
 
-  <!-- 3. Table of Contents -->
+  <!-- Ornament divider -->
+  <div class="ornament">
+    <div class="orn-line"></div><div class="orn-ic">❧</div><div class="orn-line"></div>
+  </div>
+
+  <!-- Section B: Table of Contents -->
   <div class="toc-sec" id="toc-sec">
-    <h2 class="toc-title">📋 목차</h2>
+    <h2 class="toc-title">📋 전체 목차</h2>
     <ul class="toc-list" id="toc-list"></ul>
   </div>
 
-  <!-- 4. All chapters (filled by JS) -->
-  <div id="chapters-container"></div>
-
-  <!-- 4. Pricing (hidden in full-book mode) -->
-  <div class="price-sec" id="price-sec" style="display:none">
+  <!-- Section C: Purchase -->
+  <div class="price-sec" id="price-sec">
     <div class="price-wrap">
       <h2 class="price-title">완전한 이야기를 받아보세요</h2>
-      <p class="price-sub">10개의 완전한 챕터로 나만의 이야기를 완성하세요</p>
+      <p class="price-sub">나머지 9개 챕터를 지금 바로 받아보세요</p>
       <div class="price-cards">
 
         <div class="price-card">
           <div class="price-type">DIGITAL DOWNLOAD</div>
-          <div class="price-name">📱 디지털 PDF</div>
+          <div class="price-name">디지털 PDF</div>
           <div class="price-desc">전체 10챕터 즉시 다운로드</div>
           <div class="price-amt">₩9,900</div>
-          <button class="btn-price btn-p2" onclick="showCoverSelect()">PDF 다운로드</button>
+          <button class="btn-price btn-p2" onclick="showCoverSelect('digital')">PDF로 받기</button>
         </div>
 
         <div class="price-card pop">
           <div class="pop-badge">⭐ 가장 인기</div>
           <div class="price-type">PRINT BOOK</div>
-          <div class="price-name">📚 실물 책</div>
-          <div class="price-desc">나만의 책이 집으로 배송돼요</div>
+          <div class="price-name">실물 책</div>
+          <div class="price-desc">나만의 책이 집으로 배송돼요<br>PDF도 함께 제공</div>
           <div class="price-amt">₩39,900</div>
-          <button class="btn-price btn-p1" onclick="showToast()">나만의 책 주문하기</button>
+          <button class="btn-price btn-p1" onclick="showCoverSelect('physical')">책으로 받기</button>
         </div>
 
         <div class="price-card">
-          <div class="price-type">PREMIUM PACKAGE</div>
-          <div class="price-name">🎁 프리미엄 박스</div>
-          <div class="price-desc">실물 책 + 디지털 PDF + 특별 패키지</div>
-          <div class="price-amt">₩89,900</div>
-          <button class="btn-price btn-p2" onclick="showToast()">프리미엄으로 받기</button>
+          <div class="price-type">GIFT BOX</div>
+          <div class="price-name">선물 박스</div>
+          <div class="price-desc">실물 책 + PDF + 특별 패키징</div>
+          <div class="price-amt">₩59,900</div>
+          <button class="btn-price btn-p2" onclick="showCoverSelect('gift')">선물로 받기</button>
         </div>
 
       </div>
-      <p class="price-note">* 결제 시스템은 곧 오픈됩니다! 기대해주세요 😊</p>
     </div>
   </div>
 
   <div class="new-story-sec">
-    <button class="btn-pdf" onclick="downloadPDF()">📄 PDF로 저장하기</button>
-    <p class="new-story-hint" style="margin-top:28px;">다른 이야기를 만들고 싶으신가요?</p>
+    <p class="new-story-hint">다른 이야기를 만들고 싶으신가요?</p>
     <button class="btn-gold" onclick="goHome()">🔄 새 이야기 만들기</button>
   </div>
 
-  <footer class="footer"><p>© 2026 My Story AI. 모든 이야기는 AI에 의해 생성됩니다.</p></footer>
+  <footer class="footer"><p>© 2026 어나더북. 모든 이야기는 AI에 의해 생성됩니다.</p></footer>
 </div>
 
 <!-- Toast -->
@@ -1691,6 +1683,7 @@ let openaiKey = sessionStorage.getItem('openai_key') || '';
 let loadTimer = null;
 let selectedCover = 'simple'; // 'ai' or 'simple'
 let aiCoverDataUrl = null;
+let selectedProduct = 'digital'; // 'digital', 'physical', 'gift'
 
 // ──────────── QUESTIONNAIRE DATA ────────────
 const TOPICS = [
@@ -2033,12 +2026,12 @@ function markLoadStep(id){
   const s=document.getElementById(id);
   if(s){ s.classList.remove('active'); s.classList.add('done'); s.querySelector('.step-ico').textContent='✅';
     s.scrollIntoView({block:'nearest',behavior:'smooth'}); }
-  const order=['ls1','ls2','ls3','ls4','ls5','ls6','ls7','ls8','ls9','ls10','ls11','ls12'];
+  const order=['ls1','ls2','ls3','ls4'];
   const idx=order.indexOf(id);
   if(idx>=0){
     const next=document.getElementById(order[idx+1]);
     if(next) next.classList.add('active');
-    setProgress(idx===11 ? 100 : Math.round((idx+1)/12*100));
+    setProgress(idx===3 ? 100 : Math.round((idx+1)/4*100));
   }
 }
 
@@ -2060,8 +2053,7 @@ function setLoadMsg(msg){
 // ──────────── GENERATE ────────────
 async function generateStory(){
   showPage('page-loading');
-  // Reset steps and progress bar
-  ['ls1','ls2','ls3','ls4','ls5','ls6','ls7','ls8','ls9','ls10','ls11','ls12'].forEach((id,i)=>{
+  ['ls1','ls2','ls3','ls4'].forEach((id,i)=>{
     const el=document.getElementById(id);
     if(el){ el.classList.remove('done','active'); el.querySelector('.step-ico').textContent='⏳'; }
     if(i===0 && el) el.classList.add('active');
@@ -2074,28 +2066,119 @@ async function generateStory(){
     ? `You are a bestselling English novelist.\nStyle: Literary commercial fiction, warm and emotional tone.\nVocabulary: Natural adult English, accessible but sophisticated.\nProtagonist: ${ans.name}`
     : '당신은 한국어 베스트셀러 소설 작가입니다.';
   const qualityStdFn = isEnglish
-    ? (chNum) => `Write Chapter ${chNum} in English.\nTarget length: 2,000–2,500 words. Do not summarize.\nStyle: Literary commercial fiction, warm and emotional tone.\nVocabulary: Natural adult English, accessible but sophisticated.\nWrite with full dialogue, sensory descriptions, inner monologue, and vivid scenes.`
-    : (chNum) => `챕터 ${chNum} 분량: 1,500~2,000 한국어 단어 (반드시 지킬 것). 요약하지 마세요.\n출판된 한국 소설가처럼 써주세요: 완전한 대화, 감각적 묘사, 내면 독백, 생생한 장면.`;
-  const responseFormatInstr = isEnglish
-    ? '**Response format — output only the chapter body text. No part numbers, titles, JSON, or markdown. Separate paragraphs with blank lines:**'
-    : '**응답 형식 — 이 파트의 본문만 출력하세요. 파트 번호, 제목, JSON, 마크다운 없이 순수 본문만. 단락 사이는 빈 줄로 구분:**';
+    ? () => `Write Chapter 1 in English.\nTarget length: 2,000–2,500 words. Do not summarize.\nStyle: Literary commercial fiction, warm and emotional tone.\nWrite with full dialogue, sensory descriptions, inner monologue, and vivid scenes.`
+    : () => `챕터 1 분량: 1,500~2,000 한국어 단어 (반드시 지킬 것). 요약하지 마세요.\n출판된 한국 소설가처럼 써주세요: 완전한 대화, 감각적 묘사, 내면 독백, 생생한 장면.`;
 
-  const lotteryRule = ans.topic === '복권 당첨' ? `
-**복권 당첨 스토리 전용 규칙:**
-- 당첨 복권을 발견하는 장면은 반드시 두 단계의 감정적 비트로 나누어 써야 함:
-  1. 첫 번째 비트: 1등임을 인식하는 순간 — 믿기지 않는 충격과 혼란
-  2. 두 번째 비트: 핸드폰으로 당첨금을 검색해 **로또 1등 당첨금 약 30억 원**이라는 숫자를 직접 확인하는 순간 — 이 두 번째 충격이 첫 번째보다 훨씬 더 강렬하고 감정적이어야 함. 30억이라는 구체적인 숫자가 주인공에게 물리적인 충격처럼 느껴지도록 묘사할 것
-- 30억 원(약 30억 원)이라는 금액은 이 장면에서 반드시 명시적으로 언급되어야 함
-` : '';
+  const storyInfo = buildStoryInfo();
+  const rules = buildRules();
+  const lotteryRule = buildLotteryRule();
 
-  const storyInfo = `이야기 주제: ${ans.topic}
+  try {
+    // ── Step 1: Design story structure ──
+    setLoadMsg(isEnglish ? 'Designing story structure...' : '이야기 구조를 설계하고 있어요...');
+    const outlinePrompt = isEnglish
+      ? `${writerRole} Based on the information below, create the title and 10 chapter titles for a 10-chapter novel.
+
+${storyInfo}
+
+Output ONLY pure JSON, no other text:
+{"title":"novel title","subtitle":"subtitle","chapters":[{"number":1,"title":"chapter title"},{"number":2,"title":"chapter title"},{"number":3,"title":"chapter title"},{"number":4,"title":"chapter title"},{"number":5,"title":"chapter title"},{"number":6,"title":"chapter title"},{"number":7,"title":"chapter title"},{"number":8,"title":"chapter title"},{"number":9,"title":"chapter title"},{"number":10,"title":"chapter title"}]}`
+      : `당신은 한국어 베스트셀러 소설 작가입니다. 아래 정보를 바탕으로 10챕터 소설의 제목과 각 챕터 제목을 만들어주세요.
+
+${storyInfo}
+
+반드시 순수 JSON만 출력, 다른 텍스트 없이:
+{"title":"소설 제목","subtitle":"부제목","chapters":[{"number":1,"title":"챕터 제목"},{"number":2,"title":"챕터 제목"},{"number":3,"title":"챕터 제목"},{"number":4,"title":"챕터 제목"},{"number":5,"title":"챕터 제목"},{"number":6,"title":"챕터 제목"},{"number":7,"title":"챕터 제목"},{"number":8,"title":"챕터 제목"},{"number":9,"title":"챕터 제목"},{"number":10,"title":"챕터 제목"}]}`;
+
+    const outlineRaw = await apiCall(outlinePrompt, 800);
+    const outline = extractJSON(outlineRaw);
+    markLoadStep('ls1');
+
+    // ── Step 2: Chapter titles complete ──
+    setLoadMsg(isEnglish ? 'Chapter titles ready...' : '챕터 제목이 완성됐어요...');
+    await new Promise(r=>setTimeout(r,300));
+    markLoadStep('ls2');
+
+    // ── Step 3: Write Chapter 1 ──
+    setLoadMsg(isEnglish ? 'Writing Chapter 1...' : '챕터 1을 집필하고 있어요...');
+    const ch1Title = outline.chapters[0].title;
+    const ch1Prompt = isEnglish
+      ? `${writerRole}
+
+Write Chapter 1 of the novel below in full.
+
+**Novel info:**
+Title: ${outline.title}
+${storyInfo}
+
+**Full chapter outline:**
+${outline.chapters.map(c=>`Chapter ${c.number}: ${c.title}`).join('\n')}
+
+**Now writing — Chapter 1: ${ch1Title}**
+End with a moment that naturally draws the reader into Chapter 2.
+
+**Length and quality:**
+${qualityStdFn()}
+
+${rules}
+${lotteryRule}
+**Response format — output only the chapter body. No chapter number, title, JSON, or markdown. Separate paragraphs with blank lines:**`
+      : `당신은 한국어 베스트셀러 소설 작가입니다. 아래 소설의 챕터 1을 완전하게 집필해주세요.
+
+**소설 정보:**
+제목: ${outline.title}
+${storyInfo}
+
+**전체 챕터 구성:**
+${outline.chapters.map(c=>`챕터 ${c.number}: ${c.title}`).join('\n')}
+
+**현재 집필 — 챕터 1: ${ch1Title}**
+다음 챕터로 자연스럽게 이어지는 여운을 남기세요.
+
+**분량 및 품질:**
+${qualityStdFn()}
+
+${rules}
+${lotteryRule}
+**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON, 마크다운 없이 순수 본문만. 단락 사이는 빈 줄로 구분:**`;
+
+    const ch1Raw = await apiCall(ch1Prompt, 8000);
+    const ch1Content = ch1Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
+    markLoadStep('ls3');
+
+    // ── Step 4: Done ──
+    await new Promise(r=>setTimeout(r,300));
+    markLoadStep('ls4');
+    setProgress(100, isEnglish ? 'Done! 🎉' : '완성! 🎉');
+
+    story = {
+      title: outline.title,
+      subtitle: outline.subtitle,
+      allChapterTitles: outline.chapters,
+      chapters: [{number:1, title:ch1Title, content:ch1Content}]
+    };
+    stopLoading();
+    displayStory(story);
+
+  } catch(err){
+    stopLoading();
+    alert(`오류가 발생했습니다:\n${err.message}\n\nAPI 키를 확인하고 다시 시도해주세요.`);
+    showPage('page-questions');
+  }
+}
+
+// ──────────── SHARED PROMPT BUILDERS ────────────
+function buildStoryInfo(){
+  return `이야기 주제: ${ans.topic}
 주인공 이름: ${ans.name}
 주인공 나이대: ${ans.ageGroup||'없음'}
 주인공 관련 정보: ${ans.personalDetails||'없음'}
 이야기 분위기: ${ans.mood}
 특별 요청 장면: ${ans.specialScenes||'없음'}`;
+}
 
-  const rules = `**개인화 규칙:**
+function buildRules(){
+  return `**개인화 규칙:**
 1. 주인공의 이름(${ans.name})은 모든 챕터에 자연스럽게 등장해야 함
 2. 주인공 나이대(${ans.ageGroup||'없음'})에 어울리는 생활 방식, 고민, 감성으로 묘사할 것
 3. 주인공 관련 정보(${ans.personalDetails||'없음'})에 언급된 취미, 장소, 소중한 사람 등을 최소 5개 챕터에 자연스럽게 녹여줄 것
@@ -2116,174 +2199,47 @@ async function generateStory(){
 3. 초반 챕터의 작은 복선이 후반 챕터에서 결실을 맺어야 함
 4. 주인공은 10챕터에 걸쳐 뚜렷한 감정적 성장을 보여야 함
 5. 10챕터의 마지막 단락은 기억에 남고 감동적으로 마무리되어야 함`;
+}
 
-  try {
-    // ── Step 1: Outline ──
-    markLoadStep('ls1');
-    const outlinePrompt = isEnglish
-      ? `${writerRole} Based on the information below, create the title and 10 chapter titles for a 10-chapter novel.
-
-${storyInfo}
-
-Output ONLY pure JSON, no other text:
-{"title":"novel title","subtitle":"subtitle","chapters":[{"number":1,"title":"chapter title"},{"number":2,"title":"chapter title"},{"number":3,"title":"chapter title"},{"number":4,"title":"chapter title"},{"number":5,"title":"chapter title"},{"number":6,"title":"chapter title"},{"number":7,"title":"chapter title"},{"number":8,"title":"chapter title"},{"number":9,"title":"chapter title"},{"number":10,"title":"chapter title"}]}`
-      : `당신은 한국어 베스트셀러 소설 작가입니다. 아래 정보를 바탕으로 10챕터 소설의 제목과 각 챕터 제목을 만들어주세요.
-
-${storyInfo}
-
-반드시 순수 JSON만 출력, 다른 텍스트 없이:
-{"title":"소설 제목","subtitle":"부제목","chapters":[{"number":1,"title":"챕터 제목"},{"number":2,"title":"챕터 제목"},{"number":3,"title":"챕터 제목"},{"number":4,"title":"챕터 제목"},{"number":5,"title":"챕터 제목"},{"number":6,"title":"챕터 제목"},{"number":7,"title":"챕터 제목"},{"number":8,"title":"챕터 제목"},{"number":9,"title":"챕터 제목"},{"number":10,"title":"챕터 제목"}]}`;
-
-    const outlineRaw = await apiCall(outlinePrompt, 800);
-    const outline = extractJSON(outlineRaw);
-
-    // ── Steps 2–11: Generate each chapter ──
-    const chapters = [];
-    const summaries = [];
-
-    for(let i=0; i<10; i++){
-      const chNum = i+1;
-      const chTitle = outline.chapters[i].title;
-      const isLast = chNum===10;
-
-      const ls3label=document.getElementById(`ls${i+2}`);
-      if(ls3label) ls3label.querySelector('span:last-child').textContent=`챕터 ${chNum} 집필 중...`;
-      setLoadMsg(isEnglish ? `Writing Chapter ${chNum}...` : `챕터 ${chNum} 집필 중...`);
-
-      const prevChContext = summaries.length>0
-        ? (isEnglish
-            ? `\n**Previous chapters summary:**\n${summaries.join('\n')}\n`
-            : `\n**이전 챕터 요약:**\n${summaries.join('\n')}\n`)
-        : '';
-
-      const chapterPrompt = isEnglish
-        ? `${writerRole}
-
-Write Chapter ${chNum} of the novel below in full.
-
-**Novel info:**
-Title: ${outline.title}
-${storyInfo}
-
-**Full chapter outline:**
-${outline.chapters.map(c=>`Chapter ${c.number}: ${c.title}`).join('\n')}
-${prevChContext}
-**Now writing — Chapter ${chNum}: ${chTitle}**
-${isLast ? 'This is the final chapter. Bring the story to a moving, memorable conclusion.' : 'End with a moment that flows naturally into the next chapter.'}
-
-**Length and quality:**
-${qualityStdFn(chNum)}
-
-${rules}
-${lotteryRule}
-**Response format — output only the chapter body. No chapter number, title, JSON, or markdown. Separate paragraphs with blank lines:**`
-        : `당신은 한국어 베스트셀러 소설 작가입니다. 아래 소설의 챕터 ${chNum}을 완전하게 집필해주세요.
-
-**소설 정보:**
-제목: ${outline.title}
-${storyInfo}
-
-**전체 챕터 구성:**
-${outline.chapters.map(c=>`챕터 ${c.number}: ${c.title}`).join('\n')}
-${prevChContext}
-**현재 집필 — 챕터 ${chNum}: ${chTitle}**
-${isLast ? '이것은 마지막 챕터입니다. 전체 이야기를 긍정적이고 감동적으로 완결하세요. 마지막 단락은 독자의 가슴에 오래 남도록 특별히 공들여 써주세요.' : '다음 챕터로 자연스럽게 이어지는 여운을 남기세요.'}
-
-**분량 및 품질:**
-${qualityStdFn(chNum)}
-
-${rules}
-${lotteryRule}
-**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON, 마크다운 없이 순수 본문만. 단락 사이는 빈 줄로 구분:**`;
-
-      const raw = await apiCall(chapterPrompt, 8000);
-      const content = raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
-
-      chapters.push({number:chNum, title:chTitle, content});
-      const summaryExcerpt = content.substring(0,400).replace(/\n/g,' ');
-      summaries.push(isEnglish
-        ? `Chapter ${chNum} "${chTitle}": ${summaryExcerpt}...`
-        : `챕터 ${chNum} "${chTitle}": ${summaryExcerpt}...`);
-
-      const wc = content.split(/\s+/).filter(w=>w.length>0).length;
-      setLoadMsg(isEnglish ? `Chapter ${chNum} done ✓ (~${wc.toLocaleString()} words)` : `챕터 ${chNum} 완료 ✓ (~${wc.toLocaleString()} 단어)`);
-      markLoadStep(`ls${i+2}`);
-      await new Promise(r=>setTimeout(r,400));
-    }
-
-    // ── Step 12: Finish ──
-    markLoadStep('ls12');
-    setProgress(100, isEnglish ? 'Done! 🎉' : '완성! 🎉');
-    story = {title:outline.title, subtitle:outline.subtitle, allChapterTitles:outline.chapters, chapters};
-    stopLoading();
-    displayStory(story);
-
-  } catch(err){
-    stopLoading();
-    alert(`오류가 발생했습니다:\n${err.message}\n\nAPI 키를 확인하고 다시 시도해주세요.`);
-    showPage('page-questions');
-  }
+function buildLotteryRule(){
+  return ans.topic === '복권 당첨' ? `
+**복권 당첨 스토리 전용 규칙:**
+- 당첨 복권을 발견하는 장면은 반드시 두 단계의 감정적 비트로 나누어 써야 함:
+  1. 첫 번째 비트: 1등임을 인식하는 순간 — 믿기지 않는 충격과 혼란
+  2. 두 번째 비트: 핸드폰으로 당첨금을 검색해 **로또 1등 당첨금 약 30억 원**이라는 숫자를 직접 확인하는 순간 — 이 두 번째 충격이 첫 번째보다 훨씬 더 강렬하고 감정적이어야 함
+- 30억 원이라는 금액은 이 장면에서 반드시 명시적으로 언급되어야 함
+` : '';
 }
 
 // ──────────── DISPLAY STORY ────────────
 function displayStory(d){
   const isEn = selectedLang === 'en';
+  const ch1 = d.chapters[0];
 
   document.getElementById('s-title').textContent = d.title;
   document.getElementById('s-author').textContent = isEn ? `${ans.name}'s Story` : `${ans.name}의 이야기`;
 
-  const totalWords = d.chapters.reduce((sum,ch)=>sum+ch.content.split(/\s+/).filter(w=>w.length>0).length, 0);
-  let wcEl = document.getElementById('s-wordcount');
-  if(!wcEl){
-    wcEl = document.createElement('div');
-    wcEl.id = 's-wordcount';
-    wcEl.style.cssText = "color:rgba(201,168,76,.75);font-family:'Noto Sans KR',sans-serif;font-size:13px;margin-top:10px;letter-spacing:.5px;";
-    document.getElementById('s-author').insertAdjacentElement('afterend', wcEl);
-  }
-  wcEl.textContent = isEn ? `Total: ${totalWords.toLocaleString()} words` : `총 ${totalWords.toLocaleString()} 단어`;
+  // Section A: Chapter 1
+  const ch1Section = document.getElementById('ch1-section');
+  ch1Section.innerHTML = `
+    <div class="ch-hdr">
+      <div class="ch-label">CHAPTER 1 · 무료 미리보기</div>
+      <h2 class="ch-title">${ch1.title}</h2>
+    </div>
+    <div class="ch-content">${fmtContent(ch1.content)}</div>`;
 
-  // Chapter quick-nav
-  const navEl = document.getElementById('story-ch-nav');
-  navEl.style.display = 'block';
-  navEl.innerHTML = `<div class="story-ch-nav-inner">${
-    d.chapters.map(ch=>`<a class="ch-nav-btn" href="#ch-anchor-${ch.number}">${isEn?'Ch.':'챕터 '}${ch.number}</a>`).join('')
-  }</div>`;
-
-  // TOC with anchor links
+  // Section B: TOC (all 10 chapters)
   const tocEl = document.getElementById('toc-list');
   tocEl.innerHTML = '';
-  d.chapters.forEach(ch=>{
+  d.allChapterTitles.forEach((ch, i)=>{
     const li = document.createElement('li');
     li.className = 'toc-row';
-    li.style.cursor = 'pointer';
-    li.onclick = ()=>document.getElementById(`ch-anchor-${ch.number}`)?.scrollIntoView({behavior:'smooth'});
+    const isFirst = i === 0;
     li.innerHTML = `
       <span class="toc-num">${ch.number}</span>
-      <span class="toc-ch-title" style="color:var(--burg)">${ch.title}</span>
-      <span class="toc-status toc-free">↓ ${isEn?'Go':'이동'}</span>`;
+      <span class="toc-ch-title">${ch.title}</span>
+      <span class="toc-status ${isFirst ? 'toc-free' : 'toc-lock'}">${isFirst ? '✅ 읽음' : '🔒'}</span>`;
     tocEl.appendChild(li);
-  });
-
-  // All chapters
-  const container = document.getElementById('chapters-container');
-  container.innerHTML = '';
-  d.chapters.forEach((ch,i)=>{
-    const sec = document.createElement('div');
-    sec.className = 'ch-sec';
-    sec.id = `ch-anchor-${ch.number}`;
-    sec.innerHTML = `
-      <div class="ch-hdr">
-        <div class="ch-label">${isEn?'CHAPTER':'챕터'} ${ch.number}</div>
-        <h2 class="ch-title">${ch.title}</h2>
-      </div>
-      <div class="ch-content">${fmtContent(ch.content)}</div>`;
-    container.appendChild(sec);
-    if(i < d.chapters.length-1){
-      const orn = document.createElement('div');
-      orn.className = 'ornament';
-      orn.innerHTML = '<div class="orn-line"></div><div class="orn-ic">❧</div><div class="orn-line"></div>';
-      container.appendChild(orn);
-    }
   });
 
   showPage('page-story');
@@ -2295,7 +2251,7 @@ function fmtContent(txt){
     .map(p=>`<p>${p.trim()}</p>`).join('');
 }
 
-// ──────────── PDF DOWNLOAD ────────────
+// ──────────── PDF DOWNLOAD (legacy – kept for safety, unused) ────────────
 async function downloadPDF() {
   if (!story) return;
 
@@ -2551,7 +2507,8 @@ ${chaptersHTML}
 }
 
 // ──────────── COVER SELECT ────────────
-function showCoverSelect(){
+function showCoverSelect(type){
+  selectedProduct = type || 'digital';
   if(!story){ startStory(); return; }
   aiCoverDataUrl = null;
   selectedCover = 'simple';
@@ -2672,17 +2629,92 @@ async function generateAiCover(){
 
 function retryAiCover(){ generateAiCover(); }
 
-// ──────────── PDF GENERATION (jsPDF) ────────────
+// ──────────── PDF GENERATION (jsPDF text-based) ────────────
 async function confirmCoverAndMakePDF(){
   if(!story) return;
   const overlay = document.getElementById('pdf-progress-overlay');
   const barEl   = document.getElementById('pdf-progress-bar');
   const msgEl   = document.getElementById('pdf-progress-msg');
+  const titleEl = overlay.querySelector('.pdf-prog-title');
+  const iconEl  = overlay.querySelector('.pdf-prog-icon');
   overlay.style.display='flex';
   const sp=(pct,txt)=>{ barEl.style.width=pct+'%'; msgEl.textContent=txt; };
 
   try {
-    sp(5,'PDF 라이브러리 불러오는 중...');
+    // ── Phase 1: Generate chapters 2–10 if not already done ──
+    if(story.chapters.length < 10){
+      if(titleEl) titleEl.textContent='나머지 챕터를 생성하고 있어요...';
+      if(iconEl) iconEl.textContent='📖';
+      sp(0,'준비 중...');
+
+      const isEnglish = selectedLang === 'en';
+      const writerRole = isEnglish
+        ? `You are a bestselling English novelist.\nStyle: Literary commercial fiction, warm and emotional tone.\nVocabulary: Natural adult English, accessible but sophisticated.\nProtagonist: ${ans.name}`
+        : '당신은 한국어 베스트셀러 소설 작가입니다.';
+      const qualityStdFn = isEnglish
+        ? (n) => `Write Chapter ${n} in English.\nTarget length: 2,000–2,500 words. Do not summarize.\nStyle: Literary commercial fiction, warm and emotional tone.\nWrite with full dialogue, sensory descriptions, inner monologue, and vivid scenes.`
+        : (n) => `챕터 ${n} 분량: 1,500~2,000 한국어 단어 (반드시 지킬 것). 요약하지 마세요.\n출판된 한국 소설가처럼 써주세요: 완전한 대화, 감각적 묘사, 내면 독백, 생생한 장면.`;
+      const storyInfo = buildStoryInfo();
+      const rules = buildRules();
+      const lotteryRule = buildLotteryRule();
+      const outline = story.allChapterTitles;
+
+      const summaries = [
+        isEnglish
+          ? `Chapter 1 "${story.chapters[0].title}": ${story.chapters[0].content.substring(0,400).replace(/\n/g,' ')}...`
+          : `챕터 1 "${story.chapters[0].title}": ${story.chapters[0].content.substring(0,400).replace(/\n/g,' ')}...`
+      ];
+
+      for(let i=1; i<10; i++){
+        const chNum = i+1;
+        const chTitle = outline[i].title;
+        const isLast = chNum===10;
+        sp(Math.round(i/9*58), `챕터 ${chNum} 작성 중... (${chNum}/10)`);
+
+        const prevCtx = isEnglish
+          ? `\n**Previous chapters summary:**\n${summaries.join('\n')}\n`
+          : `\n**이전 챕터 요약:**\n${summaries.join('\n')}\n`;
+
+        const chPrompt = isEnglish
+          ? `${writerRole}
+Write Chapter ${chNum} of the novel below in full.
+**Novel info:** Title: ${story.title}
+${storyInfo}
+**Full chapter outline:**
+${outline.map(c=>`Chapter ${c.number}: ${c.title}`).join('\n')}
+${prevCtx}
+**Now writing — Chapter ${chNum}: ${chTitle}**
+${isLast ? 'Final chapter. Bring the story to a moving, memorable conclusion.' : 'End naturally into the next chapter.'}
+**Length and quality:** ${qualityStdFn(chNum)}
+${rules}
+${lotteryRule}
+**Response format — output only the chapter body. No chapter number, title, JSON, or markdown. Separate paragraphs with blank lines:**`
+          : `당신은 한국어 베스트셀러 소설 작가입니다. 아래 소설의 챕터 ${chNum}을 완전하게 집필해주세요.
+**소설 정보:** 제목: ${story.title}
+${storyInfo}
+**전체 챕터 구성:**
+${outline.map(c=>`챕터 ${c.number}: ${c.title}`).join('\n')}
+${prevCtx}
+**현재 집필 — 챕터 ${chNum}: ${chTitle}**
+${isLast ? '이것은 마지막 챕터입니다. 전체 이야기를 긍정적이고 감동적으로 완결하세요. 마지막 단락은 독자의 가슴에 오래 남도록 특별히 공들여 써주세요.' : '다음 챕터로 자연스럽게 이어지는 여운을 남기세요.'}
+**분량 및 품질:** ${qualityStdFn(chNum)}
+${rules}
+${lotteryRule}
+**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON, 마크다운 없이 순수 본문만. 단락 사이는 빈 줄로 구분:**`;
+
+        const raw = await apiCall(chPrompt, 8000);
+        const content = raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
+        story.chapters.push({number:chNum, title:chTitle, content});
+        summaries.push(isEnglish
+          ? `Chapter ${chNum} "${chTitle}": ${content.substring(0,400).replace(/\n/g,' ')}...`
+          : `챕터 ${chNum} "${chTitle}": ${content.substring(0,400).replace(/\n/g,' ')}...`);
+      }
+    }
+
+    // ── Phase 2: Build PDF with jsPDF text() ──
+    if(titleEl) titleEl.textContent='PDF 생성 중';
+    if(iconEl) iconEl.textContent='📄';
+    sp(62,'PDF 라이브러리 불러오는 중...');
 
     if(!window.jspdf){
       await new Promise((res,rej)=>{
@@ -2692,20 +2724,12 @@ async function confirmCoverAndMakePDF(){
         document.head.appendChild(s);
       });
     }
-    if(!window.html2canvas){
-      await new Promise((res,rej)=>{
-        const s=document.createElement('script');
-        s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-        s.onload=res; s.onerror=()=>rej(new Error('html2canvas CDN 로드 실패'));
-        document.head.appendChild(s);
-      });
-    }
 
-    sp(10,'표지 준비 중...');
+    sp(65,'표지 준비 중...');
     await document.fonts.ready;
 
     const {jsPDF} = window.jspdf;
-    const pdf = new jsPDF({orientation:'portrait', unit:'mm', format:[127,188], compress:true});
+    const doc = new jsPDF({orientation:'portrait', unit:'mm', format:[127,188], compress:true});
 
     // ── Cover page ──
     if(selectedCover==='ai' && aiCoverDataUrl){
@@ -2714,74 +2738,109 @@ async function confirmCoverAndMakePDF(){
       const cx=cc.getContext('2d');
       cx.fillStyle='#FDFAF5'; cx.fillRect(0,0,cW,cH);
       cx.fillStyle='#2C2C2C'; cx.textAlign='center';
-      cx.font='bold 24px "Noto Serif KR",serif';
-      coverWrapText(cx, story.title, cW/2, 40, cW-60, 30);
+      cx.font='bold 26px "Noto Serif KR",serif';
+      coverWrapText(cx, story.title, cW/2, 56, cW-60, 34);
       const img=new Image(); img.src=aiCoverDataUrl;
       await new Promise(r=>{img.onload=r; img.onerror=r;});
-      cx.drawImage(img, 0, 76, cW, cH*0.73);
+      cx.drawImage(img, 0, 88, cW, Math.round(cH*0.73));
       cx.fillStyle='#2C2C2C';
-      cx.font='16px "Noto Serif KR",serif';
+      cx.font='14px "Noto Serif KR",serif';
       cx.fillText(ans.author||'어나더북', cW/2, cH-22);
-      pdf.addImage(cc.toDataURL('image/jpeg',0.92),'JPEG',0,0,127,188);
+      doc.addImage(cc.toDataURL('image/jpeg',0.92),'JPEG',0,0,127,188);
     } else {
       const sc=document.getElementById('simple-cover-canvas');
-      pdf.addImage(sc.toDataURL('image/jpeg',0.92),'JPEG',0,0,127,188);
+      doc.addImage(sc.toDataURL('image/jpeg',0.92),'JPEG',0,0,127,188);
     }
 
-    // ── Chapter pages ──
-    const PW=480, PH=711, SCALE=2;
-    const authorName = ans.author||'어나더북';
+    // ── Chapter pages using text() ──
+    const PW=127, PH=188;
+    const mL=13, mR=13, mTop=15, mBot=18;
+    const textW = PW - mL - mR;
+    let globalPage = 1;
+
+    const drawPageHeader = () => {
+      doc.setFontSize(8);
+      doc.setTextColor(150,150,150);
+      const shortTitle = story.title.length > 28 ? story.title.substring(0,28)+'...' : story.title;
+      doc.text(shortTitle, PW - mR, mTop - 3, {align:'right'});
+      doc.setDrawColor(196,168,130);
+      doc.setLineWidth(0.25);
+      doc.line(mL, mTop - 0.5, PW - mR, mTop - 0.5);
+    };
+
+    const drawPageNum = (y) => {
+      doc.setFontSize(8);
+      doc.setTextColor(150,150,150);
+      doc.text(String(globalPage), PW/2, PH - 5, {align:'center'});
+    };
 
     for(let ci=0; ci<story.chapters.length; ci++){
-      const ch=story.chapters[ci];
-      sp(20+Math.round(ci/story.chapters.length*70), `챕터 ${ch.number} 렌더링 중...`);
+      const ch = story.chapters[ci];
+      sp(65 + Math.round((ci+1)/story.chapters.length*30), `챕터 ${ch.number} PDF 작성 중...`);
+      doc.addPage();
+      globalPage++;
 
-      const paras=ch.content.split(/\n\n+|\n/).filter(p=>p.trim());
-      const parasHTML=paras.map((p,i)=>`<p style="font-size:11px;line-height:1.9;color:#2C2C2C;margin:0 0 8px 0;font-family:'Noto Serif KR',serif;${i===0?'text-indent:0':'text-indent:20px'}">${p.trim()}</p>`).join('');
+      drawPageHeader();
+      let y = mTop + 10;
 
-      const div=document.createElement('div');
-      div.style.cssText=`position:fixed;top:-99999px;left:-99999px;width:${PW}px;background:#FDFAF5;box-sizing:border-box;padding:57px 45px 68px;`;
-      div.innerHTML=`
-        <div style="text-align:right;font-size:8px;color:#888888;font-family:'Noto Sans KR',sans-serif;margin-bottom:5px;">${htmlEsc(story.title)}</div>
-        <div style="width:100%;height:1px;background:#C4A882;margin-bottom:22px;"></div>
-        <div style="text-align:center;font-size:9px;letter-spacing:3px;color:#C4A882;font-family:'Noto Sans KR',sans-serif;margin-bottom:10px;">CHAPTER ${ch.number}</div>
-        <div style="text-align:center;font-size:16px;font-weight:700;color:#3D5A47;font-family:'Noto Serif KR',serif;line-height:1.4;margin-bottom:12px;">${htmlEsc(ch.title)}</div>
-        <div style="text-align:center;font-size:10px;color:#C4A882;margin-bottom:22px;">── ✦ ──</div>
-        <div>${parasHTML}</div>`;
-      document.body.appendChild(div);
+      // CHAPTER N label
+      doc.setFontSize(9);
+      doc.setTextColor(196,168,130);
+      doc.text(`CHAPTER ${ch.number}`, PW/2, y, {align:'center'});
+      y += 7;
 
-      const chCanvas=await html2canvas(div,{scale:SCALE,useCORS:true,backgroundColor:'#FDFAF5',logging:false,windowWidth:PW});
-      document.body.removeChild(div);
+      // Chapter title
+      doc.setFontSize(14);
+      doc.setFont('helvetica','bold');
+      doc.setTextColor(61,90,71);
+      const titleLines = doc.splitTextToSize(ch.title, textW);
+      doc.text(titleLines, PW/2, y, {align:'center'});
+      y += titleLines.length * 7 + 4;
 
-      const totalH=chCanvas.height;
-      const pageH=PH*SCALE;
-      let offset=0, pgNum=1;
-      while(offset<totalH){
-        pdf.addPage();
-        const sl=document.createElement('canvas');
-        sl.width=chCanvas.width;
-        sl.height=Math.min(pageH, totalH-offset);
-        const sc2=sl.getContext('2d');
-        sc2.fillStyle='#FDFAF5'; sc2.fillRect(0,0,sl.width,sl.height);
-        sc2.drawImage(chCanvas,0,-offset);
-        // Page number
-        sc2.fillStyle='#888888';
-        sc2.font=`${9*SCALE}px "Noto Sans KR",sans-serif`;
-        sc2.textAlign='center';
-        sc2.fillText(String(ci*4+pgNum+1), sl.width/2, sl.height-12*SCALE);
-        pdf.addImage(sl.toDataURL('image/jpeg',0.88),'JPEG',0,0,127,188);
-        offset+=pageH; pgNum++;
+      // Separator
+      doc.setFontSize(10);
+      doc.setFont('helvetica','normal');
+      doc.setTextColor(196,168,130);
+      doc.text('- * -', PW/2, y, {align:'center'});
+      y += 10;
+
+      // Body text
+      doc.setFontSize(10);
+      doc.setFont('helvetica','normal');
+      doc.setTextColor(44,44,44);
+
+      const paras = ch.content.split(/\n\n+|\n/).filter(p=>p.trim());
+      for(const para of paras){
+        const lines = doc.splitTextToSize(para.trim(), textW);
+        for(const line of lines){
+          if(y + 6 > PH - mBot){
+            drawPageNum();
+            doc.addPage();
+            globalPage++;
+            drawPageHeader();
+            y = mTop + 8;
+            doc.setFontSize(10);
+            doc.setFont('helvetica','normal');
+            doc.setTextColor(44,44,44);
+          }
+          doc.text(line, mL, y);
+          y += 6;
+        }
+        y += 3;
       }
+      drawPageNum();
     }
 
     sp(96,'저장 중...');
-    pdf.save(`${story.title}.pdf`);
+    doc.save(`${story.title}.pdf`);
     sp(100,'완료!');
+
     setTimeout(()=>{
       overlay.style.display='none';
       const suc=document.getElementById('pdf-success-msg');
+      suc.textContent='✅ PDF 다운로드 완료!';
       suc.style.display='block';
-      setTimeout(()=>{suc.style.display='none';},5000);
+      setTimeout(()=>{ suc.style.display='none'; },5000);
     },500);
 
   } catch(err){
