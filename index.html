@@ -1269,6 +1269,59 @@ body{
   box-shadow: 0 8px 32px rgba(61,90,71,0.4);
   white-space: nowrap;
 }
+
+/* ── COVER SELECT PAGE ── */
+.cover-sel-card {
+  background: white;
+  border: 2.5px solid var(--cream-dp);
+  border-radius: 16px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all .22s;
+  width: 300px;
+  position: relative;
+}
+.cover-sel-card:hover { border-color: var(--gold); }
+.cover-sel-card.sel {
+  border-color: var(--lp-green);
+  box-shadow: 0 0 0 1px var(--lp-green);
+}
+.cover-card-badge {
+  position: absolute;
+  top: -11px;
+  right: 16px;
+  background: linear-gradient(135deg, #C9A84C, #DFC06E);
+  color: #4A0F1C;
+  padding: 4px 14px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'Noto Sans KR', sans-serif;
+  box-shadow: 0 2px 8px rgba(201,168,76,.35);
+}
+.cover-card-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--lp-text);
+  text-align: center;
+  margin-bottom: 16px;
+}
+.cover-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(61,90,71,.15);
+  border-top-color: #3D5A47;
+  border-radius: 50%;
+  animation: cover-spin .8s linear infinite;
+  margin: 0 auto;
+}
+@keyframes cover-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 680px) {
+  .cover-sel-card { width: 100%; }
+  #cover-cards-row { flex-direction: column !important; align-items: center; }
+}
 </style>
 </head>
 <body>
@@ -1362,7 +1415,7 @@ body{
           <div class="lp-price-name">디지털 PDF</div>
           <div class="lp-price-desc">전체 10챕터 즉시 다운로드</div>
           <div class="lp-price-amt">₩9,900</div>
-          <button class="lp-btn-price lp-btn-price-outline" onclick="showToast()">PDF 다운로드</button>
+          <button class="lp-btn-price lp-btn-price-outline" onclick="showCoverSelect()">PDF 다운로드</button>
         </div>
 
         <div class="lp-price-card lp-featured">
@@ -1403,7 +1456,7 @@ body{
 <div id="modal-api" class="overlay">
   <div class="modal-box">
     <div class="modal-icon">🔑</div>
-    <h3 class="modal-title">Anthropic API 키 입력</h3>
+    <h3 class="modal-title">API 키 입력</h3>
     <p class="modal-desc">
       이야기를 생성하려면 Anthropic API 키가 필요합니다.<br>
       <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>에서 무료로 발급받으세요.<br><br>
@@ -1411,6 +1464,10 @@ body{
     </p>
     <input type="password" id="api-inp" class="inp" placeholder="sk-ant-api03-..."
       onkeydown="if(event.key==='Enter')submitKey()">
+    <p style="font-size:13px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:var(--txt-md);text-align:left;margin-bottom:6px;">OpenAI API 키 (DALL-E 표지 생성용)</p>
+    <input type="password" id="openai-inp" class="inp" placeholder="sk-proj-..."
+      onkeydown="if(event.key==='Enter')submitKey()">
+    <p style="font-size:12px;color:var(--txt-lt);font-family:'Noto Sans KR',sans-serif;text-align:left;margin-bottom:14px;margin-top:-8px;">표지 AI 이미지 생성에만 사용돼요. 없으면 심플 표지가 자동 선택됩니다.</p>
     <div id="api-err" class="err"></div>
     <button class="btn-gold" onclick="submitKey()" style="width:100%;justify-content:center;display:flex;">
       이야기 만들기 시작 →
@@ -1500,7 +1557,7 @@ body{
           <div class="price-name">📱 디지털 PDF</div>
           <div class="price-desc">전체 10챕터 즉시 다운로드</div>
           <div class="price-amt">₩9,900</div>
-          <button class="btn-price btn-p2" onclick="showToast()">PDF 다운로드</button>
+          <button class="btn-price btn-p2" onclick="showCoverSelect()">PDF 다운로드</button>
         </div>
 
         <div class="price-card pop">
@@ -1552,6 +1609,68 @@ body{
 <!-- PDF Success Toast -->
 <div id="pdf-success-msg">PDF가 준비됐어요!<br>선물용으로 출력하거나 디지털로 전송하세요 📖</div>
 
+<!-- ══════════ COVER SELECT PAGE ══════════ -->
+<div id="page-cover-select" class="page">
+  <header class="q-header">
+    <div class="q-logo">📖 어나더북</div>
+    <div class="q-spacer"></div>
+    <div class="q-spacer"></div>
+  </header>
+
+  <div style="max-width:840px;margin:0 auto;padding:48px 24px 72px;">
+    <h2 style="text-align:center;font-family:'Noto Serif KR',serif;font-size:26px;font-weight:700;color:#2C2C2C;margin-bottom:8px;">📖 표지를 선택해주세요</h2>
+    <p style="text-align:center;color:var(--txt-lt);font-family:'Noto Sans KR',sans-serif;font-size:14px;margin-bottom:44px;">마음에 드는 표지를 선택하세요</p>
+
+    <div id="cover-cards-row" style="display:flex;gap:28px;justify-content:center;flex-wrap:wrap;margin-bottom:40px;">
+
+      <!-- Card 1: AI Image Cover -->
+      <div id="cover-card-ai" class="cover-sel-card" onclick="selectCoverCard('ai')">
+        <div class="cover-card-badge">추천</div>
+        <h3 class="cover-card-title">✨ AI 이미지 표지</h3>
+        <div id="ai-cover-loading" style="text-align:center;padding:48px 20px;">
+          <div class="cover-spinner"></div>
+          <p style="margin-top:14px;font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--txt-lt);">AI 이미지 생성 중...</p>
+          <p style="font-family:'Noto Sans KR',sans-serif;font-size:12px;color:var(--txt-lt);margin-top:5px;">최대 30초 소요</p>
+        </div>
+        <div id="ai-cover-preview" style="display:none;">
+          <div style="background:#FDFAF5;border-radius:8px;padding:16px 12px;text-align:center;">
+            <div id="ai-book-title" style="font-family:'Noto Serif KR',serif;font-weight:700;font-size:16px;color:#2C2C2C;margin-bottom:10px;padding:0 8px;line-height:1.4;"></div>
+            <img id="ai-cover-img" style="width:100%;border-radius:4px;display:block;" alt="AI 표지 이미지" crossorigin="anonymous">
+            <div id="ai-author-name" style="font-family:'Noto Serif KR',serif;font-size:13px;color:#2C2C2C;margin-top:10px;"></div>
+          </div>
+        </div>
+        <div id="ai-cover-error" style="display:none;text-align:center;padding:36px 16px;">
+          <p id="ai-cover-error-msg" style="color:#b91c1c;font-family:'Noto Sans KR',sans-serif;font-size:13px;margin-bottom:14px;line-height:1.6;"></p>
+          <button onclick="retryAiCover()" style="background:none;border:1.5px solid var(--burg);color:var(--burg);padding:8px 20px;border-radius:20px;font-size:13px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;">다시 시도</button>
+        </div>
+      </div>
+
+      <!-- Card 2: Simple Cover -->
+      <div id="cover-card-simple" class="cover-sel-card sel" onclick="selectCoverCard('simple')">
+        <h3 class="cover-card-title">📝 심플 표지</h3>
+        <div style="display:flex;justify-content:center;">
+          <canvas id="simple-cover-canvas" width="254" height="376"
+            style="border-radius:3px 8px 8px 3px;box-shadow:-4px 4px 16px rgba(0,0,0,.28);"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirm Button -->
+    <div style="text-align:center;">
+      <button id="confirm-cover-btn" onclick="confirmCoverAndMakePDF()"
+        style="background:#3D5A47;color:white;border:none;width:100%;max-width:480px;padding:18px 32px;font-size:16px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border-radius:50px;cursor:pointer;transition:all .3s;box-shadow:0 4px 20px rgba(61,90,71,.3);">
+        이 표지로 PDF 만들기 →
+      </button>
+      <p style="margin-top:18px;">
+        <button onclick="goBackFromCoverSelect()"
+          style="background:none;border:none;color:var(--txt-lt);cursor:pointer;font-size:13px;font-family:'Noto Sans KR',sans-serif;">
+          ← 이야기로 돌아가기
+        </button>
+      </p>
+    </div>
+  </div>
+</div>
+
 <script>
 // ──────────── DEV MODE ────────────
 // Set to true to bypass chapter lock and show all 10 chapters without payment.
@@ -1568,7 +1687,10 @@ let ans = {};
 let selectedLang = 'ko'; // "ko" or "en"
 let story = null;
 let apiKey = sessionStorage.getItem('ms_api') || '';
+let openaiKey = sessionStorage.getItem('openai_key') || '';
 let loadTimer = null;
+let selectedCover = 'simple'; // 'ai' or 'simple'
+let aiCoverDataUrl = null;
 
 // ──────────── QUESTIONNAIRE DATA ────────────
 const TOPICS = [
@@ -1627,6 +1749,8 @@ function submitKey(){
   }
   apiKey = v;
   sessionStorage.setItem('ms_api', apiKey);
+  const ov = (document.getElementById('openai-inp')?.value||'').trim();
+  if(ov){ openaiKey = ov; sessionStorage.setItem('openai_key', openaiKey); }
   document.getElementById('modal-api').classList.remove('open');
   err.style.display='none';
   curStep=1; ans={}; selectedLang='ko';
@@ -1636,17 +1760,17 @@ function submitKey(){
 
 // ──────────── STEP RENDERER ────────────
 function renderStep(){
-  const pct = ((curStep-1)/6*100).toFixed(0);
+  const pct = ((curStep-1)/7*100).toFixed(0);
   document.getElementById('prog-fill').style.width = pct+'%';
-  document.getElementById('prog-txt').textContent = `${curStep-1} / 5`;
+  document.getElementById('prog-txt').textContent = `${curStep} / 7`;
   const body = document.getElementById('q-body');
   body.style.animation='none'; void body.offsetHeight; body.style.animation='fadeUp .4s ease';
-  [null,renderLangStep,renderStep1,renderStep2,renderStep3,renderStep4,renderStep5][curStep](body);
+  [null,renderLangStep,renderStep1,renderStep2,renderStep3,renderStep4,renderStep5,renderAuthorStep][curStep](body);
 }
 
 function renderLangStep(body){
   body.innerHTML = `
-    <div class="q-num">STEP 0 / 5</div>
+    <div class="q-num">STEP 1 / 7</div>
     <h2 class="q-title">어떤 언어로 책을 만들까요?<br><span style="font-size:18px;font-weight:400;color:var(--txt-lt)">What language for your book?</span></h2>
     <p class="q-sub" style="margin-bottom:30px;"></p>
     <div class="lang-grid">
@@ -1675,7 +1799,7 @@ function pickLang(lang){
 
 function renderStep1(body){
   body.innerHTML = `
-    <div class="q-num">STEP 1 / 5</div>
+    <div class="q-num">STEP 2 / 7</div>
     <h2 class="q-title">주인공을 소개해주세요</h2>
     <p class="q-sub">이야기의 주인공이 될 분의 이름과 나이대를 알려주세요</p>
     <input class="txt-inp" id="inp-name" placeholder="이름을 입력해주세요... (예: 지수, 민준, 소연)" value="${ans.name||''}" onkeydown="if(event.key==='Enter')nextStep()">
@@ -1693,7 +1817,7 @@ function renderStep1(body){
 
 function renderStep2(body){
   body.innerHTML = `
-    <div class="q-num">STEP 2 / 5</div>
+    <div class="q-num">STEP 3 / 7</div>
     <h2 class="q-title">주인공에 대해 더 알려주세요</h2>
     <p class="q-sub">아래 예시를 참고해서 자유롭게 적어주세요. 이야기에 자연스럽게 녹아들어요.</p>
     <div class="hint-grid">
@@ -1722,7 +1846,7 @@ function renderStep3(body){
       <span class="opt-lbl">${t.l}</span>
     </div>`).join('');
   body.innerHTML = `
-    <div class="q-num">STEP 3 / 5</div>
+    <div class="q-num">STEP 4 / 7</div>
     <h2 class="q-title">어떤 이야기를 원하시나요?</h2>
     <p class="q-sub">주인공이 경험하게 될 이야기의 주제를 선택해주세요</p>
     <div class="cards-grid">${cards}</div>
@@ -1742,7 +1866,7 @@ function renderStep4(body){
       <span class="opt-lbl">${m.l}</span>
     </div>`).join('');
   body.innerHTML = `
-    <div class="q-num">STEP 4 / 5</div>
+    <div class="q-num">STEP 5 / 7</div>
     <h2 class="q-title">이야기의 분위기는?</h2>
     <p class="q-sub">어떤 감성의 이야기를 원하세요?</p>
     <div class="cards-grid small">${cards}</div>
@@ -1754,7 +1878,7 @@ function renderStep4(body){
 
 function renderStep5(body){
   body.innerHTML = `
-    <div class="q-num">STEP 5 / 5</div>
+    <div class="q-num">STEP 6 / 7</div>
     <h2 class="q-title">특별히 넣고 싶은 장면이 있나요?</h2>
     <p class="q-sub">아래 예시를 참고해서 원하는 장면을 자유롭게 적어주세요</p>
     <div class="hint-grid">
@@ -1766,10 +1890,28 @@ function renderStep5(body){
     <div class="q-nav">
       <button class="btn-back" onclick="prevStep()">← 이전</button>
       <div class="step-nav-right">
-        <button class="btn-skip" onclick="skipAndGenerate()">건너뛰기 🤖</button>
-        <button class="btn-submit" onclick="submitAndGenerate()">✨ 이야기 만들기</button>
+        <button class="btn-skip" onclick="skipToAuthor()">건너뛰기 🤖</button>
+        <button class="btn-next" onclick="nextStep()">다음 →</button>
       </div>
     </div>`;
+}
+
+function renderAuthorStep(body){
+  body.innerHTML = `
+    <div class="q-num">STEP 7 / 7</div>
+    <h2 class="q-title">저자명을 입력해주세요</h2>
+    <p class="q-sub">책 표지와 내지에 들어갈 이름이에요</p>
+    <input class="txt-inp" id="inp-author" placeholder="어나더북" value="${ans.author||''}"
+      onkeydown="if(event.key==='Enter')submitWithAuthor()">
+    <div class="tip-box">💡 본인 이름, 선물받는 분 이름, 또는 그냥 두시면 '어나더북'으로 설정돼요</div>
+    <div class="q-nav">
+      <button class="btn-back" onclick="prevStep()">← 이전</button>
+      <div class="step-nav-right">
+        <button class="btn-skip" onclick="skipAuthorAndGenerate()">건너뛰기 🤖</button>
+        <button class="btn-submit" onclick="submitWithAuthor()">✨ 이야기 만들기</button>
+      </div>
+    </div>`;
+  setTimeout(()=>document.getElementById('inp-author')?.focus(),80);
 }
 
 // ──────────── STEP PICKERS ────────────
@@ -1816,15 +1958,19 @@ function nextStep(){
   if(curStep===5){
     if(!ans.mood){alert('분위기를 선택해주세요.');return;}
   }
-  if(curStep<6){curStep++;renderStep();}
+  if(curStep===6){
+    ans.specialScenes=(document.getElementById('inp-scenes')?.value||'').trim();
+  }
+  if(curStep<7){curStep++;renderStep();}
 }
 function prevStep(){
   if(curStep>1){curStep--;renderStep();}
   else goHome();
 }
 function skipStep2(){ ans.personalDetails=''; curStep=4; renderStep(); }
-function skipAndGenerate(){ ans.specialScenes=''; generateStory(); }
-function submitAndGenerate(){ ans.specialScenes=(document.getElementById('inp-scenes')?.value||'').trim(); generateStory(); }
+function skipToAuthor(){ ans.specialScenes=''; curStep=7; renderStep(); }
+function skipAuthorAndGenerate(){ ans.author='어나더북'; generateStory(); }
+function submitWithAuthor(){ ans.author=(document.getElementById('inp-author')?.value||'').trim()||'어나더북'; generateStory(); }
 
 // ──────────── LOADING ────────────
 const MSGS = [
@@ -2402,6 +2548,251 @@ ${chaptersHTML}
 </div>
 
 </div>`;
+}
+
+// ──────────── COVER SELECT ────────────
+function showCoverSelect(){
+  if(!story){ startStory(); return; }
+  aiCoverDataUrl = null;
+  selectedCover = 'simple';
+  showPage('page-cover-select');
+  document.fonts.ready.then(()=>{
+    drawSimpleCover();
+    if(openaiKey){
+      generateAiCover();
+    } else {
+      document.getElementById('ai-cover-loading').style.display='none';
+      document.getElementById('ai-cover-error').style.display='block';
+      document.getElementById('ai-cover-error-msg').textContent='OpenAI API 키가 없어요. 심플 표지가 선택됩니다.';
+      selectCoverCard('simple');
+    }
+  });
+}
+
+function goBackFromCoverSelect(){ showPage('page-story'); }
+
+function selectCoverCard(type){
+  selectedCover = type;
+  const aiCard = document.getElementById('cover-card-ai');
+  const simCard = document.getElementById('cover-card-simple');
+  if(aiCard) aiCard.classList.toggle('sel', type==='ai');
+  if(simCard) simCard.classList.toggle('sel', type==='simple');
+}
+
+function drawSimpleCover(){
+  const canvas = document.getElementById('simple-cover-canvas');
+  if(!canvas || !story) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  ctx.fillStyle = '#3D5A47';
+  ctx.fillRect(0,0,W,H);
+
+  const lineW = W * 0.5, lineH = 2;
+  ctx.fillStyle = '#C4A882';
+  ctx.fillRect((W-lineW)/2, H*0.08, lineW, lineH);
+
+  ctx.fillStyle = '#FDFAF5';
+  ctx.textAlign = 'center';
+  ctx.font = 'bold 20px "Noto Serif KR",serif';
+  coverWrapText(ctx, story.title, W/2, H*0.35, W*0.78, 26);
+
+  ctx.fillStyle = '#C4A882';
+  ctx.font = '14px sans-serif';
+  ctx.fillText('✦', W/2, H*0.54);
+
+  ctx.fillStyle = '#FDFAF5';
+  ctx.font = '13px "Noto Serif KR",serif';
+  ctx.fillText(ans.author||'어나더북', W/2, H*0.61);
+
+  ctx.fillStyle = '#C4A882';
+  ctx.fillRect((W-lineW)/2, H - H*0.08, lineW, lineH);
+
+  ctx.fillStyle = '#C4A882';
+  ctx.font = '9px "Noto Sans KR",sans-serif';
+  ctx.fillText('어나더북', W/2, H - H*0.03);
+}
+
+function coverWrapText(ctx, text, x, y, maxW, lh){
+  if(ctx.measureText(text).width <= maxW){ ctx.fillText(text,x,y); return; }
+  let line='', lines=[];
+  for(const ch of text){
+    const tl = line+ch;
+    if(ctx.measureText(tl).width > maxW && line){ lines.push(line); line=ch; }
+    else line=tl;
+  }
+  if(line) lines.push(line);
+  const startY = y - (lines.length-1)*lh/2;
+  lines.forEach((l,i)=>ctx.fillText(l, x, startY+i*lh));
+}
+
+async function generateAiCover(){
+  const loadEl = document.getElementById('ai-cover-loading');
+  const prevEl = document.getElementById('ai-cover-preview');
+  const errEl  = document.getElementById('ai-cover-error');
+  if(loadEl) loadEl.style.display='block';
+  if(prevEl) prevEl.style.display='none';
+  if(errEl)  errEl.style.display='none';
+  selectCoverCard('simple');
+
+  const prompt = `A beautiful watercolor illustration for a Korean novel cover. The story is about: ${ans.topic||'everyday life'}. Protagonist: ${ans.name||'a person'}. Mood: ${ans.mood||'warm'}. Style: warm, detailed interior or lifestyle scene, soft watercolor textures, muted warm colors, no text, no letters, suitable for a literary book cover. Similar to Studio Ghibli watercolor aesthetic.`;
+
+  try {
+    const res = await fetch('https://api.openai.com/v1/images/generations',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${openaiKey}`},
+      body: JSON.stringify({model:'dall-e-3', prompt, n:1, size:'1024x1792', quality:'standard', response_format:'b64_json'})
+    });
+    if(!res.ok){
+      const e = await res.json().catch(()=>({error:{message:'알 수 없는 오류'}}));
+      throw new Error(e.error?.message||`HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    const b64 = data.data[0].b64_json;
+    aiCoverDataUrl = `data:image/png;base64,${b64}`;
+
+    const imgEl = document.getElementById('ai-cover-img');
+    const titleEl = document.getElementById('ai-book-title');
+    const authorEl = document.getElementById('ai-author-name');
+    if(imgEl){ imgEl.src = aiCoverDataUrl; }
+    if(titleEl) titleEl.textContent = story.title;
+    if(authorEl) authorEl.textContent = ans.author||'어나더북';
+
+    if(loadEl) loadEl.style.display='none';
+    if(prevEl) prevEl.style.display='block';
+    selectCoverCard('ai');
+  } catch(err){
+    if(loadEl) loadEl.style.display='none';
+    if(errEl){
+      errEl.style.display='block';
+      document.getElementById('ai-cover-error-msg').textContent=`이미지 생성 실패: ${err.message}`;
+    }
+  }
+}
+
+function retryAiCover(){ generateAiCover(); }
+
+// ──────────── PDF GENERATION (jsPDF) ────────────
+async function confirmCoverAndMakePDF(){
+  if(!story) return;
+  const overlay = document.getElementById('pdf-progress-overlay');
+  const barEl   = document.getElementById('pdf-progress-bar');
+  const msgEl   = document.getElementById('pdf-progress-msg');
+  overlay.style.display='flex';
+  const sp=(pct,txt)=>{ barEl.style.width=pct+'%'; msgEl.textContent=txt; };
+
+  try {
+    sp(5,'PDF 라이브러리 불러오는 중...');
+
+    if(!window.jspdf){
+      await new Promise((res,rej)=>{
+        const s=document.createElement('script');
+        s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        s.onload=res; s.onerror=()=>rej(new Error('jsPDF CDN 로드 실패'));
+        document.head.appendChild(s);
+      });
+    }
+    if(!window.html2canvas){
+      await new Promise((res,rej)=>{
+        const s=document.createElement('script');
+        s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        s.onload=res; s.onerror=()=>rej(new Error('html2canvas CDN 로드 실패'));
+        document.head.appendChild(s);
+      });
+    }
+
+    sp(10,'표지 준비 중...');
+    await document.fonts.ready;
+
+    const {jsPDF} = window.jspdf;
+    const pdf = new jsPDF({orientation:'portrait', unit:'mm', format:[127,188], compress:true});
+
+    // ── Cover page ──
+    if(selectedCover==='ai' && aiCoverDataUrl){
+      const cW=381, cH=564;
+      const cc=document.createElement('canvas'); cc.width=cW; cc.height=cH;
+      const cx=cc.getContext('2d');
+      cx.fillStyle='#FDFAF5'; cx.fillRect(0,0,cW,cH);
+      cx.fillStyle='#2C2C2C'; cx.textAlign='center';
+      cx.font='bold 24px "Noto Serif KR",serif';
+      coverWrapText(cx, story.title, cW/2, 40, cW-60, 30);
+      const img=new Image(); img.src=aiCoverDataUrl;
+      await new Promise(r=>{img.onload=r; img.onerror=r;});
+      cx.drawImage(img, 0, 76, cW, cH*0.73);
+      cx.fillStyle='#2C2C2C';
+      cx.font='16px "Noto Serif KR",serif';
+      cx.fillText(ans.author||'어나더북', cW/2, cH-22);
+      pdf.addImage(cc.toDataURL('image/jpeg',0.92),'JPEG',0,0,127,188);
+    } else {
+      const sc=document.getElementById('simple-cover-canvas');
+      pdf.addImage(sc.toDataURL('image/jpeg',0.92),'JPEG',0,0,127,188);
+    }
+
+    // ── Chapter pages ──
+    const PW=480, PH=711, SCALE=2;
+    const authorName = ans.author||'어나더북';
+
+    for(let ci=0; ci<story.chapters.length; ci++){
+      const ch=story.chapters[ci];
+      sp(20+Math.round(ci/story.chapters.length*70), `챕터 ${ch.number} 렌더링 중...`);
+
+      const paras=ch.content.split(/\n\n+|\n/).filter(p=>p.trim());
+      const parasHTML=paras.map((p,i)=>`<p style="font-size:11px;line-height:1.9;color:#2C2C2C;margin:0 0 8px 0;font-family:'Noto Serif KR',serif;${i===0?'text-indent:0':'text-indent:20px'}">${p.trim()}</p>`).join('');
+
+      const div=document.createElement('div');
+      div.style.cssText=`position:fixed;top:-99999px;left:-99999px;width:${PW}px;background:#FDFAF5;box-sizing:border-box;padding:57px 45px 68px;`;
+      div.innerHTML=`
+        <div style="text-align:right;font-size:8px;color:#888888;font-family:'Noto Sans KR',sans-serif;margin-bottom:5px;">${htmlEsc(story.title)}</div>
+        <div style="width:100%;height:1px;background:#C4A882;margin-bottom:22px;"></div>
+        <div style="text-align:center;font-size:9px;letter-spacing:3px;color:#C4A882;font-family:'Noto Sans KR',sans-serif;margin-bottom:10px;">CHAPTER ${ch.number}</div>
+        <div style="text-align:center;font-size:16px;font-weight:700;color:#3D5A47;font-family:'Noto Serif KR',serif;line-height:1.4;margin-bottom:12px;">${htmlEsc(ch.title)}</div>
+        <div style="text-align:center;font-size:10px;color:#C4A882;margin-bottom:22px;">── ✦ ──</div>
+        <div>${parasHTML}</div>`;
+      document.body.appendChild(div);
+
+      const chCanvas=await html2canvas(div,{scale:SCALE,useCORS:true,backgroundColor:'#FDFAF5',logging:false,windowWidth:PW});
+      document.body.removeChild(div);
+
+      const totalH=chCanvas.height;
+      const pageH=PH*SCALE;
+      let offset=0, pgNum=1;
+      while(offset<totalH){
+        pdf.addPage();
+        const sl=document.createElement('canvas');
+        sl.width=chCanvas.width;
+        sl.height=Math.min(pageH, totalH-offset);
+        const sc2=sl.getContext('2d');
+        sc2.fillStyle='#FDFAF5'; sc2.fillRect(0,0,sl.width,sl.height);
+        sc2.drawImage(chCanvas,0,-offset);
+        // Page number
+        sc2.fillStyle='#888888';
+        sc2.font=`${9*SCALE}px "Noto Sans KR",sans-serif`;
+        sc2.textAlign='center';
+        sc2.fillText(String(ci*4+pgNum+1), sl.width/2, sl.height-12*SCALE);
+        pdf.addImage(sl.toDataURL('image/jpeg',0.88),'JPEG',0,0,127,188);
+        offset+=pageH; pgNum++;
+      }
+    }
+
+    sp(96,'저장 중...');
+    pdf.save(`${story.title}.pdf`);
+    sp(100,'완료!');
+    setTimeout(()=>{
+      overlay.style.display='none';
+      const suc=document.getElementById('pdf-success-msg');
+      suc.style.display='block';
+      setTimeout(()=>{suc.style.display='none';},5000);
+    },500);
+
+  } catch(err){
+    overlay.style.display='none';
+    console.error('PDF 오류:',err);
+    alert('PDF 생성 중 오류가 발생했습니다.\n'+(err.message||String(err)));
+  }
+}
+
+function htmlEsc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 // ──────────── TOAST ────────────
