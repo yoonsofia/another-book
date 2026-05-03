@@ -3062,254 +3062,214 @@ ${lotteryRule}
       }
     }
 
-    // ── Phase 2: Build PDF with jsPDF text() ──
+    // ── Phase 2: Build PDF with jsPDF ──
     if(titleEl) titleEl.textContent='PDF 생성 중';
     if(iconEl) iconEl.textContent='📄';
-    sp(62,'PDF 라이브러리 불러오는 중...');
+    await generatePDF(sp);
 
-    if(!window.jspdf){
-      await new Promise((res,rej)=>{
-        const s=document.createElement('script');
-        s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-        s.onload=res; s.onerror=()=>rej(new Error('jsPDF CDN 로드 실패'));
-        document.head.appendChild(s);
-      });
+  } catch(err){
+    overlay.style.display='none';
+    console.error('챕터 생성 오류:',err);
+    showToast('⚠️ 챕터 생성 중 문제가 발생했어요. 다시 시도해주세요.');
+  }
+}
+
+async function generatePDF(sp) {
+  const overlay = document.getElementById('pdf-progress-overlay');
+  try {
+    await generatePDFPrimary(sp);
+  } catch(error) {
+    console.log('Primary PDF failed, using fallback:', error);
+    if(overlay) overlay.style.display = 'none';
+    await generatePDFFallback();
+  }
+}
+
+async function generatePDFPrimary(sp) {
+  const overlay = document.getElementById('pdf-progress-overlay');
+
+  sp(62,'PDF 라이브러리 불러오는 중...');
+
+  if(!window.jspdf){
+    await new Promise((res,rej)=>{
+      const s=document.createElement('script');
+      s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+      s.onload=res; s.onerror=()=>rej(new Error('jsPDF CDN 로드 실패'));
+      document.head.appendChild(s);
+    });
+  }
+
+  sp(65,'표지 준비 중...');
+  await document.fonts.ready;
+
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF({orientation:'portrait', unit:'mm', format:[127,188], compress:true});
+
+  // Cover page (use pre-rendered canvas)
+  const coverCanvas = document.getElementById(
+    selectedCover==='ai' ? 'ai-cover-canvas' : 'simple-cover-canvas'
+  );
+  if(coverCanvas){
+    doc.addImage(coverCanvas.toDataURL('image/jpeg',0.95),'JPEG',0,0,127,188);
+  }
+
+  const PW=127, PH=188;
+  const mL=13, mR=13, mTop=15, mBot=18;
+  const textW = PW - mL - mR;
+  let globalPage = 1;
+
+  const drawPageHeader = () => {
+    doc.setFont('times','normal');
+    doc.setFontSize(8);
+    doc.setTextColor(136,136,136);
+    const shortTitle = story.title.length > 28 ? story.title.substring(0,28)+'…' : story.title;
+    doc.text(shortTitle, PW - mR, mTop - 3, {align:'right'});
+    doc.setDrawColor(196,168,130);
+    doc.setLineWidth(0.25);
+    doc.line(mL, mTop - 0.5, PW - mR, mTop - 0.5);
+  };
+
+  const drawPageNum = () => {
+    doc.setFont('times','normal');
+    doc.setFontSize(9);
+    doc.setTextColor(136,136,136);
+    doc.text(`— ${globalPage} —`, PW/2, PH - 5, {align:'center'});
+  };
+
+  // Pre-calculate chapter start pages for TOC
+  const AVG_CHARS_PER_LINE = 67;
+  const LINES_PER_BODY_PAGE = 21;
+  const FIRST_PAGE_LINES = 15;
+  const chapStartPages = [];
+  let estPage = 3;
+  for (const ch of story.chapters) {
+    chapStartPages.push(estPage);
+    const totalLines = Math.ceil(ch.content.length / AVG_CHARS_PER_LINE);
+    const totalPages = 1 + Math.max(0, Math.ceil((totalLines - FIRST_PAGE_LINES) / LINES_PER_BODY_PAGE));
+    estPage += totalPages;
+  }
+
+  // TOC page
+  doc.addPage();
+  globalPage++;
+  let tocY = mTop + 12;
+
+  doc.setFont('times','bold');
+  doc.setFontSize(26);
+  doc.setTextColor(61,90,71);
+  doc.text((selectedLang === 'en') ? 'Contents' : '목  차', PW/2, tocY, {align:'center'});
+  tocY += 12;
+
+  doc.setDrawColor(196,168,130);
+  doc.setLineWidth(0.4);
+  doc.line((PW-50)/2, tocY, (PW+50)/2, tocY);
+  tocY += 10;
+
+  for (let i = 0; i < story.chapters.length; i++) {
+    const ch = story.chapters[i];
+    const pgNum = chapStartPages[i];
+    const entryY = tocY + i * 12;
+
+    // Chapter number
+    doc.setFont('times','normal');
+    doc.setFontSize(12);
+    doc.setTextColor(196,168,130);
+    doc.text(`${ch.number}.`, mL + 5, entryY, {align:'right'});
+
+    // Chapter title
+    doc.setFont('times','normal');
+    doc.setFontSize(13);
+    doc.setTextColor(44,44,44);
+    const maxChars = 28;
+    const titleShort = ch.title.length > maxChars ? ch.title.substring(0, maxChars-1)+'…' : ch.title;
+    const titleEndX = mL + 8 + doc.getTextWidth(titleShort) + 2;
+    doc.text(titleShort, mL + 8, entryY);
+
+    // Page number
+    doc.setFont('times','normal');
+    doc.setFontSize(11);
+    doc.setTextColor(136,136,136);
+    const pgNumStr = String(pgNum);
+    const pgNumW = doc.getTextWidth(pgNumStr);
+    const pgStartX = PW - mR - pgNumW - 2;
+    doc.text(pgNumStr, PW - mR, entryY, {align:'right'});
+
+    // Dashed connector
+    if (pgStartX > titleEndX + 4) {
+      try {
+        doc.setDrawColor(200,200,200);
+        doc.setLineWidth(0.1);
+        doc.setLineDashPattern([0.5, 2], 0);
+        doc.line(titleEndX, entryY - 1.2, pgStartX, entryY - 1.2);
+        doc.setLineDashPattern([], 0);
+      } catch(e3) { /* skip connector if method unavailable */ }
     }
+  }
 
-    sp(65,'표지 준비 중...');
-    await document.fonts.ready;
-
-    const {jsPDF} = window.jspdf;
-    const doc = new jsPDF({orientation:'portrait', unit:'mm', format:[127,188], compress:true});
-
-    // ── Cover page (use pre-rendered canvas) ──
-    const coverCanvas = document.getElementById(
-      selectedCover==='ai' ? 'ai-cover-canvas' : 'simple-cover-canvas'
-    );
-    if(coverCanvas){
-      doc.addImage(coverCanvas.toDataURL('image/jpeg',0.95),'JPEG',0,0,127,188);
-    }
-
-    // ── Chapter pages using text() ──
-    const PW=127, PH=188;
-    const mL=13, mR=13, mTop=15, mBot=18;
-    const textW = PW - mL - mR;
-    let globalPage = 1;
-
-    // ── Load Playfair Display font for jsPDF ──
-    sp(66, 'PDF 폰트 로딩 중...');
-    let usePlayfair = false;
-    try {
-      const fetchFontB64 = async (url) => {
-        const resp = await fetch(url);
-        const buf = await resp.arrayBuffer();
-        const bytes = new Uint8Array(buf);
-        let b = '';
-        for (let i = 0; i < bytes.length; i++) b += String.fromCharCode(bytes[i]);
-        return btoa(b);
-      };
-      const cssResp = await fetch('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
-      const css = await cssResp.text();
-      const faceBlocks = css.match(/@font-face\s*\{[^}]+\}/g) || [];
-      const fontFileMap = {};
-      for (const block of faceBlocks) {
-        const styleM = block.match(/font-style:\s*(\w+)/);
-        const weightM = block.match(/font-weight:\s*(\d+)/);
-        const urlM = block.match(/url\(([^)]+)\)/);
-        if (styleM && weightM && urlM) {
-          const k = `${styleM[1]}-${weightM[1]}`;
-          if (!fontFileMap[k]) fontFileMap[k] = urlM[1];
-        }
-      }
-      for (const [key, jsPDFStyle] of [['normal-400','normal'],['normal-700','bold'],['italic-400','italic']]) {
-        const url = fontFileMap[key];
-        if (!url) continue;
-        const b64 = await fetchFontB64(url);
-        const fname = `playfair-${key}.woff2`;
-        doc.addFileToVFS(fname, b64);
-        doc.addFont(fname, 'PlayfairDisplay', jsPDFStyle);
-      }
-      usePlayfair = true;
-    } catch(e) {
-      console.warn('Playfair Display 폰트 로드 실패, 대체 폰트 사용:', e);
-    }
-
-    const setPF = (style) => {
-      try { doc.setFont('PlayfairDisplay', style); }
-      catch(e2) { doc.setFont('times', style === 'italic' ? 'italic' : style === 'bold' ? 'bold' : 'normal'); }
-    };
-    const setGE = (style) => { doc.setFont('times', style); };
-
-    const drawPageHeader = () => {
-      setGE('normal');
-      doc.setFontSize(8);
-      doc.setTextColor(136,136,136);
-      const shortTitle = story.title.length > 28 ? story.title.substring(0,28)+'…' : story.title;
-      doc.text(shortTitle, PW - mR, mTop - 3, {align:'right'});
-      doc.setDrawColor(196,168,130);
-      doc.setLineWidth(0.25);
-      doc.line(mL, mTop - 0.5, PW - mR, mTop - 0.5);
-    };
-
-    const drawPageNum = () => {
-      setGE('normal');
-      doc.setFontSize(9);
-      doc.setTextColor(136,136,136);
-      doc.text(`— ${globalPage} —`, PW/2, PH - 5, {align:'center'});
-    };
-
-    // ── Pre-calculate chapter start pages for TOC ──
-    const AVG_CHARS_PER_LINE = 67;
-    const LINES_PER_BODY_PAGE = 21;
-    const FIRST_PAGE_LINES = 15;
-    const chapStartPages = [];
-    let estPage = 3;
-    for (const ch of story.chapters) {
-      chapStartPages.push(estPage);
-      const totalLines = Math.ceil(ch.content.length / AVG_CHARS_PER_LINE);
-      const totalPages = 1 + Math.max(0, Math.ceil((totalLines - FIRST_PAGE_LINES) / LINES_PER_BODY_PAGE));
-      estPage += totalPages;
-    }
-
-    // ── TOC page ──
+  // Chapter pages
+  for(let ci=0; ci<story.chapters.length; ci++){
+    const ch = story.chapters[ci];
+    sp(65 + Math.round((ci+1)/story.chapters.length*30), `챕터 ${ch.number} PDF 작성 중...`);
     doc.addPage();
     globalPage++;
-    let tocY = mTop + 12;
 
-    if (usePlayfair) setPF('bold'); else doc.setFont('times','bold');
-    doc.setFontSize(26);
+    drawPageHeader();
+    let y = mTop + 10;
+
+    // CHAPTER N label
+    doc.setFont('times','normal');
+    doc.setFontSize(10);
+    doc.setTextColor(196,168,130);
+    doc.text(`CHAPTER ${ch.number}`, PW/2, y, {align:'center', charSpace:0.8});
+    y += 8;
+
+    // Chapter title
+    doc.setFont('times','bold');
+    doc.setFontSize(22);
     doc.setTextColor(61,90,71);
-    doc.text((selectedLang === 'en') ? 'Contents' : '목  차', PW/2, tocY, {align:'center'});
-    tocY += 12;
+    const titleLines = doc.splitTextToSize(ch.title, textW);
+    doc.text(titleLines, PW/2, y, {align:'center'});
+    y += titleLines.length * 9 + 5;
 
-    doc.setDrawColor(196,168,130);
-    doc.setLineWidth(0.4);
-    doc.line((PW-50)/2, tocY, (PW+50)/2, tocY);
-    tocY += 10;
+    // Divider
+    doc.setFont('times','normal');
+    doc.setFontSize(12);
+    doc.setTextColor(196,168,130);
+    doc.text('── ✦ ──', PW/2, y, {align:'center'});
+    y += 12;
 
-    for (let i = 0; i < story.chapters.length; i++) {
-      const ch = story.chapters[i];
-      const pgNum = chapStartPages[i];
-      const entryY = tocY + i * 12;
+    // Body text
+    doc.setFont('times','normal');
+    doc.setFontSize(11);
+    doc.setTextColor(44,44,44);
 
-      // Chapter number
-      setGE('normal');
-      doc.setFontSize(12);
-      doc.setTextColor(196,168,130);
-      doc.text(`${ch.number}.`, mL + 5, entryY, {align:'right'});
-
-      // Chapter title
-      if (usePlayfair) setPF('normal'); else doc.setFont('times','normal');
-      doc.setFontSize(13);
-      doc.setTextColor(44,44,44);
-      const maxChars = 28;
-      const titleShort = ch.title.length > maxChars ? ch.title.substring(0, maxChars-1)+'…' : ch.title;
-      const titleEndX = mL + 8 + doc.getTextWidth(titleShort) + 2;
-      doc.text(titleShort, mL + 8, entryY);
-
-      // Page number
-      setGE('normal');
-      doc.setFontSize(11);
-      doc.setTextColor(136,136,136);
-      const pgNumStr = String(pgNum);
-      const pgNumW = doc.getTextWidth(pgNumStr);
-      const pgStartX = PW - mR - pgNumW - 2;
-      doc.text(pgNumStr, PW - mR, entryY, {align:'right'});
-
-      // Dashed connector
-      if (pgStartX > titleEndX + 4) {
-        try {
-          doc.setDrawColor(200,200,200);
-          doc.setLineWidth(0.1);
-          doc.setLineDashPattern([0.5, 2], 0);
-          doc.line(titleEndX, entryY - 1.2, pgStartX, entryY - 1.2);
-          doc.setLineDashPattern([], 0);
-        } catch(e3) { /* skip connector if method unavailable */ }
-      }
-    }
-
-    // ── Chapter pages ──
-    for(let ci=0; ci<story.chapters.length; ci++){
-      const ch = story.chapters[ci];
-      sp(65 + Math.round((ci+1)/story.chapters.length*30), `챕터 ${ch.number} PDF 작성 중...`);
-      doc.addPage();
-      globalPage++;
-
-      drawPageHeader();
-      let y = mTop + 10;
-
-      // CHAPTER N label
-      setGE('normal');
-      doc.setFontSize(10);
-      doc.setTextColor(196,168,130);
-      doc.text(`CHAPTER ${ch.number}`, PW/2, y, {align:'center', charSpace:0.8});
-      y += 8;
-
-      // Chapter title
-      if (usePlayfair) setPF('bold'); else doc.setFont('times','bold');
-      doc.setFontSize(22);
-      doc.setTextColor(61,90,71);
-      const titleLines = doc.splitTextToSize(ch.title, textW);
-      doc.text(titleLines, PW/2, y, {align:'center'});
-      y += titleLines.length * 9 + 5;
-
-      // Divider
-      setGE('normal');
-      doc.setFontSize(12);
-      doc.setTextColor(196,168,130);
-      doc.text('── ✦ ──', PW/2, y, {align:'center'});
-      y += 12;
-
-      // Body text
+    const paras = ch.content.split(/\n\n+|\n/).filter(p=>p.trim());
+    for(let pi=0; pi<paras.length; pi++){
+      const para = paras[pi];
       doc.setFont('times','normal');
       doc.setFontSize(11);
       doc.setTextColor(44,44,44);
 
-      const paras = ch.content.split(/\n\n+|\n/).filter(p=>p.trim());
-      for(let pi=0; pi<paras.length; pi++){
-        const para = paras[pi];
-        doc.setFont('times','normal');
-        doc.setFontSize(11);
-        doc.setTextColor(44,44,44);
-
-        if (pi > 0) {
-          // First-line indent for all paragraphs except the first
-          const indentLines = doc.splitTextToSize(para.trim(), textW - 8);
-          const firstLine = indentLines[0] || '';
-          if (y + 7 > PH - mBot) {
-            drawPageNum();
-            doc.addPage();
-            globalPage++;
-            drawPageHeader();
-            y = mTop + 8;
-            doc.setFont('times','normal');
-            doc.setFontSize(11);
-            doc.setTextColor(44,44,44);
-          }
-          doc.text(firstLine, mL + 8, y);
-          y += 7;
-          const remaining = para.trim().substring(firstLine.length).trim();
-          if (remaining) {
-            const restLines = doc.splitTextToSize(remaining, textW);
-            for (const line of restLines) {
-              if (y + 7 > PH - mBot) {
-                drawPageNum();
-                doc.addPage();
-                globalPage++;
-                drawPageHeader();
-                y = mTop + 8;
-                doc.setFont('times','normal');
-                doc.setFontSize(11);
-                doc.setTextColor(44,44,44);
-              }
-              doc.text(line, mL, y);
-              y += 7;
-            }
-          }
-        } else {
-          // No indent for first paragraph of each chapter
-          const lines = doc.splitTextToSize(para.trim(), textW);
-          for (const line of lines) {
+      if (pi > 0) {
+        // First-line indent for all paragraphs except the first
+        const indentLines = doc.splitTextToSize(para.trim(), textW - 8);
+        const firstLine = indentLines[0] || '';
+        if (y + 7 > PH - mBot) {
+          drawPageNum();
+          doc.addPage();
+          globalPage++;
+          drawPageHeader();
+          y = mTop + 8;
+          doc.setFont('times','normal');
+          doc.setFontSize(11);
+          doc.setTextColor(44,44,44);
+        }
+        doc.text(firstLine, mL + 8, y);
+        y += 7;
+        const remaining = para.trim().substring(firstLine.length).trim();
+        if (remaining) {
+          const restLines = doc.splitTextToSize(remaining, textW);
+          for (const line of restLines) {
             if (y + 7 > PH - mBot) {
               drawPageNum();
               doc.addPage();
@@ -3324,26 +3284,96 @@ ${lotteryRule}
             y += 7;
           }
         }
+      } else {
+        // No indent for first paragraph of each chapter
+        const lines = doc.splitTextToSize(para.trim(), textW);
+        for (const line of lines) {
+          if (y + 7 > PH - mBot) {
+            drawPageNum();
+            doc.addPage();
+            globalPage++;
+            drawPageHeader();
+            y = mTop + 8;
+            doc.setFont('times','normal');
+            doc.setFontSize(11);
+            doc.setTextColor(44,44,44);
+          }
+          doc.text(line, mL, y);
+          y += 7;
+        }
       }
-      drawPageNum();
+    }
+    drawPageNum();
+  }
+
+  sp(96,'저장 중...');
+  doc.save(`${story.title}.pdf`);
+  sp(100,'완료!');
+
+  setTimeout(()=>{
+    if(overlay) overlay.style.display='none';
+    const suc=document.getElementById('pdf-success-msg');
+    suc.textContent = selectedLang === 'en' ? '✅ PDF download complete!' : '✅ PDF 다운로드 완료!';
+    suc.style.display='block';
+    setTimeout(()=>{ suc.style.display='none'; },5000);
+  },500);
+}
+
+async function generatePDFFallback() {
+  const overlay = document.getElementById('pdf-progress-overlay');
+  try {
+    if(!window.jspdf){
+      await new Promise((res,rej)=>{
+        const s=document.createElement('script');
+        s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        s.onload=res; s.onerror=()=>rej(new Error('jsPDF CDN 로드 실패'));
+        document.head.appendChild(s);
+      });
+    }
+    const {jsPDF} = window.jspdf;
+    const doc = new jsPDF('p', 'mm', [127, 188]);
+
+    let r=61, g=90, b=71;
+    if(coverDesign?.coverColor){
+      const hex = coverDesign.coverColor.replace('#','');
+      if(hex.length===6){
+        r=parseInt(hex.slice(0,2),16);
+        g=parseInt(hex.slice(2,4),16);
+        b=parseInt(hex.slice(4,6),16);
+      }
+    }
+    doc.setFillColor(r, g, b);
+    doc.rect(0, 0, 127, 188, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('times', 'bold');
+    doc.setFontSize(20);
+    doc.text(story.title || 'My Story', 63.5, 80, {align: 'center', maxWidth: 100});
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(12);
+    doc.text(ans.author || '', 63.5, 110, {align: 'center'});
+    doc.setFontSize(9);
+    doc.text('anotherbook', 63.5, 178, {align: 'center'});
+
+    for (let i = 0; i < story.chapters.length; i++) {
+      doc.addPage();
+      doc.setTextColor(44, 44, 44);
+      doc.setFont('times', 'bold');
+      doc.setFontSize(14);
+      doc.text('CHAPTER ' + (i + 1), 63.5, 20, {align: 'center'});
+      doc.setFont('times', 'normal');
+      doc.setFontSize(10);
+      const lines = doc.splitTextToSize(story.chapters[i].content || '', 100);
+      doc.text(lines, 13, 35);
     }
 
-    sp(96,'저장 중...');
-    doc.save(`${story.title}.pdf`);
-    sp(100,'완료!');
+    doc.save((story.title || 'my-story') + '.pdf');
+    if(overlay) overlay.style.display = 'none';
+    showToast(selectedLang === 'en' ? '✅ PDF download complete!' : '✅ PDF 다운로드 완료!');
 
-    setTimeout(()=>{
-      overlay.style.display='none';
-      const suc=document.getElementById('pdf-success-msg');
-      suc.textContent='✅ PDF 다운로드 완료!';
-      suc.style.display='block';
-      setTimeout(()=>{ suc.style.display='none'; },5000);
-    },500);
-
-  } catch(err){
-    overlay.style.display='none';
-    console.error('PDF 오류:',err);
-    alert('PDF 생성 중 오류가 발생했습니다.\n'+(err.message||String(err)));
+  } catch(fallbackError) {
+    console.error('Fallback also failed:', fallbackError);
+    if(overlay) overlay.style.display = 'none';
+    showToast('⚠️ PDF 생성 중 문제가 발생했어요. 다시 시도해주세요.');
   }
 }
 
@@ -3352,8 +3382,9 @@ function htmlEsc(s){
 }
 
 // ──────────── TOAST ────────────
-function showToast(){
+function showToast(msg){
   const t=document.getElementById('toast');
+  if(msg) t.textContent=msg;
   t.style.display='block';
   setTimeout(()=>t.style.display='none',3200);
 }
