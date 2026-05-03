@@ -2630,35 +2630,11 @@ function selectCoverCard(type){
 function drawSimpleCover(){
   const canvas = document.getElementById('simple-cover-canvas');
   if(!canvas || !story) return;
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-
-  ctx.fillStyle = '#3D5A47';
-  ctx.fillRect(0,0,W,H);
-
-  const lineW = W * 0.5, lineH = 2;
-  ctx.fillStyle = '#C4A882';
-  ctx.fillRect((W-lineW)/2, H*0.08, lineW, lineH);
-
-  ctx.fillStyle = '#FDFAF5';
-  ctx.textAlign = 'center';
-  ctx.font = 'bold 20px "Playfair Display","Noto Serif KR",serif';
-  coverWrapText(ctx, story.title, W/2, H*0.35, W*0.78, 26);
-
-  ctx.fillStyle = '#C4A882';
-  ctx.font = '14px sans-serif';
-  ctx.fillText('✦', W/2, H*0.54);
-
-  ctx.fillStyle = '#C4A882';
-  ctx.font = 'italic 13px "Playfair Display","Noto Serif KR",serif';
-  ctx.fillText(ans.author||'저자', W/2, H*0.61);
-
-  ctx.fillStyle = '#C4A882';
-  ctx.fillRect((W-lineW)/2, H - H*0.08, lineW, lineH);
-
-  ctx.fillStyle = '#C4A882';
-  ctx.font = '9px Georgia,"Noto Sans KR",sans-serif';
-  ctx.fillText('어나더북', W/2, H - H*0.03);
+  const design = coverDesign || {
+    coverColor:'#3D5A47', textColor:'#FDFAF5', accentColor:'#C4A882',
+    titleLines:[story.title], authorPosition:'bottom_center'
+  };
+  renderSimpleCover(canvas, design, story.title, ans.author||'어나더북');
 }
 
 function coverWrapText(ctx, text, x, y, maxW, lh){
@@ -2697,29 +2673,54 @@ function setCoverLoadDot(step){
 // ──────────── STEP 1: CLAUDE COVER DESIGN ────────────
 async function getCoverDesign(){
   const bookTitle = story?.title || '';
-  const systemPrompt = `You are a professional book cover designer for a modern literary fiction publisher like Penguin, Faber & Faber, or Riverhead Books. You make bold, modern design decisions. Always return valid JSON only, no explanation, no markdown.`;
-  const userPrompt = `Design a book cover for this story:
+  const systemPrompt = `You are a bold, modern book cover designer for publishers like Penguin, Faber & Faber, and Riverhead Books. You create striking, contemporary covers that look like award-winning literary fiction. Always return valid JSON only.`;
+  const userPrompt = `Design a modern literary book cover for:
 - Title: ${bookTitle}
 - Theme: ${ans.topic}
 - Mood: ${ans.mood}
-- Protagonist name: ${ans.name}
 - Language: ${selectedLang === 'ko' ? 'Korean' : 'English'}
 
-Return a JSON object with exactly these fields:
+Rules:
+1. Choose ONE powerful symbolic object that represents the emotional core of this story. Think metaphorically, not literally. The symbol should be unexpected and visually striking.
+   Examples of GOOD symbols:
+   - a cracked mirror with light pouring through
+   - a single key floating in dark water
+   - a torn photograph reassembling itself
+   - a clock with melting hands
+   - a single door in an empty field
+   Examples of BAD symbols (too literal/generic):
+   - a stack of books (for a story about reading)
+   - a heart (for a love story)
+   - a graduation cap (for a school story)
+
+2. Choose a bold, unexpected color palette - not safe or generic. Think of covers like The Vanishing Half (navy + gold), Fake Accounts (red + pink), Normal People (bright orange). Be bold.
+
+3. The layout must feel intentional and modern.
+
+Return exactly this JSON:
 {
-  "coverColor": "(one dominant hex color matching the mood - be bold and specific)",
-  "textColor": "(either #FFFFFF or a dark color like #1C1C1C or #2C1810 - must have strong contrast against coverColor)",
-  "accentColor": "(secondary hex color for decorative details - complementary to coverColor)",
-  "symbol": "(one single concrete object or symbol representing this story's emotional core - be specific and visual, e.g. 'a cracked ceramic bowl with gold repair lines', 'a single wilting sunflower casting a long shadow', 'an antique compass with a spinning needle' - NO people, NO faces, NO human figures, NO silhouettes)",
-  "layout": "(one of: image_dominant, title_dominant, side_title, split)",
-  "titleSize": "(one of: small, large, massive)",
-  "titlePosition": "(one of: top_left, top_center, bottom_left, bottom_center, side_left)",
-  "titleLines": ["split the title into an array of lines for dramatic effect"],
-  "authorPosition": "(one of: bottom_left, bottom_right, bottom_center)",
-  "symbolSize": "(one of: small, medium, large, full_bleed)",
-  "symbolPosition": "(one of: center, off_center_right, off_center_left, bottom_bleed, top_bleed)",
-  "dallePrompt": "(write the complete DALL-E 3 prompt for generating ONLY the illustration - include the symbol description, background color, style direction, and explicitly end with: no text, no letters, no numbers, no words, no people, no faces, no human figures)"
-}`;
+  coverColor: (dominant hex - bold and specific, NOT generic navy or forest green),
+  textColor: (hex - must contrast strongly, use white for dark bg, dark for light bg),
+  accentColor: (complementary hex for details),
+  symbol: (one highly specific visual symbol - be poetic and unexpected),
+  layout: (image_dominant | title_dominant | side_title | split),
+  titleSize: (small | large | massive),
+  titlePosition: (top_left | top_center | bottom_left | bottom_center | side_left),
+  titleLines: (array - split title dramatically, e.g. ['THE', 'FOOTNOTES', 'OF', 'MINA PARK']),
+  authorPosition: (bottom_left | bottom_right | bottom_center),
+  symbolSize: (small | medium | large | full_bleed),
+  symbolPosition: (center | off_center_right | off_center_left | bottom_bleed | top_bleed),
+  dallePrompt: (complete DALL-E prompt - see rules below)
+}
+
+DALLE PROMPT RULES:
+- Start with the symbol description in vivid detail
+- Specify the exact background color
+- Say: bold graphic flat illustration style
+- Say: modern literary fiction book cover art
+- Say: clean bold shapes, strong color contrast
+- Say: no text, no letters, no numbers, no words, no people, no faces, no human figures, no silhouettes, no body parts
+- End with the mood/feeling it should evoke`;
   const raw = await apiCall(userPrompt, 1000, systemPrompt);
   return extractJSON(raw);
 }
@@ -2735,6 +2736,7 @@ async function generateDalleImage(dallePrompt){
       n:1,
       size:'1024x1792',
       quality:'standard',
+      style:'vivid',
       response_format:'b64_json'
     })
   });
@@ -2791,15 +2793,20 @@ async function renderCover(canvas, design, imageUrl, bookTitle, authorName){
 
   // 3. Title Text
   ctx.fillStyle = design.textColor;
-  const sizePx = {small:36,large:52,massive:72};
-  const fontSize = sizePx[design.titleSize]||52;
   const lines = (design.titleLines&&design.titleLines.length>0) ? design.titleLines : [bookTitle];
+  const longestLine = lines.reduce((a,b)=>a.length>b.length?a:b,'');
+  const autoSize = {
+    massive: Math.min(90, (W * 0.85) / (longestLine.length * 0.6)),
+    large:   Math.min(60, (W * 0.75) / (longestLine.length * 0.6)),
+    small:   28
+  };
+  const fontSize = autoSize[design.titleSize] || autoSize.large;
   const layout = design.layout, pos = design.titlePosition;
   let titleStartY=80, titleEndY=80, titleAlign='left';
 
   function drawTitleLines(startX, startY, align, sz){
     ctx.textAlign = align;
-    const lh = sz + (sz>=72?14:10);
+    const lh = sz * 1.1;
     titleStartY = startY;
     lines.forEach((line,i)=>{
       let s=sz; ctx.font=`bold ${s}px ${fontFam}`;
@@ -2819,20 +2826,22 @@ async function renderCover(canvas, design, imageUrl, bookTitle, authorName){
     ctx.textAlign='center'; ctx.fillText(lines.join(' '),0,0);
     ctx.restore(); titleStartY=H/2; titleEndY=H/2; titleAlign='center';
   } else if(layout==='title_dominant'){
-    const sz=design.titleSize==='massive'?90:design.titleSize==='large'?66:52;
+    ctx.letterSpacing = '2px';
+    const sz=autoSize[design.titleSize]||autoSize.large;
     drawTitleLines(0,80,'center',sz); titleAlign='center';
+    ctx.letterSpacing = '0px';
   } else if(layout==='split'){
-    const sz=design.titleSize==='massive'?80:design.titleSize==='large'?60:44;
+    const sz=autoSize[design.titleSize]||autoSize.large;
     drawTitleLines(0,80,'center',sz); titleAlign='center';
   } else {
     if(pos==='top_left'){drawTitleLines(50,80,'left',fontSize);titleAlign='left';}
     else if(pos==='top_center'){drawTitleLines(0,80,'center',fontSize);titleAlign='center';}
     else if(pos==='bottom_left'){
-      const lh=fontSize+(fontSize>=72?14:10);
+      const lh=fontSize*1.1;
       const sY=H-120-(lines.length-1)*lh;
       drawTitleLines(50,sY,'left',fontSize);titleAlign='left';
     } else if(pos==='bottom_center'){
-      const lh=fontSize+(fontSize>=72?14:10);
+      const lh=fontSize*1.1;
       const sY=H-120-(lines.length-1)*lh;
       drawTitleLines(0,sY,'center',fontSize);titleAlign='center';
     } else {
@@ -2841,24 +2850,32 @@ async function renderCover(canvas, design, imageUrl, bookTitle, authorName){
   }
 
   // 4. Decorative Accent Line
-  ctx.strokeStyle = design.accentColor; ctx.lineWidth = 2;
-  const accentW = W*0.4;
+  ctx.strokeStyle = design.accentColor; ctx.lineWidth = 1.5;
+  const accentW = W*0.35;
   const isBottom = (pos==='bottom_left'||pos==='bottom_center');
   const lineY = isBottom ? titleStartY-20 : titleEndY+10;
   const lineX = titleAlign==='center' ? (W-accentW)/2 : 50;
   ctx.beginPath(); ctx.moveTo(lineX,lineY); ctx.lineTo(lineX+accentW,lineY); ctx.stroke();
+  ctx.fillStyle = design.accentColor;
+  ctx.fillRect(lineX-2, lineY-2, 4, 4);
+  ctx.fillRect(lineX+accentW-2, lineY-2, 4, 4);
 
   // 5. Author Name
   ctx.globalAlpha=0.85; ctx.fillStyle=design.textColor;
-  ctx.font=`18px ${fontFam}`;
-  if(design.authorPosition==='bottom_right'){ctx.textAlign='right';ctx.fillText(authorName,W-50,H-55);}
-  else if(design.authorPosition==='bottom_center'){ctx.textAlign='center';ctx.fillText(authorName,W/2,H-55);}
-  else{ctx.textAlign='left';ctx.fillText(authorName,50,H-55);}
+  ctx.letterSpacing = '3px';
+  ctx.font=`13px ${fontFam}`;
+  const displayAuthor = authorName.toUpperCase();
+  if(design.authorPosition==='bottom_right'){ctx.textAlign='right';ctx.fillText(displayAuthor,W-50,H-55);}
+  else if(design.authorPosition==='bottom_center'){ctx.textAlign='center';ctx.fillText(displayAuthor,W/2,H-55);}
+  else{ctx.textAlign='left';ctx.fillText(displayAuthor,50,H-55);}
   ctx.globalAlpha=1.0;
+  ctx.letterSpacing = '0px';
 
   // 6. AnotherBook Logo
-  ctx.fillStyle=design.accentColor; ctx.font=`13px ${fontFam}`; ctx.textAlign='center';
+  ctx.globalAlpha=0.7; ctx.fillStyle=design.accentColor;
+  ctx.font=`11px ${fontFam}`; ctx.textAlign='center';
   ctx.fillText(selectedLang==='ko'?'어나더북':'anotherbook',W/2,H-25);
+  ctx.globalAlpha=1.0;
 }
 
 // ──────────── SIMPLE COVER RENDER ────────────
@@ -2870,26 +2887,44 @@ function renderSimpleCover(canvas, design, bookTitle, authorName){
   const fontFam=isKo?'"Noto Serif KR","Noto Sans KR",serif':'"Playfair Display",Georgia,serif';
 
   ctx.fillStyle=design.coverColor; ctx.fillRect(0,0,W,H);
-  ctx.fillStyle=design.accentColor; ctx.fillRect((W-W*.5)/2,H*.08,W*.5,2);
 
-  ctx.fillStyle=design.textColor; ctx.textAlign='center';
+  const lineW=W*0.35;
+  ctx.strokeStyle=design.accentColor; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo((W-lineW)/2,H*.08); ctx.lineTo((W+lineW)/2,H*.08); ctx.stroke();
+  ctx.fillStyle=design.accentColor;
+  ctx.fillRect((W-lineW)/2-2, H*.08-2, 4, 4);
+  ctx.fillRect((W+lineW)/2-2, H*.08-2, 4, 4);
+
   const lines=(design.titleLines&&design.titleLines.length>0)?design.titleLines:[bookTitle];
-  const sz=56, lh=sz+14;
+  const longestLine=lines.reduce((a,b)=>a.length>b.length?a:b,'');
+  const sz=Math.min(72,(W*0.8)/(longestLine.length*0.6));
+  const lh=sz*1.1;
   let startY=(H-lines.length*lh)/2-40;
+  ctx.fillStyle=design.textColor; ctx.textAlign='center';
   lines.forEach((line,i)=>{
     let s=sz; ctx.font=`bold ${s}px ${fontFam}`;
-    while(ctx.measureText(line).width>W*.78&&s>18){s-=4;ctx.font=`bold ${s}px ${fontFam}`;}
+    while(ctx.measureText(line).width>W*.82&&s>18){s-=4;ctx.font=`bold ${s}px ${fontFam}`;}
     ctx.fillText(line,W/2,startY+i*lh);
   });
   const lastY=startY+(lines.length-1)*lh;
 
-  ctx.fillStyle=design.accentColor; ctx.font='32px sans-serif'; ctx.fillText('✦',W/2,lastY+70);
+  ctx.fillStyle=design.accentColor; ctx.font='24px sans-serif'; ctx.fillText('✦',W/2,lastY+65);
+
   ctx.fillStyle=design.textColor; ctx.globalAlpha=0.85;
-  ctx.font=`italic 22px ${fontFam}`; ctx.fillText(authorName,W/2,lastY+118);
-  ctx.globalAlpha=1.0;
-  ctx.fillStyle=design.accentColor; ctx.fillRect((W-W*.5)/2,H-H*.08,W*.5,2);
-  ctx.font=`13px ${fontFam}`;
+  ctx.letterSpacing='3px'; ctx.font=`13px ${fontFam}`;
+  ctx.fillText(authorName.toUpperCase(),W/2,lastY+110);
+  ctx.globalAlpha=1.0; ctx.letterSpacing='0px';
+
+  ctx.strokeStyle=design.accentColor; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo((W-lineW)/2,H-H*.08); ctx.lineTo((W+lineW)/2,H-H*.08); ctx.stroke();
+  ctx.fillStyle=design.accentColor;
+  ctx.fillRect((W-lineW)/2-2, H-H*.08-2, 4, 4);
+  ctx.fillRect((W+lineW)/2-2, H-H*.08-2, 4, 4);
+
+  ctx.globalAlpha=0.7; ctx.fillStyle=design.accentColor;
+  ctx.font=`11px ${fontFam}`; ctx.textAlign='center';
   ctx.fillText(selectedLang==='ko'?'어나더북':'anotherbook',W/2,H-H*.028);
+  ctx.globalAlpha=1.0;
 }
 
 // ──────────── FULL COVER GENERATION FLOW ────────────
