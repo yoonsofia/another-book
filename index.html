@@ -3188,14 +3188,7 @@ async function generatePDFPrimary(sp) {
   let globalPage = 1;
 
   const drawPageHeader = () => {
-    doc.setFont(bodyFont,'normal');
-    doc.setFontSize(8);
-    doc.setTextColor(136,136,136);
-    const shortTitle = story.title.length > 28 ? story.title.substring(0,28)+'…' : story.title;
-    doc.text(shortTitle, PW - mR, mTop - 3, {align:'right'});
-    doc.setDrawColor(196,168,130);
-    doc.setLineWidth(0.25);
-    doc.line(mL, mTop - 0.5, PW - mR, mTop - 0.5);
+    // Running header removed
   };
 
   const drawPageNum = () => {
@@ -3313,32 +3306,51 @@ async function generatePDFPrimary(sp) {
     doc.setTextColor(44,44,44);
 
     const paras = ch.content.split(/\n\n+|\n/).filter(p=>p.trim());
-    for(let pi=0; pi<paras.length; pi++){
-      const para = paras[pi];
+    let isFirstParagraph = true;
+
+    for (const para of paras) {
+      const cleanPara = para.trim();
       doc.setFont(bodyFont,'normal');
       doc.setFontSize(11);
       doc.setTextColor(44,44,44);
 
-      if (pi > 0) {
-        // First-line indent for all paragraphs except the first
-        const indentLines = doc.splitTextToSize(para.trim(), textW - 8);
-        const firstLine = indentLines[0] || '';
-        if (y + 7 > PH - mBot) {
-          drawPageNum();
-          doc.addPage();
-          globalPage++;
-          drawPageHeader();
-          y = mTop + 8;
-          doc.setFont(bodyFont,'normal');
-          doc.setFontSize(11);
-          doc.setTextColor(44,44,44);
-        }
-        doc.text(firstLine, mL + 8, y);
-        y += 7;
-        const remaining = para.trim().substring(firstLine.length).trim();
-        if (remaining) {
-          const restLines = doc.splitTextToSize(remaining, textW);
-          for (const line of restLines) {
+      // Page break check before paragraph
+      if (y + 14 > PH - mBot) {
+        drawPageNum();
+        doc.addPage();
+        globalPage++;
+        drawPageHeader();
+        y = mTop + 8;
+        doc.setFont(bodyFont,'normal');
+        doc.setFontSize(11);
+        doc.setTextColor(44,44,44);
+      }
+
+      if (cleanPara.includes('*')) {
+        const newY = renderParagraphWithItalics(
+          doc, cleanPara,
+          isFirstParagraph ? mL : mL + 8,
+          y, textW, 11, bodyFont
+        );
+        y = newY + 3;
+      } else {
+        const lines = doc.splitTextToSize(cleanPara, textW);
+        if (!isFirstParagraph) {
+          // First-line indent
+          const firstLine = lines[0] || '';
+          if (y + 7 > PH - mBot) {
+            drawPageNum();
+            doc.addPage();
+            globalPage++;
+            drawPageHeader();
+            y = mTop + 8;
+            doc.setFont(bodyFont,'normal');
+            doc.setFontSize(11);
+            doc.setTextColor(44,44,44);
+          }
+          doc.text(firstLine, mL + 8, y);
+          y += 7;
+          for (const line of lines.slice(1)) {
             if (y + 7 > PH - mBot) {
               drawPageNum();
               doc.addPage();
@@ -3352,25 +3364,27 @@ async function generatePDFPrimary(sp) {
             doc.text(line, mL, y);
             y += 7;
           }
-        }
-      } else {
-        // No indent for first paragraph of each chapter
-        const lines = doc.splitTextToSize(para.trim(), textW);
-        for (const line of lines) {
-          if (y + 7 > PH - mBot) {
-            drawPageNum();
-            doc.addPage();
-            globalPage++;
-            drawPageHeader();
-            y = mTop + 8;
-            doc.setFont(bodyFont,'normal');
-            doc.setFontSize(11);
-            doc.setTextColor(44,44,44);
+          y += 3;
+        } else {
+          // No indent for first paragraph of each chapter
+          for (const line of lines) {
+            if (y + 7 > PH - mBot) {
+              drawPageNum();
+              doc.addPage();
+              globalPage++;
+              drawPageHeader();
+              y = mTop + 8;
+              doc.setFont(bodyFont,'normal');
+              doc.setFontSize(11);
+              doc.setTextColor(44,44,44);
+            }
+            doc.text(line, mL, y);
+            y += 7;
           }
-          doc.text(line, mL, y);
-          y += 7;
+          y += 3;
         }
       }
+      isFirstParagraph = false;
     }
     drawPageNum();
   }
@@ -3386,6 +3400,87 @@ async function generatePDFPrimary(sp) {
     suc.style.display='block';
     setTimeout(()=>{ suc.style.display='none'; },5000);
   },500);
+}
+
+function renderLineSegments(doc, segments, x, y, fontName, fontSize) {
+  let currentX = x;
+  for (const seg of segments) {
+    try {
+      doc.setFont(fontName, seg.style || 'normal');
+    } catch(e) {
+      doc.setFont('times', seg.style || 'normal');
+    }
+    doc.setFontSize(fontSize);
+    doc.text(seg.text, currentX, y);
+    currentX += seg.width;
+  }
+}
+
+function renderParagraphWithItalics(doc, text, x, y, maxWidth, fontSize, fontName) {
+  const parts = [];
+  const regex = /\*\*([^*]+)\*\*|\*([^*]+)\*/g;
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({ text: text.slice(lastIndex, match.index), style: 'normal' });
+    }
+    if (match[1]) {
+      parts.push({ text: match[1], style: 'bold' });
+    } else {
+      parts.push({ text: match[2], style: 'italic' });
+    }
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) {
+    parts.push({ text: text.slice(lastIndex), style: 'normal' });
+  }
+  if (parts.length === 0) {
+    parts.push({ text: text, style: 'normal' });
+  }
+
+  let currentLineWidth = 0;
+  let currentY = y;
+  let lineSegments = [];
+
+  for (const part of parts) {
+    const words = part.text.split(' ');
+    for (let i = 0; i < words.length; i++) {
+      const word = words[i];
+      const wordWithSpace = (i === words.length - 1) ? word : word + ' ';
+      try {
+        doc.setFont(fontName, part.style || 'normal');
+      } catch(e) {
+        doc.setFont('times', part.style || 'normal');
+      }
+      doc.setFontSize(fontSize);
+      const wordWidth = doc.getTextWidth(wordWithSpace);
+
+      if (currentLineWidth + wordWidth > maxWidth && currentLineWidth > 0) {
+        renderLineSegments(doc, lineSegments, x, currentY, fontName, fontSize);
+        currentY += fontSize * 0.45;
+        currentLineWidth = 0;
+        lineSegments = [];
+      }
+
+      const lastSeg = lineSegments[lineSegments.length - 1];
+      if (lastSeg && lastSeg.style === (part.style || 'normal')) {
+        lastSeg.text += wordWithSpace;
+        lastSeg.width += wordWidth;
+      } else {
+        lineSegments.push({ text: wordWithSpace, style: part.style || 'normal', width: wordWidth });
+      }
+      currentLineWidth += wordWidth;
+    }
+  }
+
+  if (lineSegments.length > 0) {
+    renderLineSegments(doc, lineSegments, x, currentY, fontName, fontSize);
+    currentY += fontSize * 0.45;
+  }
+
+  return currentY;
 }
 
 async function generatePDFFallback() {
