@@ -1323,6 +1323,50 @@ body{
   .cover-sel-card { width: 100%; }
   #cover-cards-row { flex-direction: column !important; align-items: center; }
 }
+
+/* ── COVER LOADING PAGE ── */
+.cover-loading-page{
+  background:linear-gradient(145deg,var(--burg-dk) 0%,var(--burg) 60%,var(--burg-lt) 100%);
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;padding:60px 28px;
+  position:relative;overflow:hidden;
+}
+.cover-loading-page::before{
+  content:'';position:absolute;width:600px;height:600px;
+  border-radius:50%;border:1px solid rgba(201,168,76,.07);
+  top:-200px;right:-180px;pointer-events:none;
+}
+.cover-loading-page::after{
+  content:'';position:absolute;width:400px;height:400px;
+  border-radius:50%;border:1px solid rgba(201,168,76,.05);
+  bottom:-140px;left:-140px;pointer-events:none;
+}
+.cover-load-pulse{
+  font-family:'Noto Serif KR',serif;font-size:20px;font-weight:700;
+  color:var(--gold);letter-spacing:3px;margin-bottom:40px;
+  animation:cover-pulse 2.4s ease-in-out infinite;
+}
+@keyframes cover-pulse{
+  0%,100%{opacity:.65;transform:scale(1);}
+  50%{opacity:1;transform:scale(1.05);}
+}
+.cover-load-icon{font-size:64px;display:block;margin-bottom:24px;
+  animation:cover-float 3s ease-in-out infinite;}
+@keyframes cover-float{
+  0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}
+}
+.cover-load-msg{
+  font-size:17px;color:var(--gold-lt);
+  font-family:'Noto Sans KR',sans-serif;font-style:italic;
+  min-height:30px;transition:opacity .45s;
+  max-width:400px;line-height:1.75;margin-bottom:32px;
+}
+.cover-load-dots{display:flex;gap:12px;justify-content:center;}
+.cover-load-dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.15);transition:all .4s;}
+.cover-load-dot.active{background:var(--gold);transform:scale(1.35);}
+.cover-load-dot.done{background:var(--gold-dk);}
+.cover-sel-card.sel{border-width:3px;}
 </style>
 </head>
 <body>
@@ -1602,6 +1646,20 @@ body{
 <!-- PDF Success Toast -->
 <div id="pdf-success-msg">PDF가 준비됐어요!<br>선물용으로 출력하거나 디지털로 전송하세요 📖</div>
 
+<!-- ══════════ COVER LOADING PAGE ══════════ -->
+<div id="page-cover-loading" class="page">
+  <div class="cover-loading-page">
+    <div class="cover-load-pulse">어나더북</div>
+    <span class="cover-load-icon" id="cover-load-icon">🎨</span>
+    <div class="cover-load-msg" id="cover-load-msg">🎨 AI가 표지 디자인을 구상하고 있어요...</div>
+    <div class="cover-load-dots">
+      <div class="cover-load-dot active" id="cld1"></div>
+      <div class="cover-load-dot" id="cld2"></div>
+      <div class="cover-load-dot" id="cld3"></div>
+    </div>
+  </div>
+</div>
+
 <!-- ══════════ COVER SELECT PAGE ══════════ -->
 <div id="page-cover-select" class="page">
   <header class="q-header">
@@ -1611,48 +1669,41 @@ body{
   </header>
 
   <div style="max-width:840px;margin:0 auto;padding:48px 24px 72px;">
-    <h2 style="text-align:center;font-family:'Noto Serif KR',serif;font-size:26px;font-weight:700;color:#2C2C2C;margin-bottom:8px;">📖 표지를 선택해주세요</h2>
+    <h2 style="text-align:center;font-family:'Noto Serif KR',serif;font-size:26px;font-weight:700;color:#2C2C2C;margin-bottom:8px;">📖 표지 미리보기</h2>
     <p style="text-align:center;color:var(--txt-lt);font-family:'Noto Sans KR',sans-serif;font-size:14px;margin-bottom:44px;">마음에 드는 표지를 선택하세요</p>
 
-    <div id="cover-cards-row" style="display:flex;gap:28px;justify-content:center;flex-wrap:wrap;margin-bottom:40px;">
+    <div id="cover-cards-row" style="display:flex;gap:28px;justify-content:center;flex-wrap:wrap;margin-bottom:32px;">
 
-      <!-- Card 1: AI Image Cover -->
-      <div id="cover-card-ai" class="cover-sel-card" onclick="selectCoverCard('ai')">
-        <div class="cover-card-badge">추천</div>
-        <h3 class="cover-card-title">✨ AI 이미지 표지</h3>
-        <div id="ai-cover-loading" style="text-align:center;padding:48px 20px;">
-          <div class="cover-spinner"></div>
-          <p style="margin-top:14px;font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--txt-lt);">AI 이미지 생성 중...</p>
-          <p style="font-family:'Noto Sans KR',sans-serif;font-size:12px;color:var(--txt-lt);margin-top:5px;">최대 30초 소요</p>
-        </div>
-        <div id="ai-cover-preview" style="display:none;">
-          <div style="background:#FDFAF5;border-radius:8px;padding:16px 12px;text-align:center;">
-            <div id="ai-book-title" style="font-family:'Noto Serif KR',serif;font-weight:700;font-size:16px;color:#2C2C2C;margin-bottom:10px;padding:0 8px;line-height:1.4;"></div>
-            <img id="ai-cover-img" style="width:100%;border-radius:4px;display:block;" alt="AI 표지 이미지" crossorigin="anonymous">
-            <div id="ai-author-name" style="font-family:'Noto Serif KR',serif;font-size:13px;color:#2C2C2C;margin-top:10px;"></div>
-          </div>
-        </div>
-        <div id="ai-cover-error" style="display:none;text-align:center;padding:36px 16px;">
-          <p id="ai-cover-error-msg" style="color:#b91c1c;font-family:'Noto Sans KR',sans-serif;font-size:13px;margin-bottom:14px;line-height:1.6;"></p>
-          <button onclick="retryAiCover()" style="background:none;border:1.5px solid var(--burg);color:var(--burg);padding:8px 20px;border-radius:20px;font-size:13px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;">다시 시도</button>
+      <!-- Card 1: AI Generated Cover -->
+      <div id="cover-card-ai" class="cover-sel-card sel" onclick="selectCoverCard('ai')">
+        <div class="cover-card-badge" style="background:linear-gradient(135deg,#3D5A47,#5a8a68);color:white;">Claude + DALL-E 3</div>
+        <h3 class="cover-card-title">✨ AI 추천 표지</h3>
+        <div style="display:flex;justify-content:center;">
+          <canvas id="ai-cover-canvas" width="800" height="1200"
+            style="width:220px;height:330px;border-radius:3px 8px 8px 3px;box-shadow:-4px 4px 16px rgba(0,0,0,.28);display:block;"></canvas>
         </div>
       </div>
 
-      <!-- Card 2: Simple Cover -->
-      <div id="cover-card-simple" class="cover-sel-card sel" onclick="selectCoverCard('simple')">
-        <h3 class="cover-card-title">📝 심플 표지</h3>
+      <!-- Card 2: Simple Text Cover -->
+      <div id="cover-card-simple" class="cover-sel-card" onclick="selectCoverCard('simple')">
+        <div class="cover-card-badge" style="background:linear-gradient(135deg,#7A7A6E,#9A9A8E);color:white;">타이포그래피</div>
+        <h3 class="cover-card-title">✦ 심플 표지</h3>
         <div style="display:flex;justify-content:center;">
-          <canvas id="simple-cover-canvas" width="254" height="376"
-            style="border-radius:3px 8px 8px 3px;box-shadow:-4px 4px 16px rgba(0,0,0,.28);"></canvas>
+          <canvas id="simple-cover-canvas" width="800" height="1200"
+            style="width:220px;height:330px;border-radius:3px 8px 8px 3px;box-shadow:-4px 4px 16px rgba(0,0,0,.28);display:block;"></canvas>
         </div>
       </div>
     </div>
 
-    <!-- Confirm Button -->
-    <div style="text-align:center;">
+    <!-- Action Buttons -->
+    <div style="text-align:center;max-width:480px;margin:0 auto;">
+      <button onclick="regenerateCover()"
+        style="background:transparent;border:2px solid #3D5A47;color:#3D5A47;width:100%;padding:14px 32px;font-size:14px;font-weight:600;font-family:'Noto Sans KR',sans-serif;border-radius:50px;cursor:pointer;transition:all .3s;margin-bottom:14px;">
+        🔄 표지 다시 생성하기
+      </button>
       <button id="confirm-cover-btn" onclick="confirmCoverAndMakePDF()"
-        style="background:#3D5A47;color:white;border:none;width:100%;max-width:480px;padding:18px 32px;font-size:16px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border-radius:50px;cursor:pointer;transition:all .3s;box-shadow:0 4px 20px rgba(61,90,71,.3);">
-        이 표지로 PDF 만들기 →
+        style="background:#3D5A47;color:white;border:none;width:100%;padding:18px 32px;font-size:16px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border-radius:50px;cursor:pointer;transition:all .3s;box-shadow:0 4px 20px rgba(61,90,71,.3);">
+        이 표지로 계속하기 →
       </button>
       <p style="margin-top:18px;">
         <button onclick="goBackFromCoverSelect()"
@@ -1682,8 +1733,9 @@ let story = null;
 let apiKey = sessionStorage.getItem('ms_api') || '';
 let openaiKey = sessionStorage.getItem('openai_key') || '';
 let loadTimer = null;
-let selectedCover = 'simple'; // 'ai' or 'simple'
+let selectedCover = 'ai'; // 'ai' or 'simple'
 let aiCoverDataUrl = null;
+let coverDesign = null;
 let selectedProduct = 'digital'; // 'digital', 'physical', 'gift'
 
 // ──────────── QUESTIONNAIRE DATA ────────────
@@ -1989,7 +2041,13 @@ function startLoading(){
 function stopLoading(){ clearInterval(loadTimer); }
 
 // ──────────── GENERATE HELPERS ────────────
-async function apiCall(promptText, maxTok){
+async function apiCall(promptText, maxTok, systemPrompt){
+  const body = {
+    model:'claude-opus-4-7',
+    max_tokens: maxTok,
+    messages:[{role:'user', content: promptText}]
+  };
+  if(systemPrompt) body.system = systemPrompt;
   const res = await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
     headers:{
@@ -1998,11 +2056,7 @@ async function apiCall(promptText, maxTok){
       'anthropic-version':'2023-06-01',
       'anthropic-dangerous-direct-browser-access':'true'
     },
-    body: JSON.stringify({
-      model:'claude-opus-4-7',
-      max_tokens: maxTok,
-      messages:[{role:'user', content: promptText}]
-    })
+    body: JSON.stringify(body)
   });
   if(!res.ok){
     const e = await res.json().catch(()=>({error:{message:'알 수 없는 오류'}}));
@@ -2067,8 +2121,8 @@ async function generateStory(){
     ? `You are a bestselling English novelist.\nStyle: Literary commercial fiction, warm and emotional tone.\nVocabulary: Natural adult English, accessible but sophisticated.\nProtagonist: ${ans.name}`
     : '당신은 한국어 베스트셀러 소설 작가입니다.';
   const qualityStdFn = isEnglish
-    ? () => `Write Chapter 1 in English.\nTarget length: 2,000–2,500 words. Do not summarize.\nStyle: Literary commercial fiction, warm and emotional tone.\nWrite with full dialogue, sensory descriptions, inner monologue, and vivid scenes.`
-    : () => `챕터 1 분량: 1,500~2,000 한국어 단어 (반드시 지킬 것). 요약하지 마세요.\n출판된 한국 소설가처럼 써주세요: 완전한 대화, 감각적 묘사, 내면 독백, 생생한 장면.`;
+    ? () => `Write Chapter 1 in English.\nMinimum 1,000 English words for this part. Write in full detail, do not summarize.\nStyle: Literary commercial fiction, warm and emotional tone.\nWrite with full dialogue, sensory descriptions, inner monologue, and vivid scenes.`
+    : () => `챕터 1 집필.\n최소 700 한국어 단어. 요약하지 말고 완전하게 작성하세요.\n출판된 한국 소설가처럼 써주세요: 완전한 대화, 감각적 묘사, 내면 독백, 생생한 장면.`;
 
   const storyInfo = buildStoryInfo();
   const rules = buildRules();
@@ -2100,13 +2154,13 @@ ${storyInfo}
     await new Promise(r=>setTimeout(r,300));
     markLoadStep('ls2');
 
-    // ── Step 3: Write Chapter 1 ──
-    setLoadMsg(isEnglish ? 'Writing Chapter 1...' : '챕터 1을 집필하고 있어요...');
+    // ── Step 3: Write Chapter 1 (Part 1 + Part 2) ──
+    setLoadMsg(isEnglish ? 'Writing Chapter 1 (Part 1)...' : '챕터 1 파트 1을 집필하고 있어요...');
     const ch1Title = outline.chapters[0].title;
-    const ch1Prompt = isEnglish
+    const ch1Part1Prompt = isEnglish
       ? `${writerRole}
 
-Write Chapter 1 of the novel below in full.
+Write Part 1 of 2 for Chapter 1 of the novel below.
 
 **Novel info:**
 Title: ${outline.title}
@@ -2115,8 +2169,8 @@ ${storyInfo}
 **Full chapter outline:**
 ${outline.chapters.map(c=>`Chapter ${c.number}: ${c.title}`).join('\n')}
 
-**Now writing — Chapter 1: ${ch1Title}**
-End with a moment that naturally draws the reader into Chapter 2.
+**Now writing — Chapter 1: ${ch1Title} (Part 1 of 2)**
+Write the first half of the chapter. End at a natural mid-point — do not conclude the chapter yet.
 
 **Length and quality:**
 ${qualityStdFn()}
@@ -2124,7 +2178,7 @@ ${qualityStdFn()}
 ${rules}
 ${lotteryRule}
 **Response format — output only the chapter body. No chapter number, title, JSON, or markdown. Separate paragraphs with blank lines:**`
-      : `당신은 한국어 베스트셀러 소설 작가입니다. 아래 소설의 챕터 1을 완전하게 집필해주세요.
+      : `당신은 한국어 베스트셀러 소설 작가입니다. 아래 소설의 챕터 1 파트 1을 집필해주세요.
 
 **소설 정보:**
 제목: ${outline.title}
@@ -2133,8 +2187,8 @@ ${storyInfo}
 **전체 챕터 구성:**
 ${outline.chapters.map(c=>`챕터 ${c.number}: ${c.title}`).join('\n')}
 
-**현재 집필 — 챕터 1: ${ch1Title}**
-다음 챕터로 자연스럽게 이어지는 여운을 남기세요.
+**현재 집필 — 챕터 1: ${ch1Title} (파트 1/2)**
+챕터의 전반부를 써주세요. 자연스러운 중간 지점에서 끊어주세요 — 챕터를 완결짓지 마세요.
 
 **분량 및 품질:**
 ${qualityStdFn()}
@@ -2143,8 +2197,53 @@ ${rules}
 ${lotteryRule}
 **응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON, 마크다운 없이 순수 본문만. 단락 사이는 빈 줄로 구분:**`;
 
-    const ch1Raw = await apiCall(ch1Prompt, 8000);
-    const ch1Content = ch1Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
+    const ch1Part1Raw = await apiCall(ch1Part1Prompt, 2000);
+    const ch1Part1Content = ch1Part1Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
+
+    setLoadMsg(isEnglish ? 'Writing Chapter 1 (Part 2)...' : '챕터 1 파트 2를 집필하고 있어요...');
+    const ch1Part2Prompt = isEnglish
+      ? `${writerRole}
+
+Write Part 2 of 2 for Chapter 1, continuing directly from Part 1.
+
+**Novel info:**
+Title: ${outline.title}
+${storyInfo}
+
+**Part 1 content:**
+${ch1Part1Content}
+
+**Now writing — Chapter 1: ${ch1Title} (Part 2 of 2)**
+Continue directly from Part 1. End with a moment that naturally draws the reader into Chapter 2.
+
+**Length and quality:**
+${qualityStdFn()}
+
+${rules}
+${lotteryRule}
+**Response format — output only the continuation. No chapter number, title, JSON, or markdown. Separate paragraphs with blank lines:**`
+      : `당신은 한국어 베스트셀러 소설 작가입니다. 파트 1에 이어 챕터 1의 파트 2를 집필해주세요.
+
+**소설 정보:**
+제목: ${outline.title}
+${storyInfo}
+
+**파트 1 내용:**
+${ch1Part1Content}
+
+**현재 집필 — 챕터 1: ${ch1Title} (파트 2/2)**
+파트 1에서 이어서 써주세요. 다음 챕터로 자연스럽게 이어지는 여운을 남기세요.
+
+**분량 및 품질:**
+${qualityStdFn()}
+
+${rules}
+${lotteryRule}
+**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON, 마크다운 없이 순수 본문만. 단락 사이는 빈 줄로 구분:**`;
+
+    const ch1Part2Raw = await apiCall(ch1Part2Prompt, 2000);
+    const ch1Part2Content = ch1Part2Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
+    const ch1Content = ch1Part1Content + '\n\n' + ch1Part2Content;
     markLoadStep('ls3');
 
     // ── Step 4: Done ──
@@ -2512,19 +2611,10 @@ function showCoverSelect(type){
   selectedProduct = type || 'digital';
   if(!story){ startStory(); return; }
   aiCoverDataUrl = null;
-  selectedCover = 'simple';
-  showPage('page-cover-select');
-  document.fonts.ready.then(()=>{
-    drawSimpleCover();
-    if(openaiKey){
-      generateAiCover();
-    } else {
-      document.getElementById('ai-cover-loading').style.display='none';
-      document.getElementById('ai-cover-error').style.display='block';
-      document.getElementById('ai-cover-error-msg').textContent='OpenAI API 키가 없어요. 심플 표지가 선택됩니다.';
-      selectCoverCard('simple');
-    }
-  });
+  coverDesign = null;
+  selectedCover = 'ai';
+  showPage('page-cover-loading');
+  generateFullCover();
 }
 
 function goBackFromCoverSelect(){ showPage('page-story'); }
@@ -2584,51 +2674,282 @@ function coverWrapText(ctx, text, x, y, maxW, lh){
   lines.forEach((l,i)=>ctx.fillText(l, x, startY+i*lh));
 }
 
-async function generateAiCover(){
-  const loadEl = document.getElementById('ai-cover-loading');
-  const prevEl = document.getElementById('ai-cover-preview');
-  const errEl  = document.getElementById('ai-cover-error');
-  if(loadEl) loadEl.style.display='block';
-  if(prevEl) prevEl.style.display='none';
-  if(errEl)  errEl.style.display='none';
-  selectCoverCard('simple');
+function retryAiCover(){ regenerateCover(); }
 
-  const prompt = `A beautiful watercolor illustration for a Korean novel cover. The story is about: ${ans.topic||'everyday life'}. Protagonist: ${ans.name||'a person'}. Mood: ${ans.mood||'warm'}. Style: warm, detailed interior or lifestyle scene, soft watercolor textures, muted warm colors, no text, no letters, suitable for a literary book cover. Similar to Studio Ghibli watercolor aesthetic.`;
+// ──────────── COVER LOADING HELPERS ────────────
+function setCoverLoadMsg(msg){
+  const el = document.getElementById('cover-load-msg');
+  if(!el) return;
+  el.style.opacity = '0';
+  setTimeout(()=>{ el.textContent = msg; el.style.opacity = '1'; }, 400);
+}
 
-  try {
-    const res = await fetch('https://api.openai.com/v1/images/generations',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${openaiKey}`},
-      body: JSON.stringify({model:'dall-e-3', prompt, n:1, size:'1024x1792', quality:'standard', response_format:'b64_json'})
-    });
-    if(!res.ok){
-      const e = await res.json().catch(()=>({error:{message:'알 수 없는 오류'}}));
-      throw new Error(e.error?.message||`HTTP ${res.status}`);
-    }
-    const data = await res.json();
-    const b64 = data.data[0].b64_json;
-    aiCoverDataUrl = `data:image/png;base64,${b64}`;
-
-    const imgEl = document.getElementById('ai-cover-img');
-    const titleEl = document.getElementById('ai-book-title');
-    const authorEl = document.getElementById('ai-author-name');
-    if(imgEl){ imgEl.src = aiCoverDataUrl; }
-    if(titleEl) titleEl.textContent = story.title;
-    if(authorEl) authorEl.textContent = ans.author||'어나더북';
-
-    if(loadEl) loadEl.style.display='none';
-    if(prevEl) prevEl.style.display='block';
-    selectCoverCard('ai');
-  } catch(err){
-    if(loadEl) loadEl.style.display='none';
-    if(errEl){
-      errEl.style.display='block';
-      document.getElementById('ai-cover-error-msg').textContent=`이미지 생성 실패: ${err.message}`;
-    }
+function setCoverLoadDot(step){
+  for(let i=1; i<=3; i++){
+    const dot = document.getElementById('cld'+i);
+    if(!dot) continue;
+    dot.classList.remove('active','done');
+    if(i < step) dot.classList.add('done');
+    else if(i === step) dot.classList.add('active');
   }
 }
 
-function retryAiCover(){ generateAiCover(); }
+// ──────────── STEP 1: CLAUDE COVER DESIGN ────────────
+async function getCoverDesign(){
+  const bookTitle = story?.title || '';
+  const systemPrompt = `You are a professional book cover designer for a modern literary fiction publisher like Penguin, Faber & Faber, or Riverhead Books. You make bold, modern design decisions. Always return valid JSON only, no explanation, no markdown.`;
+  const userPrompt = `Design a book cover for this story:
+- Title: ${bookTitle}
+- Theme: ${ans.topic}
+- Mood: ${ans.mood}
+- Protagonist name: ${ans.name}
+- Language: ${selectedLang === 'ko' ? 'Korean' : 'English'}
+
+Return a JSON object with exactly these fields:
+{
+  "coverColor": "(one dominant hex color matching the mood - be bold and specific)",
+  "textColor": "(either #FFFFFF or a dark color like #1C1C1C or #2C1810 - must have strong contrast against coverColor)",
+  "accentColor": "(secondary hex color for decorative details - complementary to coverColor)",
+  "symbol": "(one single concrete object or symbol representing this story's emotional core - be specific and visual, e.g. 'a cracked ceramic bowl with gold repair lines', 'a single wilting sunflower casting a long shadow', 'an antique compass with a spinning needle' - NO people, NO faces, NO human figures, NO silhouettes)",
+  "layout": "(one of: image_dominant, title_dominant, side_title, split)",
+  "titleSize": "(one of: small, large, massive)",
+  "titlePosition": "(one of: top_left, top_center, bottom_left, bottom_center, side_left)",
+  "titleLines": ["split the title into an array of lines for dramatic effect"],
+  "authorPosition": "(one of: bottom_left, bottom_right, bottom_center)",
+  "symbolSize": "(one of: small, medium, large, full_bleed)",
+  "symbolPosition": "(one of: center, off_center_right, off_center_left, bottom_bleed, top_bleed)",
+  "dallePrompt": "(write the complete DALL-E 3 prompt for generating ONLY the illustration - include the symbol description, background color, style direction, and explicitly end with: no text, no letters, no numbers, no words, no people, no faces, no human figures)"
+}`;
+  const raw = await apiCall(userPrompt, 1000, systemPrompt);
+  return extractJSON(raw);
+}
+
+// ──────────── STEP 2: DALL-E IMAGE ────────────
+async function generateDalleImage(dallePrompt){
+  const res = await fetch('https://api.openai.com/v1/images/generations',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':`Bearer ${openaiKey}`},
+    body: JSON.stringify({
+      model:'dall-e-3',
+      prompt: dallePrompt,
+      n:1,
+      size:'1024x1792',
+      quality:'standard',
+      response_format:'b64_json'
+    })
+  });
+  if(!res.ok){
+    const e = await res.json().catch(()=>({error:{message:'알 수 없는 오류'}}));
+    throw new Error(e.error?.message||`HTTP ${res.status}`);
+  }
+  const data = await res.json();
+  return `data:image/png;base64,${data.data[0].b64_json}`;
+}
+
+// ──────────── STEP 3: RENDER COVER ON CANVAS ────────────
+async function renderCover(canvas, design, imageUrl, bookTitle, authorName){
+  const W = 800, H = 1200;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  const isKo = selectedLang === 'ko';
+  const fontFam = isKo ? '"Noto Serif KR","Noto Sans KR",serif' : '"Playfair Display",Georgia,serif';
+
+  // 1. Background
+  ctx.fillStyle = design.coverColor;
+  ctx.fillRect(0, 0, W, H);
+
+  // 2. DALL-E Image
+  if(imageUrl){
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    await new Promise(resolve=>{ img.onload=resolve; img.onerror=resolve; img.src=imageUrl; });
+    ctx.save();
+    const sp = design.symbolPosition, ss = design.symbolSize, layout = design.layout;
+    if(layout === 'split'){
+      const aH = H * 0.5, scale = Math.min(W/img.width, aH/img.height);
+      const dw = img.width*scale, dh = img.height*scale;
+      ctx.drawImage(img,(W-dw)/2, H/2+(aH-dh)/2, dw, dh);
+    } else if(ss === 'full_bleed'){
+      ctx.globalAlpha = 0.85;
+      const scale = Math.max(W/img.width, H/img.height);
+      const dw = img.width*scale, dh = img.height*scale;
+      ctx.drawImage(img,(W-dw)/2,(H-dh)/2,dw,dh);
+    } else {
+      let imgH, imgW, x, y;
+      if(ss === 'large'){
+        if(sp === 'off_center_right'){imgH=H*.6;imgW=img.width*imgH/img.height;x=W*.5-imgW*.2;y=(H-imgH)/2;}
+        else if(sp === 'off_center_left'){imgH=H*.6;imgW=img.width*imgH/img.height;x=-imgW*.2;y=(H-imgH)/2;}
+        else if(sp === 'bottom_bleed'){imgH=H*.6;imgW=img.width*imgH/img.height;x=(W-imgW)/2;y=H*.4;}
+        else if(sp === 'top_bleed'){imgH=H*.55;imgW=img.width*imgH/img.height;x=(W-imgW)/2;y=-imgH*.1;}
+        else{imgH=H*.55;imgW=img.width*imgH/img.height;x=(W-imgW)/2;y=(H-imgH)/2;}
+      } else if(ss === 'medium'){imgH=H*.45;imgW=img.width*imgH/img.height;x=(W-imgW)/2;y=(H-imgH)/2;}
+      else{imgH=H*.30;imgW=img.width*imgH/img.height;x=(W-imgW)/2;y=(H-imgH)/2;}
+      ctx.drawImage(img,x,y,imgW,imgH);
+    }
+    ctx.restore();
+  }
+
+  // 3. Title Text
+  ctx.fillStyle = design.textColor;
+  const sizePx = {small:36,large:52,massive:72};
+  const fontSize = sizePx[design.titleSize]||52;
+  const lines = (design.titleLines&&design.titleLines.length>0) ? design.titleLines : [bookTitle];
+  const layout = design.layout, pos = design.titlePosition;
+  let titleStartY=80, titleEndY=80, titleAlign='left';
+
+  function drawTitleLines(startX, startY, align, sz){
+    ctx.textAlign = align;
+    const lh = sz + (sz>=72?14:10);
+    titleStartY = startY;
+    lines.forEach((line,i)=>{
+      let s=sz; ctx.font=`bold ${s}px ${fontFam}`;
+      const maxW = align==='center' ? W-80 : W-100;
+      while(ctx.measureText(line).width>maxW && s>18){ s-=4; ctx.font=`bold ${s}px ${fontFam}`; }
+      const drawX = align==='left' ? startX : align==='right' ? startX : W/2;
+      ctx.fillText(line, drawX, startY+i*lh);
+    });
+    titleEndY = startY+(lines.length-1)*lh+sz+8;
+    return lh;
+  }
+
+  if(layout==='side_title'||pos==='side_left'){
+    ctx.save();
+    ctx.font=`bold 28px ${fontFam}`; ctx.fillStyle=design.textColor;
+    ctx.translate(40,H/2); ctx.rotate(-Math.PI/2);
+    ctx.textAlign='center'; ctx.fillText(lines.join(' '),0,0);
+    ctx.restore(); titleStartY=H/2; titleEndY=H/2; titleAlign='center';
+  } else if(layout==='title_dominant'){
+    const sz=design.titleSize==='massive'?90:design.titleSize==='large'?66:52;
+    drawTitleLines(0,80,'center',sz); titleAlign='center';
+  } else if(layout==='split'){
+    const sz=design.titleSize==='massive'?80:design.titleSize==='large'?60:44;
+    drawTitleLines(0,80,'center',sz); titleAlign='center';
+  } else {
+    if(pos==='top_left'){drawTitleLines(50,80,'left',fontSize);titleAlign='left';}
+    else if(pos==='top_center'){drawTitleLines(0,80,'center',fontSize);titleAlign='center';}
+    else if(pos==='bottom_left'){
+      const lh=fontSize+(fontSize>=72?14:10);
+      const sY=H-120-(lines.length-1)*lh;
+      drawTitleLines(50,sY,'left',fontSize);titleAlign='left';
+    } else if(pos==='bottom_center'){
+      const lh=fontSize+(fontSize>=72?14:10);
+      const sY=H-120-(lines.length-1)*lh;
+      drawTitleLines(0,sY,'center',fontSize);titleAlign='center';
+    } else {
+      drawTitleLines(50,80,'left',fontSize); titleAlign='left';
+    }
+  }
+
+  // 4. Decorative Accent Line
+  ctx.strokeStyle = design.accentColor; ctx.lineWidth = 2;
+  const accentW = W*0.4;
+  const isBottom = (pos==='bottom_left'||pos==='bottom_center');
+  const lineY = isBottom ? titleStartY-20 : titleEndY+10;
+  const lineX = titleAlign==='center' ? (W-accentW)/2 : 50;
+  ctx.beginPath(); ctx.moveTo(lineX,lineY); ctx.lineTo(lineX+accentW,lineY); ctx.stroke();
+
+  // 5. Author Name
+  ctx.globalAlpha=0.85; ctx.fillStyle=design.textColor;
+  ctx.font=`18px ${fontFam}`;
+  if(design.authorPosition==='bottom_right'){ctx.textAlign='right';ctx.fillText(authorName,W-50,H-55);}
+  else if(design.authorPosition==='bottom_center'){ctx.textAlign='center';ctx.fillText(authorName,W/2,H-55);}
+  else{ctx.textAlign='left';ctx.fillText(authorName,50,H-55);}
+  ctx.globalAlpha=1.0;
+
+  // 6. AnotherBook Logo
+  ctx.fillStyle=design.accentColor; ctx.font=`13px ${fontFam}`; ctx.textAlign='center';
+  ctx.fillText(selectedLang==='ko'?'어나더북':'anotherbook',W/2,H-25);
+}
+
+// ──────────── SIMPLE COVER RENDER ────────────
+function renderSimpleCover(canvas, design, bookTitle, authorName){
+  const W=800, H=1200;
+  canvas.width=W; canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  const isKo=selectedLang==='ko';
+  const fontFam=isKo?'"Noto Serif KR","Noto Sans KR",serif':'"Playfair Display",Georgia,serif';
+
+  ctx.fillStyle=design.coverColor; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle=design.accentColor; ctx.fillRect((W-W*.5)/2,H*.08,W*.5,2);
+
+  ctx.fillStyle=design.textColor; ctx.textAlign='center';
+  const lines=(design.titleLines&&design.titleLines.length>0)?design.titleLines:[bookTitle];
+  const sz=56, lh=sz+14;
+  let startY=(H-lines.length*lh)/2-40;
+  lines.forEach((line,i)=>{
+    let s=sz; ctx.font=`bold ${s}px ${fontFam}`;
+    while(ctx.measureText(line).width>W*.78&&s>18){s-=4;ctx.font=`bold ${s}px ${fontFam}`;}
+    ctx.fillText(line,W/2,startY+i*lh);
+  });
+  const lastY=startY+(lines.length-1)*lh;
+
+  ctx.fillStyle=design.accentColor; ctx.font='32px sans-serif'; ctx.fillText('✦',W/2,lastY+70);
+  ctx.fillStyle=design.textColor; ctx.globalAlpha=0.85;
+  ctx.font=`italic 22px ${fontFam}`; ctx.fillText(authorName,W/2,lastY+118);
+  ctx.globalAlpha=1.0;
+  ctx.fillStyle=design.accentColor; ctx.fillRect((W-W*.5)/2,H-H*.08,W*.5,2);
+  ctx.font=`13px ${fontFam}`;
+  ctx.fillText(selectedLang==='ko'?'어나더북':'anotherbook',W/2,H-H*.028);
+}
+
+// ──────────── FULL COVER GENERATION FLOW ────────────
+async function generateFullCover(){
+  setCoverLoadMsg('🎨 AI가 표지 디자인을 구상하고 있어요...');
+  setCoverLoadDot(1);
+
+  const fallbackDesign = {
+    coverColor:'#3D5A47', textColor:'#FDFAF5', accentColor:'#C4A882',
+    titleLines: story?[story.title]:['나의 이야기'],
+    titlePosition:'top_center', titleSize:'large',
+    layout:'title_dominant', authorPosition:'bottom_center',
+    symbolSize:'medium', symbolPosition:'center'
+  };
+
+  try {
+    // Step 1: Claude designs the cover
+    coverDesign = await getCoverDesign();
+  } catch(err){
+    console.warn('getCoverDesign 실패, 기본 디자인 사용:', err);
+    coverDesign = fallbackDesign;
+  }
+
+  let coverImageUrl = null;
+  if(openaiKey){
+    try {
+      setCoverLoadMsg('🖌️ 심볼 일러스트를 생성하고 있어요...');
+      setCoverLoadDot(2);
+      coverImageUrl = await generateDalleImage(coverDesign.dallePrompt||
+        `A beautiful illustration for a book cover. Mood: ${ans.mood||'warm'}. Theme: ${ans.topic||'life'}. Abstract, no text, no letters, no numbers, no words, no people, no faces, no human figures`);
+    } catch(err){
+      console.warn('DALL-E 생성 실패:', err);
+    }
+  }
+
+  setCoverLoadMsg('✨ 표지를 완성하고 있어요...');
+  setCoverLoadDot(3);
+  await new Promise(r=>setTimeout(r,300));
+
+  await document.fonts.ready;
+
+  const bookTitle = story?.title||'';
+  const authorName = ans.author||'어나더북';
+
+  const aiCanvas = document.getElementById('ai-cover-canvas');
+  await renderCover(aiCanvas, coverDesign, coverImageUrl, bookTitle, authorName);
+
+  const simpleCanvas = document.getElementById('simple-cover-canvas');
+  renderSimpleCover(simpleCanvas, coverDesign, bookTitle, authorName);
+
+  selectedCover = 'ai';
+  selectCoverCard('ai');
+  showPage('page-cover-select');
+}
+
+function regenerateCover(){
+  coverDesign = null;
+  showPage('page-cover-loading');
+  generateFullCover();
+}
 
 // ──────────── PDF GENERATION (jsPDF text-based) ────────────
 async function confirmCoverAndMakePDF(){
@@ -2653,8 +2974,8 @@ async function confirmCoverAndMakePDF(){
         ? `You are a bestselling English novelist.\nStyle: Literary commercial fiction, warm and emotional tone.\nVocabulary: Natural adult English, accessible but sophisticated.\nProtagonist: ${ans.name}`
         : '당신은 한국어 베스트셀러 소설 작가입니다.';
       const qualityStdFn = isEnglish
-        ? (n) => `Write Chapter ${n} in English.\nTarget length: 2,000–2,500 words. Do not summarize.\nStyle: Literary commercial fiction, warm and emotional tone.\nWrite with full dialogue, sensory descriptions, inner monologue, and vivid scenes.`
-        : (n) => `챕터 ${n} 분량: 1,500~2,000 한국어 단어 (반드시 지킬 것). 요약하지 마세요.\n출판된 한국 소설가처럼 써주세요: 완전한 대화, 감각적 묘사, 내면 독백, 생생한 장면.`;
+        ? (n) => `Write Chapter ${n} in English.\nMinimum 1,000 English words for this part. Write in full detail, do not summarize.\nStyle: Literary commercial fiction, warm and emotional tone.\nWrite with full dialogue, sensory descriptions, inner monologue, and vivid scenes.`
+        : (n) => `챕터 ${n} 집필.\n최소 700 한국어 단어. 요약하지 말고 완전하게 작성하세요.\n출판된 한국 소설가처럼 써주세요: 완전한 대화, 감각적 묘사, 내면 독백, 생생한 장면.`;
       const storyInfo = buildStoryInfo();
       const rules = buildRules();
       const lotteryRule = buildLotteryRule();
@@ -2676,35 +2997,64 @@ async function confirmCoverAndMakePDF(){
           ? `\n**Previous chapters summary:**\n${summaries.join('\n')}\n`
           : `\n**이전 챕터 요약:**\n${summaries.join('\n')}\n`;
 
-        const chPrompt = isEnglish
+        const chPart1Prompt = isEnglish
           ? `${writerRole}
-Write Chapter ${chNum} of the novel below in full.
+Write Part 1 of 2 for Chapter ${chNum} of the novel below.
 **Novel info:** Title: ${story.title}
 ${storyInfo}
 **Full chapter outline:**
 ${outline.map(c=>`Chapter ${c.number}: ${c.title}`).join('\n')}
 ${prevCtx}
-**Now writing — Chapter ${chNum}: ${chTitle}**
-${isLast ? 'Final chapter. Bring the story to a moving, memorable conclusion.' : 'End naturally into the next chapter.'}
+**Now writing — Chapter ${chNum}: ${chTitle} (Part 1 of 2)**
+Write the first half of the chapter. End at a natural mid-point — do not conclude the chapter yet.
 **Length and quality:** ${qualityStdFn(chNum)}
 ${rules}
 ${lotteryRule}
 **Response format — output only the chapter body. No chapter number, title, JSON, or markdown. Separate paragraphs with blank lines:**`
-          : `당신은 한국어 베스트셀러 소설 작가입니다. 아래 소설의 챕터 ${chNum}을 완전하게 집필해주세요.
+          : `당신은 한국어 베스트셀러 소설 작가입니다. 아래 소설의 챕터 ${chNum} 파트 1을 집필해주세요.
 **소설 정보:** 제목: ${story.title}
 ${storyInfo}
 **전체 챕터 구성:**
 ${outline.map(c=>`챕터 ${c.number}: ${c.title}`).join('\n')}
 ${prevCtx}
-**현재 집필 — 챕터 ${chNum}: ${chTitle}**
-${isLast ? '이것은 마지막 챕터입니다. 전체 이야기를 긍정적이고 감동적으로 완결하세요. 마지막 단락은 독자의 가슴에 오래 남도록 특별히 공들여 써주세요.' : '다음 챕터로 자연스럽게 이어지는 여운을 남기세요.'}
+**현재 집필 — 챕터 ${chNum}: ${chTitle} (파트 1/2)**
+챕터의 전반부를 써주세요. 자연스러운 중간 지점에서 끊어주세요 — 챕터를 완결짓지 마세요.
 **분량 및 품질:** ${qualityStdFn(chNum)}
 ${rules}
 ${lotteryRule}
 **응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON, 마크다운 없이 순수 본문만. 단락 사이는 빈 줄로 구분:**`;
 
-        const raw = await apiCall(chPrompt, 8000);
-        const content = raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
+        const part1Raw = await apiCall(chPart1Prompt, 2000);
+        const part1Content = part1Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
+
+        const chPart2Prompt = isEnglish
+          ? `${writerRole}
+Write Part 2 of 2 for Chapter ${chNum}, continuing directly from Part 1.
+**Novel info:** Title: ${story.title}
+${storyInfo}
+**Part 1 content:**
+${part1Content}
+**Now writing — Chapter ${chNum}: ${chTitle} (Part 2 of 2)**
+Continue directly from Part 1. ${isLast ? 'Final chapter — bring the story to a moving, memorable conclusion.' : 'End naturally into the next chapter.'}
+**Length and quality:** ${qualityStdFn(chNum)}
+${rules}
+${lotteryRule}
+**Response format — output only the continuation. No chapter number, title, JSON, or markdown. Separate paragraphs with blank lines:**`
+          : `당신은 한국어 베스트셀러 소설 작가입니다. 파트 1에 이어 챕터 ${chNum}의 파트 2를 집필해주세요.
+**소설 정보:** 제목: ${story.title}
+${storyInfo}
+**파트 1 내용:**
+${part1Content}
+**현재 집필 — 챕터 ${chNum}: ${chTitle} (파트 2/2)**
+파트 1에서 이어서 써주세요. ${isLast ? '이것은 마지막 챕터입니다. 전체 이야기를 긍정적이고 감동적으로 완결하세요. 마지막 단락은 독자의 가슴에 오래 남도록 특별히 공들여 써주세요.' : '다음 챕터로 자연스럽게 이어지는 여운을 남기세요.'}
+**분량 및 품질:** ${qualityStdFn(chNum)}
+${rules}
+${lotteryRule}
+**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON, 마크다운 없이 순수 본문만. 단락 사이는 빈 줄로 구분:**`;
+
+        const part2Raw = await apiCall(chPart2Prompt, 2000);
+        const part2Content = part2Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
+        const content = part1Content + '\n\n' + part2Content;
         story.chapters.push({number:chNum, title:chTitle, content});
         summaries.push(isEnglish
           ? `Chapter ${chNum} "${chTitle}": ${content.substring(0,400).replace(/\n/g,' ')}...`
@@ -2732,28 +3082,12 @@ ${lotteryRule}
     const {jsPDF} = window.jspdf;
     const doc = new jsPDF({orientation:'portrait', unit:'mm', format:[127,188], compress:true});
 
-    // ── Cover page ──
-    if(selectedCover==='ai' && aiCoverDataUrl){
-      const cW=381, cH=564;
-      const cc=document.createElement('canvas'); cc.width=cW; cc.height=cH;
-      const cx=cc.getContext('2d');
-      cx.fillStyle='#FDFAF5'; cx.fillRect(0,0,cW,cH);
-      cx.fillStyle='#2C2C2C'; cx.textAlign='center';
-      cx.font='bold 34px "Playfair Display","Noto Serif KR",serif';
-      coverWrapText(cx, story.title, cW/2, 52, cW-60, 38);
-      const img=new Image(); img.src=aiCoverDataUrl;
-      await new Promise(r=>{img.onload=r; img.onerror=r;});
-      cx.drawImage(img, 0, 98, cW, Math.round(cH*0.71));
-      cx.fillStyle='#555555';
-      cx.font='italic 16px "Playfair Display","Noto Serif KR",serif';
-      cx.fillText(ans.author||'저자', cW/2, cH-44);
-      cx.fillStyle='#999999';
-      cx.font='10px Georgia,"Noto Serif KR",serif';
-      cx.fillText('어나더북', cW/2, cH-22);
-      doc.addImage(cc.toDataURL('image/jpeg',0.92),'JPEG',0,0,127,188);
-    } else {
-      const sc=document.getElementById('simple-cover-canvas');
-      doc.addImage(sc.toDataURL('image/jpeg',0.92),'JPEG',0,0,127,188);
+    // ── Cover page (use pre-rendered canvas) ──
+    const coverCanvas = document.getElementById(
+      selectedCover==='ai' ? 'ai-cover-canvas' : 'simple-cover-canvas'
+    );
+    if(coverCanvas){
+      doc.addImage(coverCanvas.toDataURL('image/jpeg',0.95),'JPEG',0,0,127,188);
     }
 
     // ── Chapter pages using text() ──
