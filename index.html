@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>어나더북 | 세상에 하나뿐인 나만의 소설</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=Bebas+Neue&family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
@@ -2738,47 +2738,40 @@ async function getCoverDesign(){
 - Mood: ${ans.mood}
 - Language: ${selectedLang === 'ko' ? 'Korean' : 'English'}
 
-Rules:
-1. Choose ONE powerful symbolic object that represents the emotional core of this story. Think metaphorically, not literally. The symbol should be unexpected and visually striking.
-   Examples of GOOD symbols:
-   - a cracked mirror with light pouring through
-   - a single key floating in dark water
-   - a torn photograph reassembling itself
-   - a clock with melting hands
-   - a single door in an empty field
-   Examples of BAD symbols (too literal/generic):
-   - a stack of books (for a story about reading)
-   - a heart (for a love story)
-   - a graduation cap (for a school story)
+DESIGN RULES — read carefully:
 
-2. Choose a bold, unexpected color palette - not safe or generic. Think of covers like The Vanishing Half (navy + gold), Fake Accounts (red + pink), Normal People (bright orange). Be bold.
+1. SYMBOL: Choose ONE powerful symbolic object that represents the emotional core of this story. Think screen print, poster art, graphic novel — NOT photography or realism. The symbol must be abstract or graphic, not photorealistic.
+   GOOD symbols (abstract/graphic):
+   - a cracked mirror with geometric shards
+   - a single key made of bold flat shapes
+   - a clock face dissolving into geometric forms
+   - a door outlined in stark flat color
+   - an eye rendered as bold flat graphic shapes
+   BAD symbols (too literal/realistic):
+   - a stack of books, a heart, a graduation cap, a realistic face
 
-3. The layout must feel intentional and modern.
+2. COLOR: Choose BOLD, unexpected colors — NOT muted, NOT safe dark navy alone. Pick 2-3 colors with high contrast and graphic impact. Examples of GREAT palettes:
+   - Hot pink #FF1493 + electric blue #0066FF + cream #F5F0E8
+   - Bright orange #FF6B00 + deep purple #2D0057 + yellow #FFE600
+   - Coral #FF4F4F + forest green #1A5C2E + white
+   - Mustard #E8B400 + navy #1B2A4A + pink #FF69B4
+   - Electric red #E8000D + black #0A0A0A + cream #F5F0E8
+   Be bold. Surprise the viewer.
+
+3. The cover is full-bleed — the DALL-E image fills the entire cover, so the image itself must carry all the visual interest.
 
 Return exactly this JSON:
 {
-  coverColor: (dominant hex - bold and specific, NOT generic navy or forest green),
-  textColor: (hex - must contrast strongly, use white for dark bg, dark for light bg),
-  accentColor: (complementary hex for details),
-  symbol: (one highly specific visual symbol - be poetic and unexpected),
-  layout: (image_dominant | title_dominant | side_title | split),
-  titleSize: (small | large | massive),
-  titlePosition: (top_left | top_center | bottom_left | bottom_center | side_left),
-  titleLines: (array - split title dramatically, e.g. ['THE', 'FOOTNOTES', 'OF', 'MINA PARK']),
-  authorPosition: (bottom_left | bottom_right | bottom_center),
-  symbolSize: (small | medium | large | full_bleed),
-  symbolPosition: (center | off_center_right | off_center_left | bottom_bleed | top_bleed),
-  dallePrompt: (complete DALL-E prompt - see rules below)
+  coverColor: (dominant background hex — bold and specific),
+  textColor: "#F5F0E8",
+  accentColor: (complementary hex for logo),
+  symbol: (one highly specific graphic/abstract visual symbol — poetic and unexpected),
+  titleLines: (array — split title into individual words, e.g. ['THE', 'FOOTNOTES', 'OF', 'MINA PARK']),
+  dallePrompt: (complete DALL-E prompt — see rules below)
 }
 
-DALLE PROMPT RULES:
-- Start with the symbol description in vivid detail
-- Specify the exact background color
-- Say: bold graphic flat illustration style
-- Say: modern literary fiction book cover art
-- Say: clean bold shapes, strong color contrast
-- Say: no text, no letters, no numbers, no words, no people, no faces, no human figures, no silhouettes, no body parts
-- End with the mood/feeling it should evoke`;
+DALLE PROMPT RULES — build the prompt in this exact structure:
+"2D flat graphic art book cover illustration. [SYMBOL]: [vivid description of the graphic/abstract symbol]. Style: bold flat vector illustration, graphic design poster art, NOT photographic, NOT 3D render, NOT realistic lighting, NOT shadows, NOT depth of field. Colors: [list 2-3 bold colors with hex codes, e.g. deep navy #1B2A4A, warm amber #E8A020, cream #F5F0E8]. Flat solid color shapes, bold graphic forms, strong geometric composition, high contrast between foreground and background, graphic novel aesthetic, screen print style, modern literary fiction book cover art 2024. No text, no letters, no words, no numbers. No people, no faces, no figures."`;
   const raw = await apiCall(userPrompt, 1000, systemPrompt);
   return extractJSON(raw);
 }
@@ -2812,128 +2805,93 @@ async function renderCover(canvas, design, imageUrl, bookTitle, authorName){
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
   const isKo = selectedLang === 'ko';
-  const fontFam = isKo ? '"Noto Serif KR","Noto Sans KR",serif' : '"Playfair Display",Georgia,serif';
+  const titleFont = isKo ? '"Noto Sans KR",sans-serif' : '"Bebas Neue",sans-serif';
+  const bodyFont  = isKo ? '"Noto Sans KR",sans-serif' : '"Montserrat",sans-serif';
 
-  // 1. Background
-  ctx.fillStyle = design.coverColor;
+  // Preload fonts so canvas renders them correctly
+  try {
+    await Promise.all([
+      document.fonts.load(`${isKo?'900 70px':'90px'} ${titleFont}`),
+      document.fonts.load(`300 13px ${bodyFont}`)
+    ]);
+  } catch(e){ /* non-fatal */ }
+
+  // 1. Solid background fallback
+  ctx.fillStyle = design.coverColor || '#1B2A4A';
   ctx.fillRect(0, 0, W, H);
 
-  // 2. DALL-E Image
+  // 2. DALL-E image fills entire cover (full bleed)
   if(imageUrl){
     const img = new Image();
     img.crossOrigin = 'anonymous';
     await new Promise(resolve=>{ img.onload=resolve; img.onerror=resolve; img.src=imageUrl; });
-    ctx.save();
-    const sp = design.symbolPosition, ss = design.symbolSize, layout = design.layout;
-    if(layout === 'split'){
-      const aH = H * 0.5, scale = Math.min(W/img.width, aH/img.height);
-      const dw = img.width*scale, dh = img.height*scale;
-      ctx.drawImage(img,(W-dw)/2, H/2+(aH-dh)/2, dw, dh);
-    } else if(ss === 'full_bleed'){
-      ctx.globalAlpha = 0.85;
-      const scale = Math.max(W/img.width, H/img.height);
-      const dw = img.width*scale, dh = img.height*scale;
-      ctx.drawImage(img,(W-dw)/2,(H-dh)/2,dw,dh);
-    } else {
-      let imgH, imgW, x, y;
-      if(ss === 'large'){
-        if(sp === 'off_center_right'){imgH=H*.6;imgW=img.width*imgH/img.height;x=W*.5-imgW*.2;y=(H-imgH)/2;}
-        else if(sp === 'off_center_left'){imgH=H*.6;imgW=img.width*imgH/img.height;x=-imgW*.2;y=(H-imgH)/2;}
-        else if(sp === 'bottom_bleed'){imgH=H*.6;imgW=img.width*imgH/img.height;x=(W-imgW)/2;y=H*.4;}
-        else if(sp === 'top_bleed'){imgH=H*.55;imgW=img.width*imgH/img.height;x=(W-imgW)/2;y=-imgH*.1;}
-        else{imgH=H*.55;imgW=img.width*imgH/img.height;x=(W-imgW)/2;y=(H-imgH)/2;}
-      } else if(ss === 'medium'){imgH=H*.45;imgW=img.width*imgH/img.height;x=(W-imgW)/2;y=(H-imgH)/2;}
-      else{imgH=H*.30;imgW=img.width*imgH/img.height;x=(W-imgW)/2;y=(H-imgH)/2;}
-      ctx.drawImage(img,x,y,imgW,imgH);
-    }
-    ctx.restore();
+    const scale = Math.max(W / img.width, H / img.height);
+    const dw = img.width * scale, dh = img.height * scale;
+    ctx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh);
   }
 
-  // 3. Title Text
-  ctx.fillStyle = design.textColor;
-  const lines = (design.titleLines&&design.titleLines.length>0) ? design.titleLines : [bookTitle];
-  const longestLine = lines.reduce((a,b)=>a.length>b.length?a:b,'');
-  const autoSize = {
-    massive: Math.min(90, (W * 0.85) / (longestLine.length * 0.6)),
-    large:   Math.min(60, (W * 0.75) / (longestLine.length * 0.6)),
-    small:   28
-  };
-  const fontSize = autoSize[design.titleSize] || autoSize.large;
-  const layout = design.layout, pos = design.titlePosition;
-  let titleStartY=80, titleEndY=80, titleAlign='left';
+  // 3. Dark gradient — top 40% for title legibility
+  const topGrad = ctx.createLinearGradient(0, 0, 0, H * 0.42);
+  topGrad.addColorStop(0,   'rgba(0,0,0,0.55)');
+  topGrad.addColorStop(0.7, 'rgba(0,0,0,0.20)');
+  topGrad.addColorStop(1,   'rgba(0,0,0,0)');
+  ctx.fillStyle = topGrad;
+  ctx.fillRect(0, 0, W, H * 0.42);
 
-  function drawTitleLines(startX, startY, align, sz){
-    ctx.textAlign = align;
-    const lh = sz * 1.1;
-    titleStartY = startY;
-    lines.forEach((line,i)=>{
-      let s=sz; ctx.font=`bold ${s}px ${fontFam}`;
-      const maxW = align==='center' ? W-80 : W-100;
-      while(ctx.measureText(line).width>maxW && s>18){ s-=4; ctx.font=`bold ${s}px ${fontFam}`; }
-      const drawX = align==='left' ? startX : align==='right' ? startX : W/2;
-      ctx.fillText(line, drawX, startY+i*lh);
-    });
-    titleEndY = startY+(lines.length-1)*lh+sz+8;
-    return lh;
+  // 4. Dark gradient — bottom 20% for author legibility
+  const botGrad = ctx.createLinearGradient(0, H * 0.80, 0, H);
+  botGrad.addColorStop(0, 'rgba(0,0,0,0)');
+  botGrad.addColorStop(1, 'rgba(0,0,0,0.50)');
+  ctx.fillStyle = botGrad;
+  ctx.fillRect(0, H * 0.80, W, H * 0.20);
+
+  // 5. Title — top third, Bebas Neue (or Noto for Korean), each word on its own line
+  const lines = (design.titleLines && design.titleLines.length > 0)
+    ? design.titleLines
+    : bookTitle.split(' ');
+
+  const longestLine = lines.reduce((a, b) => a.length > b.length ? a : b, '');
+  let fontSize = isKo ? 72 : 96;
+  const testFont = () => isKo ? `900 ${fontSize}px ${titleFont}` : `${fontSize}px ${titleFont}`;
+  ctx.font = testFont();
+  while(ctx.measureText(longestLine).width > W - 90 && fontSize > 36){
+    fontSize -= 4;
+    ctx.font = testFont();
   }
 
-  if(layout==='side_title'||pos==='side_left'){
-    ctx.save();
-    ctx.font=`bold 28px ${fontFam}`; ctx.fillStyle=design.textColor;
-    ctx.translate(40,H/2); ctx.rotate(-Math.PI/2);
-    ctx.textAlign='center'; ctx.fillText(lines.join(' '),0,0);
-    ctx.restore(); titleStartY=H/2; titleEndY=H/2; titleAlign='center';
-  } else if(layout==='title_dominant'){
-    ctx.letterSpacing = '2px';
-    const sz=autoSize[design.titleSize]||autoSize.large;
-    drawTitleLines(0,80,'center',sz); titleAlign='center';
-    ctx.letterSpacing = '0px';
-  } else if(layout==='split'){
-    const sz=autoSize[design.titleSize]||autoSize.large;
-    drawTitleLines(0,80,'center',sz); titleAlign='center';
-  } else {
-    if(pos==='top_left'){drawTitleLines(50,80,'left',fontSize);titleAlign='left';}
-    else if(pos==='top_center'){drawTitleLines(0,80,'center',fontSize);titleAlign='center';}
-    else if(pos==='bottom_left'){
-      const lh=fontSize*1.1;
-      const sY=H-120-(lines.length-1)*lh;
-      drawTitleLines(50,sY,'left',fontSize);titleAlign='left';
-    } else if(pos==='bottom_center'){
-      const lh=fontSize*1.1;
-      const sY=H-120-(lines.length-1)*lh;
-      drawTitleLines(0,sY,'center',fontSize);titleAlign='center';
-    } else {
-      drawTitleLines(50,80,'left',fontSize); titleAlign='left';
-    }
-  }
+  const lineH = fontSize * 0.95;
+  const titleStartX = 50;
+  const titleStartY = 72;
 
-  // 4. Decorative Accent Line
-  ctx.strokeStyle = design.accentColor; ctx.lineWidth = 1.5;
-  const accentW = W*0.35;
-  const isBottom = (pos==='bottom_left'||pos==='bottom_center');
-  const lineY = isBottom ? titleStartY-20 : titleEndY+10;
-  const lineX = titleAlign==='center' ? (W-accentW)/2 : 50;
-  ctx.beginPath(); ctx.moveTo(lineX,lineY); ctx.lineTo(lineX+accentW,lineY); ctx.stroke();
-  ctx.fillStyle = design.accentColor;
-  ctx.fillRect(lineX-2, lineY-2, 4, 4);
-  ctx.fillRect(lineX+accentW-2, lineY-2, 4, 4);
-
-  // 5. Author Name
-  ctx.globalAlpha=0.85; ctx.fillStyle=design.textColor;
+  ctx.fillStyle = '#F5F0E8';
+  ctx.textAlign = 'left';
   ctx.letterSpacing = '3px';
-  ctx.font=`13px ${fontFam}`;
-  const displayAuthor = authorName.toUpperCase();
-  if(design.authorPosition==='bottom_right'){ctx.textAlign='right';ctx.fillText(displayAuthor,W-50,H-55);}
-  else if(design.authorPosition==='bottom_center'){ctx.textAlign='center';ctx.fillText(displayAuthor,W/2,H-55);}
-  else{ctx.textAlign='left';ctx.fillText(displayAuthor,50,H-55);}
-  ctx.globalAlpha=1.0;
+  lines.forEach((line, i) => {
+    ctx.font = testFont();
+    ctx.fillText(line, titleStartX, titleStartY + fontSize + i * lineH);
+  });
   ctx.letterSpacing = '0px';
 
-  // 6. AnotherBook Logo
-  ctx.globalAlpha=0.7; ctx.fillStyle=design.accentColor;
-  ctx.font=`11px ${fontFam}`; ctx.textAlign='center';
-  ctx.fillText(selectedLang==='ko'?'어나더북':'anotherbook',W/2,H-25);
-  ctx.globalAlpha=1.0;
+  // 6. Author name — bottom 8% of cover
+  const authorY = H - Math.round(H * 0.08);
+  ctx.fillStyle = '#F5F0E8';
+  ctx.globalAlpha = 0.92;
+  ctx.textAlign = 'left';
+  ctx.letterSpacing = '5px';
+  ctx.font = `300 13px ${bodyFont}`;
+  ctx.fillText(authorName.toUpperCase(), 50, authorY);
+  ctx.globalAlpha = 1.0;
+  ctx.letterSpacing = '0px';
+
+  // 7. "anotherbook" logo — bottom center, very subtle
+  ctx.globalAlpha = 0.6;
+  ctx.fillStyle = '#F5F0E8';
+  ctx.textAlign = 'center';
+  ctx.letterSpacing = '2px';
+  ctx.font = `300 10px ${bodyFont}`;
+  ctx.fillText(isKo ? '어나더북' : 'anotherbook', W / 2, H - 20);
+  ctx.globalAlpha = 1.0;
+  ctx.letterSpacing = '0px';
 }
 
 // ──────────── SIMPLE COVER RENDER ────────────
@@ -2991,11 +2949,8 @@ async function generateFullCover(){
   setCoverLoadDot(1);
 
   const fallbackDesign = {
-    coverColor:'#3D5A47', textColor:'#FDFAF5', accentColor:'#C4A882',
-    titleLines: story?[story.title]:['나의 이야기'],
-    titlePosition:'top_center', titleSize:'large',
-    layout:'title_dominant', authorPosition:'bottom_center',
-    symbolSize:'medium', symbolPosition:'center'
+    coverColor:'#1B2A4A', textColor:'#F5F0E8', accentColor:'#E8A020',
+    titleLines: story ? story.title.split(' ') : ['나의', '이야기'],
   };
 
   try {
@@ -3813,27 +3768,29 @@ async function devTestCover() {
 - Mood: ${DEV_MOOD}
 - Language: English
 
-Rules:
-1. Choose ONE powerful symbolic object that represents the emotional core of this story. Think metaphorically, not literally. The symbol should be unexpected and visually striking.
-   Examples of GOOD symbols: a cracked mirror with light pouring through, a single key floating in dark water, a torn photograph reassembling itself.
-   Examples of BAD symbols: a stack of books, a heart, a graduation cap.
-2. Choose a bold, unexpected color palette. Think: The Vanishing Half (navy + gold), Normal People (bright orange). Be bold.
-3. The layout must feel intentional and modern.
+DESIGN RULES — read carefully:
+
+1. SYMBOL: Choose ONE powerful symbolic object. Think screen print, poster art, graphic novel — NOT photography or realism. Abstract or graphic, not photorealistic.
+   GOOD: a cracked mirror as geometric shards, a key as bold flat shapes, a clock dissolving into geometric forms.
+   BAD: a stack of books, a heart, a graduation cap, a realistic face.
+
+2. COLOR: Choose BOLD, unexpected colors — NOT muted, NOT safe dark navy alone. Pick 2-3 high-contrast colors. Examples:
+   - Hot pink #FF1493 + electric blue #0066FF + cream #F5F0E8
+   - Bright orange #FF6B00 + deep purple #2D0057 + yellow #FFE600
+   - Coral #FF4F4F + forest green #1A5C2E + white
+   - Mustard #E8B400 + navy #1B2A4A + pink #FF69B4
+   Be bold. Surprise the viewer.
+
+3. The cover is full-bleed — DALL-E image fills the entire cover.
 
 Return exactly this JSON:
 {
-  coverColor: (dominant hex),
-  textColor: (hex - strong contrast),
+  coverColor: (dominant background hex — bold and specific),
+  textColor: "#F5F0E8",
   accentColor: (complementary hex),
-  symbol: (one highly specific visual symbol),
-  layout: (image_dominant | title_dominant | side_title | split),
-  titleSize: (small | large | massive),
-  titlePosition: (top_left | top_center | bottom_left | bottom_center | side_left),
-  titleLines: (array - split title dramatically),
-  authorPosition: (bottom_left | bottom_right | bottom_center),
-  symbolSize: (small | medium | large | full_bleed),
-  symbolPosition: (center | off_center_right | off_center_left | bottom_bleed | top_bleed),
-  dallePrompt: (complete DALL-E prompt: vivid symbol description, background color, bold graphic flat illustration style, modern literary fiction book cover art, clean bold shapes strong color contrast, no text no letters no numbers no words no people no faces no human figures no silhouettes no body parts, mood evoked)
+  symbol: (one highly specific graphic/abstract visual symbol),
+  titleLines: (array — split title into individual words, e.g. ['THE', 'VANISHING', 'HALF']),
+  dallePrompt: (complete DALL-E prompt built as: "2D flat graphic art book cover illustration. [SYMBOL]: [vivid description]. Style: bold flat vector illustration, graphic design poster art, NOT photographic, NOT 3D render, NOT realistic lighting, NOT shadows, NOT depth of field. Colors: [2-3 bold colors with hex codes]. Flat solid color shapes, bold graphic forms, strong geometric composition, high contrast between foreground and background, graphic novel aesthetic, screen print style, modern literary fiction book cover art 2024. No text, no letters, no words, no numbers. No people, no faces, no figures.")
 }`;
 
     const rawDesign = await apiCall(usrPrompt, 1000, sysPrompt);
