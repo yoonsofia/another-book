@@ -2142,8 +2142,8 @@ async function generateStory(){
 
   const isEnglish = selectedLang === 'en';
   const writerRole = isEnglish
-    ? `You are a bestselling English novelist.\nStyle: Literary commercial fiction, warm and emotional tone.\nVocabulary: Natural adult English, accessible but sophisticated.\nProtagonist: ${ans.name}\n\nYou may naturally include Korean words and phrases where they feel authentic to the story.\nROMANIZED Korean words are ALWAYS fine: names (eomma, appa, unnie, oppa, sunbae), food (japchae, kimbap, tteokbokki, samgyeopsal), places (Hongdae, Sinchon, Yeouido), expressions (daebak, aigoo, fighting).\nHANGUL SCRIPT is also fine to use naturally: pet names (뭉치), affectionate calls (지수야, 엄마), money amounts (30억 원), signs/menus, brief Korean dialogue when a character speaks Korean.\nUse both romanized and Hangul naturally as a skilled literary author would.`
-    : '당신은 한국어 베스트셀러 소설 작가입니다.';
+    ? `You are a bestselling English novelist.\nStyle: Literary commercial fiction, warm and emotional tone.\nVocabulary: Natural adult English, accessible but sophisticated.\nProtagonist: ${ans.name}\n\nFormatting: You may use *italic* sparingly for emphasis (internal thoughts, a single stressed word). Never use **bold** — bold markdown is unprofessional in literary fiction body text and must not appear anywhere in the story.\n\nYou may naturally include Korean words and phrases where they feel authentic to the story.\nROMANIZED Korean words are ALWAYS fine: names (eomma, appa, unnie, oppa, sunbae), food (japchae, kimbap, tteokbokki, samgyeopsal), places (Hongdae, Sinchon, Yeouido), expressions (daebak, aigoo, fighting).\nHANGUL SCRIPT is also fine to use naturally: pet names (뭉치), affectionate calls (지수야, 엄마), money amounts (30억 원), signs/menus, brief Korean dialogue when a character speaks Korean.\nUse both romanized and Hangul naturally as a skilled literary author would.`
+    : '당신은 한국어 베스트셀러 소설 작가입니다.\n형식: *이탤릭체*는 강조에 드물게 사용할 수 있습니다(예: 내면의 생각, 강조할 단어). **굵은 글씨**는 절대 사용하지 마세요 — 문학 소설 본문에 볼드체는 적합하지 않습니다.';
   const qualityStdFn = isEnglish
     ? (part) => part === 1
         ? `Write Part 1 of this chapter. Minimum 1,500 words.\nWrite with rich detail, full scene development, complete dialogue exchanges, and deep interiority.\nDo not summarize. Do not rush.\nTake your time with each scene.\nExpand every moment fully.\nShow don't tell throughout.\nInclude at least 2 fully developed scenes.`
@@ -2206,7 +2206,7 @@ ${qualityStdFn(1)}
 
 ${rules}
 ${lotteryRule}
-**Response format — output only the chapter body. No chapter number, title, JSON, or markdown. Separate paragraphs with blank lines:**`
+**Response format — output only the chapter body. No chapter number, title, or JSON. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**`
       : `당신은 한국어 베스트셀러 소설 작가입니다. 아래 소설의 챕터 1 파트 1을 집필해주세요.
 
 **소설 정보:**
@@ -2221,7 +2221,7 @@ ${qualityStdFn(1)}
 
 ${rules}
 ${lotteryRule}
-**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON, 마크다운 없이 순수 본문만. 단락 사이는 빈 줄로 구분:**`;
+**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**`;
 
     const ch1Part1Raw = await apiCall(ch1Part1Prompt, 3000);
     const ch1Part1Content = ch1Part1Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
@@ -2244,7 +2244,7 @@ ${qualityStdFn(2)}
 
 ${rules}
 ${lotteryRule}
-**Response format — output only the continuation. No chapter number, title, JSON, or markdown. Separate paragraphs with blank lines:**`
+**Response format — output only the continuation. No chapter number, title, or JSON. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**`
       : `당신은 한국어 베스트셀러 소설 작가입니다. 파트 1에 이어 챕터 1의 파트 2를 집필해주세요.
 
 **소설 정보:**
@@ -2259,7 +2259,7 @@ ${qualityStdFn(2)}
 
 ${rules}
 ${lotteryRule}
-**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON, 마크다운 없이 순수 본문만. 단락 사이는 빈 줄로 구분:**`;
+**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**`;
 
     const ch1Part2Raw = await apiCall(ch1Part2Prompt, 3000);
     const ch1Part2Content = ch1Part2Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
@@ -2282,7 +2282,7 @@ ${qualityStdFn(3)}
 
 ${rules}
 ${lotteryRule}
-**Response format — output only the continuation. No chapter number, title, JSON, or markdown. Separate paragraphs with blank lines:**`
+**Response format — output only the continuation. No chapter number, title, or JSON. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**`
       : `당신은 한국어 베스트셀러 소설 작가입니다. 챕터 1의 마지막 파트 3을 집필해주세요.
 
 **소설 정보:**
@@ -2297,7 +2297,7 @@ ${qualityStdFn(3)}
 
 ${rules}
 ${lotteryRule}
-**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON, 마크다운 없이 순수 본문만. 단락 사이는 빈 줄로 구분:**`;
+**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**`;
 
     const ch1Part3Raw = await apiCall(ch1Part3Prompt, 3000);
     const ch1Part3Content = ch1Part3Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
@@ -3110,7 +3110,7 @@ ${prevCtx}
 ${qualityStdFn(1)}
 ${rules}
 ${lotteryRule}
-**Response format — output only the chapter body. No chapter number, title, JSON, or markdown. Separate paragraphs with blank lines:**`
+**Response format — output only the chapter body. No chapter number, title, or JSON. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**`
           : `당신은 한국어 베스트셀러 소설 작가입니다. 아래 소설의 챕터 ${chNum} 파트 1을 집필해주세요.
 **소설 정보:** 제목: ${story.title}
 ${storyInfo}
@@ -3121,7 +3121,7 @@ ${prevCtx}
 ${qualityStdFn(1)}
 ${rules}
 ${lotteryRule}
-**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON, 마크다운 없이 순수 본문만. 단락 사이는 빈 줄로 구분:**`;
+**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**`;
 
         const part1Raw = await apiCall(chPart1Prompt, 3000);
         const part1Content = part1Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
@@ -3138,7 +3138,7 @@ Continue directly from Part 1. ${isLast ? 'Final chapter — bring the story to 
 **Length and quality:** ${qualityStdFn(chNum)}
 ${rules}
 ${lotteryRule}
-**Response format — output only the continuation. No chapter number, title, JSON, or markdown. Separate paragraphs with blank lines:**`
+**Response format — output only the continuation. No chapter number, title, or JSON. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**`
           : `당신은 한국어 베스트셀러 소설 작가입니다. 파트 1에 이어 챕터 ${chNum}의 파트 2를 집필해주세요.
 **소설 정보:** 제목: ${story.title}
 ${storyInfo}
@@ -3149,7 +3149,7 @@ ${part1Content}
 **분량 및 품질:** ${qualityStdFn(chNum)}
 ${rules}
 ${lotteryRule}
-**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON, 마크다운 없이 순수 본문만. 단락 사이는 빈 줄로 구분:**`;
+**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**`;
 
         const part2Raw = await apiCall(chPart2Prompt, 2000);
         const part2Content = part2Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
@@ -3704,6 +3704,32 @@ Elena stayed until the cold came in. **She did not check her phone.**
 This, she thought, was a beginning. She was not sure of what. But she had learned, in the long years of her careful, efficient life, that beginnings often did not announce themselves. They arrived quietly, like afternoon light, and you either noticed them or you didn't.
 
 She noticed.`
+  },
+  {
+    title: "잊혀진 빛을 찾아서",
+    content: `지수는 창문 앞에 서서 서울의 skyline을 바라보았다. *그 순간만큼은* 시간이 멈춘 것 같았다. 11년 동안 매일 아침 이 창문을 지나쳤지만, 한 번도 제대로 바라본 적이 없었다.
+
+"또 야근이에요?" 동료 민준이 물었다. 그의 목소리에는 걱정과 체념이 함께 섞여 있었다.
+
+지수는 고개를 끄덕였다. "어쩔 수 없어요. 마감이 내일인데." She said it in Korean but thought it in English — the language of deadlines, of quarterly reviews, of performance metrics that never quite added up to a life.
+
+커피 한 잔을 손에 들고, 그녀는 다시 노트북 앞에 앉았다. 화면에는 숫자들이 가득했다 — revenue projections, KPI dashboards, pivot tables. *아름다운 것은 아무것도 없었다.* 그저 효율과 성과만이 존재할 뿐이었다.
+
+퇴근길, 지수는 처음으로 이어폰을 끼지 않았다. 홍대 거리에는 버스킹 음악이 흘러넘쳤다 — 어떤 청년이 기타를 치며 조용히 노래하고 있었다. 가사는 알아들을 수 없었지만, *그 멜로디는 오래전 잊고 있던 무언가를 건드렸다.*
+
+"행복하세요?" 그 청년이 갑자기 물었다. 지수는 깜짝 놀라 걸음을 멈췄다.
+
+She had no answer. In Korean or in English.
+
+그날 밤, 지수는 일기장을 꺼냈다. 마지막으로 쓴 날짜는 2019년 3월 7일이었다. 거의 5년 전. 페이지를 넘기자 그때의 자신이 보였다 — 꿈이 있었고, 좋아하는 것들이 있었고, *시간을 세지 않았던* 지수가.
+
+그 페이지 아래, 그녀는 천천히 펜을 들었다. 오늘의 날짜를 쓰고, 딱 한 문장만 적었다.
+
+나는 무엇을 좋아하는가.
+
+It was a beginning. Small and uncertain — the kind that doesn't announce itself. But she had written it in Korean, her mother tongue, the language she had slowly stopped using for anything that mattered.
+
+*그것으로 충분했다.*`
   }
 ];
 
