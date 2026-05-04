@@ -1367,6 +1367,28 @@ body{
 .cover-load-dot.active{background:var(--gold);transform:scale(1.35);}
 .cover-load-dot.done{background:var(--gold-dk);}
 .cover-sel-card.sel{border-width:3px;}
+
+/* ── DEV MODE COVER MODAL ── */
+#dev-cover-modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;
+  display:none;align-items:center;justify-content:center;flex-direction:column;
+}
+.dev-modal-card{
+  background:#111;border:1px solid #333;border-radius:14px;
+  padding:24px 24px 20px;max-width:420px;width:90%;text-align:center;
+}
+.dev-modal-label{
+  color:#D4AF37;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;
+  margin-bottom:14px;font-family:monospace;
+}
+#dev-cover-canvas{width:100%;border-radius:8px;display:block;}
+.dev-modal-hint{color:#666;font-size:12px;margin-top:12px;letter-spacing:.5px;}
+.dev-modal-close{
+  margin-top:16px;padding:8px 24px;background:#222;color:#ccc;
+  border:1px solid #444;border-radius:6px;cursor:pointer;font-size:13px;
+  transition:background .2s;
+}
+.dev-modal-close:hover{background:#333;}
 </style>
 </head>
 <body>
@@ -3624,6 +3646,234 @@ function showToast(msg){
 document.getElementById('modal-api').addEventListener('click',function(e){
   if(e.target===this) this.classList.remove('open');
 });
+
+// ──────────── DEV KEYBOARD SHORTCUTS ────────────
+// Ctrl+Shift+P → PDF formatting test (no API calls, ₩0)
+// Ctrl+Shift+C → Cover design test (Claude + DALL-E HD, ~₩73)
+// Set DEV_MODE = false before shipping to production.
+
+const DEV_TEST_CHAPTERS = [
+  {
+    title: "The Morning She Stopped Counting",
+    content: `She had been counting for eleven years. The days since her last vacation — *four thousand and twelve*. The hours logged in the quarter — **eighty-seven**. The number of times she had eaten lunch away from her desk — once, and only because the building lost power.
+
+That Tuesday morning, the alarm went off at five-fifteen as it always did. Elena reached for her phone with the practiced efficiency of someone who had long since stopped needing to think about it. She silenced it before the second pulse. She was already awake.
+
+The apartment was quiet in the way that expensive apartments in expensive cities are quiet — the silence of good insulation, of neighbors who also worked too much, of a life arranged precisely to minimize distraction.
+
+She made coffee. She did not look out the window.
+
+Later, she would struggle to explain what happened in the bathroom. She was brushing her teeth when she caught her own eyes in the mirror, and something — some *fraying thread* in the careful fabric of her composure — simply gave way.
+
+She stood there for what might have been three minutes or thirty. The electric toothbrush kept humming. She did not notice when it stopped.
+
+The face looking back at her was not quite a stranger's. But it was not entirely hers either. It belonged to someone who had been somewhere else for a very long time.
+
+She called in sick for the first time in six years. She used the word *tired* and felt, immediately, that it was the most honest thing she had said in recent memory.
+
+The day stretched out in front of her, **unscheduled and bewildering**. She did not know what to do with it.
+
+She started by sitting on the floor.`
+  },
+  {
+    title: "What Remains When Everything Is Quiet",
+    content: `There is a particular quality to afternoon light in October that Elena had not seen in years. Not because it had changed — light does not change — but because she had always been inside by then, behind glass, behind the blue glow of a monitor, behind the steady accumulation of things that *needed doing*.
+
+She sat on the bench in the small park two blocks from her building. She had passed this park every morning for four years and had never once sat in it.
+
+A dog came and pressed its nose against her knee. Its owner apologized, and Elena said, *"Please don't,"* meaning: please do not take it away.
+
+She thought about her mother, who had always said that the trouble with Elena was not that she worked too hard but that she had **forgotten how to want things for herself**. At the time, Elena had found this observation irritating in the way that accurate things often are.
+
+She had wants. She wanted promotions. She wanted quarterly targets met. She wanted to be the kind of person other people described as exceptional.
+
+She had achieved all of these things.
+
+The dog was still there, patient and warm against her leg.
+
+She thought: *I do not know what I like.*
+
+Not in the way she had sometimes thought it during a bad week, as a complaint. But as a genuine question, a *discovery of absence* — the way you might reach for something on a shelf and find only air.
+
+What did she like? What would she choose, if choosing were allowed to be simple?
+
+The light moved through the leaves. A child across the path was eating something orange and getting it on everything. The dog finally left with its owner, glancing back once.
+
+Elena stayed until the cold came in. **She did not check her phone.**
+
+This, she thought, was a beginning. She was not sure of what. But she had learned, in the long years of her careful, efficient life, that beginnings often did not announce themselves. They arrived quietly, like afternoon light, and you either noticed them or you didn't.
+
+She noticed.`
+  }
+];
+
+async function devTestPDF() {
+  if (!DEV_MODE) return;
+  showToast('🔧 Dev Mode: PDF Test');
+
+  const overlay = document.getElementById('pdf-progress-overlay');
+  const msgEl   = document.getElementById('pdf-progress-msg');
+  const barEl   = document.getElementById('pdf-progress-bar');
+  if (overlay) overlay.style.display = 'flex';
+  if (barEl)   barEl.style.width = '35%';
+  if (msgEl)   msgEl.textContent = 'Dev: sending to Railway PDF server...';
+
+  try {
+    const response = await fetch(`${PDF_SERVER_URL}/generate-pdf`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        bookTitle: "The Light I Almost Forgot",
+        authorName: "Sara Kim",
+        language: "en",
+        coverDesign: {
+          coverColor: "#2C1B5E",
+          textColor: "#FFFFFF",
+          accentColor: "#D4AF37",
+          symbol: "a single floating key",
+          layout: "title_dominant"
+        },
+        coverImageUrl: null,
+        chapters: DEV_TEST_CHAPTERS
+      })
+    });
+
+    if (!response.ok) throw new Error(`Server error ${response.status}`);
+
+    const blob = await response.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = 'dev-pdf-test.pdf';
+    a.click();
+
+    if (overlay) overlay.style.display = 'none';
+    showToast('✅ Dev PDF downloaded!');
+  } catch (err) {
+    if (overlay) overlay.style.display = 'none';
+    showToast('⚠️ Dev PDF failed: ' + err.message);
+    console.error('[DEV] PDF test failed:', err);
+  }
+}
+
+async function devTestCover() {
+  if (!DEV_MODE) return;
+  showToast('🔧 Dev Mode: Cover Test');
+
+  if (!apiKey)    { showToast('⚠️ Set your Claude API key first');  return; }
+  if (!openaiKey) { showToast('⚠️ Set your OpenAI API key first');  return; }
+
+  const DEV_TITLE  = "The Light I Almost Forgot";
+  const DEV_AUTHOR = "Sara Kim";
+  const DEV_TOPIC  = "a woman rediscovering herself after years of overworking";
+  const DEV_MOOD   = "quiet, melancholic, hopeful";
+
+  const overlay = document.getElementById('pdf-progress-overlay');
+  const msgEl   = document.getElementById('pdf-progress-msg');
+  const barEl   = document.getElementById('pdf-progress-bar');
+  function sp(pct, msg) {
+    if (overlay) overlay.style.display = 'flex';
+    if (barEl)   barEl.style.width = pct + '%';
+    if (msgEl)   msgEl.textContent = msg;
+  }
+
+  try {
+    sp(15, 'Claude designing cover...');
+
+    const sysPrompt = `You are a bold, modern book cover designer for publishers like Penguin, Faber & Faber, and Riverhead Books. You create striking, contemporary covers that look like award-winning literary fiction. Always return valid JSON only.`;
+    const usrPrompt = `Design a modern literary book cover for:
+- Title: ${DEV_TITLE}
+- Theme: ${DEV_TOPIC}
+- Mood: ${DEV_MOOD}
+- Language: English
+
+Rules:
+1. Choose ONE powerful symbolic object that represents the emotional core of this story. Think metaphorically, not literally. The symbol should be unexpected and visually striking.
+   Examples of GOOD symbols: a cracked mirror with light pouring through, a single key floating in dark water, a torn photograph reassembling itself.
+   Examples of BAD symbols: a stack of books, a heart, a graduation cap.
+2. Choose a bold, unexpected color palette. Think: The Vanishing Half (navy + gold), Normal People (bright orange). Be bold.
+3. The layout must feel intentional and modern.
+
+Return exactly this JSON:
+{
+  coverColor: (dominant hex),
+  textColor: (hex - strong contrast),
+  accentColor: (complementary hex),
+  symbol: (one highly specific visual symbol),
+  layout: (image_dominant | title_dominant | side_title | split),
+  titleSize: (small | large | massive),
+  titlePosition: (top_left | top_center | bottom_left | bottom_center | side_left),
+  titleLines: (array - split title dramatically),
+  authorPosition: (bottom_left | bottom_right | bottom_center),
+  symbolSize: (small | medium | large | full_bleed),
+  symbolPosition: (center | off_center_right | off_center_left | bottom_bleed | top_bleed),
+  dallePrompt: (complete DALL-E prompt: vivid symbol description, background color, bold graphic flat illustration style, modern literary fiction book cover art, clean bold shapes strong color contrast, no text no letters no numbers no words no people no faces no human figures no silhouettes no body parts, mood evoked)
+}`;
+
+    const rawDesign = await apiCall(usrPrompt, 1000, sysPrompt);
+    const design = extractJSON(rawDesign);
+    console.log('[DEV] Cover design from Claude:', design);
+
+    sp(50, 'DALL-E generating HD cover image...');
+
+    const imageRes = await fetch('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${openaiKey}` },
+      body: JSON.stringify({
+        model: 'dall-e-3',
+        prompt: design.dallePrompt,
+        n: 1,
+        size: '1024x1792',
+        quality: 'hd',
+        style: 'vivid',
+        response_format: 'b64_json'
+      })
+    });
+    if (!imageRes.ok) {
+      const e = await imageRes.json().catch(() => ({ error: { message: 'Unknown' } }));
+      throw new Error(e.error?.message || `DALL-E HTTP ${imageRes.status}`);
+    }
+    const imgData = await imageRes.json();
+    const coverImageUrl = `data:image/png;base64,${imgData.data[0].b64_json}`;
+
+    sp(85, 'Rendering cover...');
+
+    const canvas   = document.getElementById('dev-cover-canvas');
+    const prevLang = selectedLang;
+    selectedLang   = 'en';
+    await renderCover(canvas, design, coverImageUrl, DEV_TITLE, DEV_AUTHOR);
+    selectedLang   = prevLang;
+
+    if (overlay) overlay.style.display = 'none';
+    document.getElementById('dev-cover-modal').style.display = 'flex';
+    showToast('✅ Cover test done — Ctrl+Shift+P to test in PDF');
+
+  } catch (err) {
+    if (overlay) overlay.style.display = 'none';
+    showToast('⚠️ Cover test failed: ' + err.message);
+    console.error('[DEV] Cover test failed:', err);
+  }
+}
+
+document.addEventListener('keydown', function(e) {
+  if (!DEV_MODE) return;
+  if (e.ctrlKey && e.shiftKey && e.key === 'P') { e.preventDefault(); devTestPDF(); }
+  if (e.ctrlKey && e.shiftKey && e.key === 'C') { e.preventDefault(); devTestCover(); }
+});
 </script>
+
+<!-- DEV MODE: Cover Test Result Modal -->
+<div id="dev-cover-modal">
+  <div class="dev-modal-card">
+    <div class="dev-modal-label">🔧 Cover Test Result</div>
+    <canvas id="dev-cover-canvas"></canvas>
+    <div class="dev-modal-hint">Ctrl+Shift+P to test this in PDF</div>
+    <button class="dev-modal-close"
+      onclick="document.getElementById('dev-cover-modal').style.display='none'">
+      Close
+    </button>
+  </div>
+</div>
+
 </body>
 </html>
