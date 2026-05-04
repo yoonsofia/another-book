@@ -2676,13 +2676,13 @@ async function getCoverDesign(){
 - Mood: ${ans.mood}
 - Language: ${selectedLang === 'ko' ? 'Korean' : 'English'}
 
-COLOR PALETTE RULES — choose based on mood:
-- Warm/romantic mood: coral #E8543A, hot pink #E91E8C, dusty rose #C4687A
-- Sad/melancholic mood: deep navy #1B2A4A, slate blue #3D5A80, dark teal #1B4B5A
-- Hopeful/uplifting mood: forest green #2D6A4F, warm amber #E76F51, burnt orange #F4A261
-- Mystery/tense mood: deep purple #2C1B5E, charcoal #2D2D2D, burgundy #6B2737
-- Bright/joyful mood: electric yellow #FFD60A, vivid orange #FF6B35, bright teal #00B4D8
-- Always choose BOLD unexpected colors — never beige, never grey, never muted
+COLOR PALETTE RULES — always choose bold, unexpected literary colors that match the story's emotional tone. Never safe corporate colors, never beige, never grey, never muted pastels:
+- Warm/romantic mood: deep crimson #8B0000, hot coral #FF4433, dusty rose #C4687A, magenta #C2185B
+- Sad/melancholic mood: electric indigo #4B0082, deep slate #1B2A4A, dark teal #1B4B5A, midnight blue #191970
+- Hopeful/uplifting mood: forest black #1A3A2A with cream text, burnt orange #CC5500, acid yellow #FFD700 with dark text
+- Mystery/tense mood: deep purple #2C1B5E, charcoal #1A1A1A, oxblood #6B2737, ink black #0D0D0D
+- Bright/joyful mood: electric indigo #4B0082, vivid orange #FF6B35, hot coral #FF4433, acid yellow #FFD700
+- When in doubt: pick the color that would look arresting on a bookstore shelf — bold, literary, surprising
 
 Return exactly this JSON:
 {
@@ -2707,7 +2707,7 @@ async function renderCover(canvas, design, bookTitle, authorName){
 
   try {
     await Promise.all([
-      document.fonts.load(`${isKo ? '900 110px' : '110px'} ${titleFont}`),
+      document.fonts.load(`${isKo ? '900 130px' : '130px'} ${titleFont}`),
       document.fonts.load(`400 16px ${bodyFont}`)
     ]);
   } catch(e){ /* non-fatal */ }
@@ -2721,10 +2721,10 @@ async function renderCover(canvas, design, bookTitle, authorName){
     ? design.titleLines
     : bookTitle.split(' ');
 
-  const fontSize   = 110;
+  const fontSize   = 130;
   const leftMargin = W * 0.08;
   const startY     = H * 0.12;
-  const lineH      = 115;
+  const lineH      = 135;
 
   ctx.fillStyle = design.textColor || '#F5F0E8';
   ctx.textAlign = 'left';
@@ -2735,7 +2735,7 @@ async function renderCover(canvas, design, bookTitle, authorName){
 
   // 3. Thin divider line — accentColor at 70% opacity
   const lastLineY = startY + fontSize + (lines.length - 1) * lineH;
-  const dividerY  = lastLineY + 30;
+  const dividerY  = lastLineY + 15;
   ctx.globalAlpha = 0.7;
   ctx.strokeStyle = design.accentColor || '#C4A882';
   ctx.lineWidth   = 1.5;
@@ -2750,7 +2750,7 @@ async function renderCover(canvas, design, bookTitle, authorName){
   ctx.fillStyle     = design.textColor || '#F5F0E8';
   ctx.globalAlpha   = 0.85;
   ctx.letterSpacing = '5px';
-  ctx.fillText((authorName || '').toUpperCase(), leftMargin, dividerY + 36);
+  ctx.fillText((authorName || '').toUpperCase(), leftMargin, dividerY + 28);
   ctx.globalAlpha   = 1.0;
   ctx.letterSpacing = '0px';
 
@@ -3569,13 +3569,13 @@ async function devTestCover() {
 - Mood: ${DEV_MOOD}
 - Language: English
 
-COLOR PALETTE RULES — choose based on mood:
-- Warm/romantic mood: coral #E8543A, hot pink #E91E8C, dusty rose #C4687A
-- Sad/melancholic mood: deep navy #1B2A4A, slate blue #3D5A80, dark teal #1B4B5A
-- Hopeful/uplifting mood: forest green #2D6A4F, warm amber #E76F51, burnt orange #F4A261
-- Mystery/tense mood: deep purple #2C1B5E, charcoal #2D2D2D, burgundy #6B2737
-- Bright/joyful mood: electric yellow #FFD60A, vivid orange #FF6B35, bright teal #00B4D8
-- Always choose BOLD unexpected colors — never beige, never grey, never muted
+COLOR PALETTE RULES — always choose bold, unexpected literary colors that match the story's emotional tone. Never safe corporate colors, never beige, never grey, never muted pastels:
+- Warm/romantic mood: deep crimson #8B0000, hot coral #FF4433, dusty rose #C4687A, magenta #C2185B
+- Sad/melancholic mood: electric indigo #4B0082, deep slate #1B2A4A, dark teal #1B4B5A, midnight blue #191970
+- Hopeful/uplifting mood: forest black #1A3A2A with cream text, burnt orange #CC5500, acid yellow #FFD700 with dark text
+- Mystery/tense mood: deep purple #2C1B5E, charcoal #1A1A1A, oxblood #6B2737, ink black #0D0D0D
+- Bright/joyful mood: electric indigo #4B0082, vivid orange #FF6B35, hot coral #FF4433, acid yellow #FFD700
+- When in doubt: pick the color that would look arresting on a bookstore shelf — bold, literary, surprising
 
 Return exactly this JSON:
 {
