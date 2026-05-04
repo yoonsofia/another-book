@@ -1698,7 +1698,7 @@ body{
 
       <!-- Card 1: AI Generated Cover -->
       <div id="cover-card-ai" class="cover-sel-card sel" onclick="selectCoverCard('ai')">
-        <div class="cover-card-badge" style="background:linear-gradient(135deg,#3D5A47,#5a8a68);color:white;">Claude + DALL-E 3</div>
+        <div class="cover-card-badge" style="background:linear-gradient(135deg,#3D5A47,#5a8a68);color:white;">AI 타이포그래피</div>
         <h3 class="cover-card-title">✨ AI 추천 표지</h3>
         <div style="display:flex;justify-content:center;">
           <canvas id="ai-cover-canvas" width="800" height="1200"
@@ -2732,166 +2732,98 @@ function setCoverLoadDot(step){
 async function getCoverDesign(){
   const bookTitle = story?.title || '';
   const systemPrompt = `You are a bold, modern book cover designer for publishers like Penguin, Faber & Faber, and Riverhead Books. You create striking, contemporary covers that look like award-winning literary fiction. Always return valid JSON only.`;
-  const userPrompt = `Design a modern literary book cover for:
+  const userPrompt = `Design a bold typography book cover for:
 - Title: ${bookTitle}
 - Theme: ${ans.topic}
 - Mood: ${ans.mood}
 - Language: ${selectedLang === 'ko' ? 'Korean' : 'English'}
 
-DESIGN RULES — read carefully:
-
-1. SYMBOL: Choose ONE powerful symbolic object that represents the emotional core of this story. Think screen print, poster art, graphic novel — NOT photography or realism. The symbol must be abstract or graphic, not photorealistic.
-   GOOD symbols (abstract/graphic):
-   - a cracked mirror with geometric shards
-   - a single key made of bold flat shapes
-   - a clock face dissolving into geometric forms
-   - a door outlined in stark flat color
-   - an eye rendered as bold flat graphic shapes
-   BAD symbols (too literal/realistic):
-   - a stack of books, a heart, a graduation cap, a realistic face
-
-2. COLOR: Choose BOLD, unexpected colors — NOT muted, NOT safe dark navy alone. Pick 2-3 colors with high contrast and graphic impact. Examples of GREAT palettes:
-   - Hot pink #FF1493 + electric blue #0066FF + cream #F5F0E8
-   - Bright orange #FF6B00 + deep purple #2D0057 + yellow #FFE600
-   - Coral #FF4F4F + forest green #1A5C2E + white
-   - Mustard #E8B400 + navy #1B2A4A + pink #FF69B4
-   - Electric red #E8000D + black #0A0A0A + cream #F5F0E8
-   Be bold. Surprise the viewer.
-
-3. The cover is full-bleed — the DALL-E image fills the entire cover, so the image itself must carry all the visual interest.
+COLOR PALETTE RULES — choose based on mood:
+- Warm/romantic mood: coral #E8543A, hot pink #E91E8C, dusty rose #C4687A
+- Sad/melancholic mood: deep navy #1B2A4A, slate blue #3D5A80, dark teal #1B4B5A
+- Hopeful/uplifting mood: forest green #2D6A4F, warm amber #E76F51, burnt orange #F4A261
+- Mystery/tense mood: deep purple #2C1B5E, charcoal #2D2D2D, burgundy #6B2737
+- Bright/joyful mood: electric yellow #FFD60A, vivid orange #FF6B35, bright teal #00B4D8
+- Always choose BOLD unexpected colors — never beige, never grey, never muted
 
 Return exactly this JSON:
 {
-  coverColor: (dominant background hex — bold and specific),
-  textColor: "#F5F0E8",
-  accentColor: (complementary hex for logo),
-  symbol: (one highly specific graphic/abstract visual symbol — poetic and unexpected),
-  titleLines: (array — split title into individual words, e.g. ['THE', 'FOOTNOTES', 'OF', 'MINA PARK']),
-  dallePrompt: (complete DALL-E prompt — see rules below)
-}
-
-DALLE PROMPT RULES — build the prompt in this exact structure:
-"2D flat graphic art book cover illustration. [SYMBOL]: [vivid description of the graphic/abstract symbol]. Style: bold flat vector illustration, graphic design poster art, NOT photographic, NOT 3D render, NOT realistic lighting, NOT shadows, NOT depth of field. Colors: [list 2-3 bold colors with hex codes, e.g. deep navy #1B2A4A, warm amber #E8A020, cream #F5F0E8]. Flat solid color shapes, bold graphic forms, strong geometric composition, high contrast between foreground and background, graphic novel aesthetic, screen print style, modern literary fiction book cover art 2024. No text, no letters, no words, no numbers. No people, no faces, no figures."`;
-  const raw = await apiCall(userPrompt, 1000, systemPrompt);
+  "coverColor": "[bold unexpected color based on mood]",
+  "textColor": "[high contrast color, usually white #FFFFFF or cream #F5F0E8]",
+  "accentColor": "[second color for divider line]",
+  "titleLines": ["EACH", "WORD", "ON", "ITS", "OWN", "LINE"],
+  "layout": "title_dominant"
+}`;
+  const raw = await apiCall(userPrompt, 400, systemPrompt);
   return extractJSON(raw);
 }
 
-// ──────────── STEP 2: DALL-E IMAGE ────────────
-async function generateDalleImage(dallePrompt){
-  const res = await fetch('https://api.openai.com/v1/images/generations',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':`Bearer ${openaiKey}`},
-    body: JSON.stringify({
-      model:'dall-e-3',
-      prompt: dallePrompt,
-      n:1,
-      size:'1024x1792',
-      quality:'standard',
-      style:'vivid',
-      response_format:'b64_json'
-    })
-  });
-  if(!res.ok){
-    const e = await res.json().catch(()=>({error:{message:'알 수 없는 오류'}}));
-    throw new Error(e.error?.message||`HTTP ${res.status}`);
-  }
-  const data = await res.json();
-  return `data:image/png;base64,${data.data[0].b64_json}`;
-}
-
-// ──────────── STEP 3: RENDER COVER ON CANVAS ────────────
-async function renderCover(canvas, design, imageUrl, bookTitle, authorName){
+// ──────────── STEP 3: RENDER COVER ON CANVAS (typography) ────────────
+async function renderCover(canvas, design, bookTitle, authorName){
   const W = 800, H = 1200;
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
   const isKo = selectedLang === 'ko';
   const titleFont = isKo ? '"Noto Sans KR",sans-serif' : '"Bebas Neue",sans-serif';
-  const bodyFont  = isKo ? '"Noto Sans KR",sans-serif' : '"Montserrat",sans-serif';
+  const bodyFont  = '"Montserrat",sans-serif';
 
-  // Preload fonts so canvas renders them correctly
   try {
     await Promise.all([
-      document.fonts.load(`${isKo?'900 70px':'90px'} ${titleFont}`),
-      document.fonts.load(`300 13px ${bodyFont}`)
+      document.fonts.load(`${isKo ? '900 110px' : '110px'} ${titleFont}`),
+      document.fonts.load(`400 16px ${bodyFont}`)
     ]);
   } catch(e){ /* non-fatal */ }
 
-  // 1. Solid background fallback
+  // 1. Solid color background — full bleed
   ctx.fillStyle = design.coverColor || '#1B2A4A';
   ctx.fillRect(0, 0, W, H);
 
-  // 2. DALL-E image fills entire cover (full bleed)
-  if(imageUrl){
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    await new Promise(resolve=>{ img.onload=resolve; img.onerror=resolve; img.src=imageUrl; });
-    const scale = Math.max(W / img.width, H / img.height);
-    const dw = img.width * scale, dh = img.height * scale;
-    ctx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh);
-  }
-
-  // 3. Dark gradient — top 40% for title legibility
-  const topGrad = ctx.createLinearGradient(0, 0, 0, H * 0.42);
-  topGrad.addColorStop(0,   'rgba(0,0,0,0.55)');
-  topGrad.addColorStop(0.7, 'rgba(0,0,0,0.20)');
-  topGrad.addColorStop(1,   'rgba(0,0,0,0)');
-  ctx.fillStyle = topGrad;
-  ctx.fillRect(0, 0, W, H * 0.42);
-
-  // 4. Dark gradient — bottom 20% for author legibility
-  const botGrad = ctx.createLinearGradient(0, H * 0.80, 0, H);
-  botGrad.addColorStop(0, 'rgba(0,0,0,0)');
-  botGrad.addColorStop(1, 'rgba(0,0,0,0.50)');
-  ctx.fillStyle = botGrad;
-  ctx.fillRect(0, H * 0.80, W, H * 0.20);
-
-  // 5. Title — top third, Bebas Neue (or Noto for Korean), each word on its own line
+  // 2. Title — each word on its own line, huge Bebas Neue / Noto
   const lines = (design.titleLines && design.titleLines.length > 0)
     ? design.titleLines
     : bookTitle.split(' ');
 
-  const longestLine = lines.reduce((a, b) => a.length > b.length ? a : b, '');
-  let fontSize = isKo ? 72 : 96;
-  const testFont = () => isKo ? `900 ${fontSize}px ${titleFont}` : `${fontSize}px ${titleFont}`;
-  ctx.font = testFont();
-  while(ctx.measureText(longestLine).width > W - 90 && fontSize > 36){
-    fontSize -= 4;
-    ctx.font = testFont();
-  }
+  const fontSize   = 110;
+  const leftMargin = W * 0.08;
+  const startY     = H * 0.12;
+  const lineH      = 115;
 
-  const lineH = fontSize * 0.95;
-  const titleStartX = 50;
-  const titleStartY = 72;
-
-  ctx.fillStyle = '#F5F0E8';
+  ctx.fillStyle = design.textColor || '#F5F0E8';
   ctx.textAlign = 'left';
-  ctx.letterSpacing = '3px';
+  ctx.font = isKo ? `900 ${fontSize}px ${titleFont}` : `${fontSize}px ${titleFont}`;
   lines.forEach((line, i) => {
-    ctx.font = testFont();
-    ctx.fillText(line, titleStartX, titleStartY + fontSize + i * lineH);
+    ctx.fillText(line, leftMargin, startY + fontSize + i * lineH);
   });
-  ctx.letterSpacing = '0px';
 
-  // 6. Author name — bottom 8% of cover
-  const authorY = H - Math.round(H * 0.08);
-  ctx.fillStyle = '#F5F0E8';
-  ctx.globalAlpha = 0.92;
-  ctx.textAlign = 'left';
+  // 3. Thin divider line — accentColor at 70% opacity
+  const lastLineY = startY + fontSize + (lines.length - 1) * lineH;
+  const dividerY  = lastLineY + 30;
+  ctx.globalAlpha = 0.7;
+  ctx.strokeStyle = design.accentColor || '#C4A882';
+  ctx.lineWidth   = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(leftMargin, dividerY);
+  ctx.lineTo(leftMargin + W * 0.35, dividerY);
+  ctx.stroke();
+  ctx.globalAlpha = 1.0;
+
+  // 4. Author name — below divider, Montserrat Light uppercase
+  ctx.font          = `400 16px ${bodyFont}`;
+  ctx.fillStyle     = design.textColor || '#F5F0E8';
+  ctx.globalAlpha   = 0.85;
   ctx.letterSpacing = '5px';
-  ctx.font = `300 13px ${bodyFont}`;
-  ctx.fillText(authorName.toUpperCase(), 50, authorY);
-  ctx.globalAlpha = 1.0;
+  ctx.fillText((authorName || '').toUpperCase(), leftMargin, dividerY + 36);
+  ctx.globalAlpha   = 1.0;
   ctx.letterSpacing = '0px';
 
-  // 7. "anotherbook" logo — bottom center, very subtle
-  ctx.globalAlpha = 0.6;
-  ctx.fillStyle = '#F5F0E8';
-  ctx.textAlign = 'center';
-  ctx.letterSpacing = '2px';
-  ctx.font = `300 10px ${bodyFont}`;
-  ctx.fillText(isKo ? '어나더북' : 'anotherbook', W / 2, H - 20);
+  // 5. Logo — bottom right, very subtle
+  ctx.font        = `300 11px ${bodyFont}`;
+  ctx.fillStyle   = design.textColor || '#F5F0E8';
+  ctx.globalAlpha = 0.4;
+  ctx.textAlign   = 'right';
+  ctx.fillText(isKo ? '어나더북' : 'anotherbook', W * 0.92, H * 0.96);
   ctx.globalAlpha = 1.0;
-  ctx.letterSpacing = '0px';
+  ctx.textAlign   = 'left';
 }
 
 // ──────────── SIMPLE COVER RENDER ────────────
@@ -2961,20 +2893,8 @@ async function generateFullCover(){
     coverDesign = fallbackDesign;
   }
 
-  let coverImageUrl = null;
-  if(openaiKey){
-    try {
-      setCoverLoadMsg('🖌️ 심볼 일러스트를 생성하고 있어요...');
-      setCoverLoadDot(2);
-      coverImageUrl = await generateDalleImage(coverDesign.dallePrompt||
-        `A beautiful illustration for a book cover. Mood: ${ans.mood||'warm'}. Theme: ${ans.topic||'life'}. Abstract, no text, no letters, no numbers, no words, no people, no faces, no human figures`);
-    } catch(err){
-      console.warn('DALL-E 생성 실패:', err);
-    }
-  }
-
   setCoverLoadMsg('✨ 표지를 완성하고 있어요...');
-  setCoverLoadDot(3);
+  setCoverLoadDot(2);
   await new Promise(r=>setTimeout(r,300));
 
   await document.fonts.ready;
@@ -2983,7 +2903,7 @@ async function generateFullCover(){
   const authorName = ans.author||'어나더북';
 
   const aiCanvas = document.getElementById('ai-cover-canvas');
-  await renderCover(aiCanvas, coverDesign, coverImageUrl, bookTitle, authorName);
+  await renderCover(aiCanvas, coverDesign, bookTitle, authorName);
 
   const simpleCanvas = document.getElementById('simple-cover-canvas');
   renderSimpleCover(simpleCanvas, coverDesign, bookTitle, authorName);
@@ -3604,7 +3524,7 @@ document.getElementById('modal-api').addEventListener('click',function(e){
 
 // ──────────── DEV KEYBOARD SHORTCUTS ────────────
 // Ctrl+Shift+P → PDF formatting test (no API calls, ₩0)
-// Ctrl+Shift+C → Cover design test (Claude + DALL-E HD, ~₩73)
+// Ctrl+Shift+C → Cover design test (Claude typography, no DALL-E)
 // Set DEV_MODE = false before shipping to production.
 
 const DEV_TEST_CHAPTERS = [
@@ -3741,8 +3661,7 @@ async function devTestCover() {
   if (!DEV_MODE) return;
   showToast('🔧 Dev Mode: Cover Test');
 
-  if (!apiKey)    { showToast('⚠️ Set your Claude API key first');  return; }
-  if (!openaiKey) { showToast('⚠️ Set your OpenAI API key first');  return; }
+  if (!apiKey) { showToast('⚠️ Set your Claude API key first'); return; }
 
   const DEV_TITLE  = "The Light I Almost Forgot";
   const DEV_AUTHOR = "Sara Kim";
@@ -3762,69 +3681,39 @@ async function devTestCover() {
     sp(15, 'Claude designing cover...');
 
     const sysPrompt = `You are a bold, modern book cover designer for publishers like Penguin, Faber & Faber, and Riverhead Books. You create striking, contemporary covers that look like award-winning literary fiction. Always return valid JSON only.`;
-    const usrPrompt = `Design a modern literary book cover for:
+    const usrPrompt = `Design a bold typography book cover for:
 - Title: ${DEV_TITLE}
 - Theme: ${DEV_TOPIC}
 - Mood: ${DEV_MOOD}
 - Language: English
 
-DESIGN RULES — read carefully:
-
-1. SYMBOL: Choose ONE powerful symbolic object. Think screen print, poster art, graphic novel — NOT photography or realism. Abstract or graphic, not photorealistic.
-   GOOD: a cracked mirror as geometric shards, a key as bold flat shapes, a clock dissolving into geometric forms.
-   BAD: a stack of books, a heart, a graduation cap, a realistic face.
-
-2. COLOR: Choose BOLD, unexpected colors — NOT muted, NOT safe dark navy alone. Pick 2-3 high-contrast colors. Examples:
-   - Hot pink #FF1493 + electric blue #0066FF + cream #F5F0E8
-   - Bright orange #FF6B00 + deep purple #2D0057 + yellow #FFE600
-   - Coral #FF4F4F + forest green #1A5C2E + white
-   - Mustard #E8B400 + navy #1B2A4A + pink #FF69B4
-   Be bold. Surprise the viewer.
-
-3. The cover is full-bleed — DALL-E image fills the entire cover.
+COLOR PALETTE RULES — choose based on mood:
+- Warm/romantic mood: coral #E8543A, hot pink #E91E8C, dusty rose #C4687A
+- Sad/melancholic mood: deep navy #1B2A4A, slate blue #3D5A80, dark teal #1B4B5A
+- Hopeful/uplifting mood: forest green #2D6A4F, warm amber #E76F51, burnt orange #F4A261
+- Mystery/tense mood: deep purple #2C1B5E, charcoal #2D2D2D, burgundy #6B2737
+- Bright/joyful mood: electric yellow #FFD60A, vivid orange #FF6B35, bright teal #00B4D8
+- Always choose BOLD unexpected colors — never beige, never grey, never muted
 
 Return exactly this JSON:
 {
-  coverColor: (dominant background hex — bold and specific),
-  textColor: "#F5F0E8",
-  accentColor: (complementary hex),
-  symbol: (one highly specific graphic/abstract visual symbol),
-  titleLines: (array — split title into individual words, e.g. ['THE', 'VANISHING', 'HALF']),
-  dallePrompt: (complete DALL-E prompt built as: "2D flat graphic art book cover illustration. [SYMBOL]: [vivid description]. Style: bold flat vector illustration, graphic design poster art, NOT photographic, NOT 3D render, NOT realistic lighting, NOT shadows, NOT depth of field. Colors: [2-3 bold colors with hex codes]. Flat solid color shapes, bold graphic forms, strong geometric composition, high contrast between foreground and background, graphic novel aesthetic, screen print style, modern literary fiction book cover art 2024. No text, no letters, no words, no numbers. No people, no faces, no figures.")
+  "coverColor": "[bold unexpected color based on mood]",
+  "textColor": "[high contrast color, usually white #FFFFFF or cream #F5F0E8]",
+  "accentColor": "[second color for divider line]",
+  "titleLines": ["EACH", "WORD", "ON", "ITS", "OWN", "LINE"],
+  "layout": "title_dominant"
 }`;
 
-    const rawDesign = await apiCall(usrPrompt, 1000, sysPrompt);
+    const rawDesign = await apiCall(usrPrompt, 400, sysPrompt);
     const design = extractJSON(rawDesign);
     console.log('[DEV] Cover design from Claude:', design);
-
-    sp(50, 'DALL-E generating HD cover image...');
-
-    const imageRes = await fetch('https://api.openai.com/v1/images/generations', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${openaiKey}` },
-      body: JSON.stringify({
-        model: 'dall-e-3',
-        prompt: design.dallePrompt,
-        n: 1,
-        size: '1024x1792',
-        quality: 'hd',
-        style: 'vivid',
-        response_format: 'b64_json'
-      })
-    });
-    if (!imageRes.ok) {
-      const e = await imageRes.json().catch(() => ({ error: { message: 'Unknown' } }));
-      throw new Error(e.error?.message || `DALL-E HTTP ${imageRes.status}`);
-    }
-    const imgData = await imageRes.json();
-    const coverImageUrl = `data:image/png;base64,${imgData.data[0].b64_json}`;
 
     sp(85, 'Rendering cover...');
 
     const canvas   = document.getElementById('dev-cover-canvas');
     const prevLang = selectedLang;
     selectedLang   = 'en';
-    await renderCover(canvas, design, coverImageUrl, DEV_TITLE, DEV_AUTHOR);
+    await renderCover(canvas, design, DEV_TITLE, DEV_AUTHOR);
     selectedLang   = prevLang;
 
     if (overlay) overlay.style.display = 'none';
