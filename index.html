@@ -1531,10 +1531,6 @@ body{
     </p>
     <input type="password" id="api-inp" class="inp" placeholder="sk-ant-api03-..."
       onkeydown="if(event.key==='Enter')submitKey()">
-    <p style="font-size:13px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:var(--txt-md);text-align:left;margin-bottom:6px;">OpenAI API 키 (DALL-E 표지 생성용)</p>
-    <input type="password" id="openai-inp" class="inp" placeholder="sk-proj-..."
-      onkeydown="if(event.key==='Enter')submitKey()">
-    <p style="font-size:12px;color:var(--txt-lt);font-family:'Noto Sans KR',sans-serif;text-align:left;margin-bottom:14px;margin-top:-8px;">표지 AI 이미지 생성에만 사용돼요. 없으면 심플 표지가 자동 선택됩니다.</p>
     <div id="api-err" class="err"></div>
     <button class="btn-gold" onclick="submitKey()" style="width:100%;justify-content:center;display:flex;">
       이야기 만들기 시작 →
@@ -1692,29 +1688,11 @@ body{
 
   <div style="max-width:840px;margin:0 auto;padding:48px 24px 72px;">
     <h2 style="text-align:center;font-family:'Noto Serif KR',serif;font-size:26px;font-weight:700;color:#2C2C2C;margin-bottom:8px;">📖 표지 미리보기</h2>
-    <p style="text-align:center;color:var(--txt-lt);font-family:'Noto Sans KR',sans-serif;font-size:14px;margin-bottom:44px;">마음에 드는 표지를 선택하세요</p>
+    <p style="text-align:center;color:var(--txt-lt);font-family:'Noto Sans KR',sans-serif;font-size:14px;margin-bottom:44px;">AI가 디자인한 표지예요</p>
 
-    <div id="cover-cards-row" style="display:flex;gap:28px;justify-content:center;flex-wrap:wrap;margin-bottom:32px;">
-
-      <!-- Card 1: AI Generated Cover -->
-      <div id="cover-card-ai" class="cover-sel-card sel" onclick="selectCoverCard('ai')">
-        <div class="cover-card-badge" style="background:linear-gradient(135deg,#3D5A47,#5a8a68);color:white;">AI 타이포그래피</div>
-        <h3 class="cover-card-title">✨ AI 추천 표지</h3>
-        <div style="display:flex;justify-content:center;">
-          <canvas id="ai-cover-canvas" width="800" height="1200"
-            style="width:220px;height:330px;border-radius:3px 8px 8px 3px;box-shadow:-4px 4px 16px rgba(0,0,0,.28);display:block;"></canvas>
-        </div>
-      </div>
-
-      <!-- Card 2: Simple Text Cover -->
-      <div id="cover-card-simple" class="cover-sel-card" onclick="selectCoverCard('simple')">
-        <div class="cover-card-badge" style="background:linear-gradient(135deg,#7A7A6E,#9A9A8E);color:white;">타이포그래피</div>
-        <h3 class="cover-card-title">✦ 심플 표지</h3>
-        <div style="display:flex;justify-content:center;">
-          <canvas id="simple-cover-canvas" width="800" height="1200"
-            style="width:220px;height:330px;border-radius:3px 8px 8px 3px;box-shadow:-4px 4px 16px rgba(0,0,0,.28);display:block;"></canvas>
-        </div>
-      </div>
+    <div style="display:flex;justify-content:center;margin-bottom:32px;">
+      <canvas id="cover-canvas" width="800" height="1200"
+        style="width:240px;height:360px;border-radius:3px 8px 8px 3px;box-shadow:-4px 4px 20px rgba(0,0,0,.32);display:block;"></canvas>
     </div>
 
     <!-- Action Buttons -->
@@ -1755,10 +1733,7 @@ let ans = {};
 let selectedLang = 'ko'; // "ko" or "en"
 let story = null;
 let apiKey = sessionStorage.getItem('ms_api') || '';
-let openaiKey = sessionStorage.getItem('openai_key') || '';
 let loadTimer = null;
-let selectedCover = 'ai'; // 'ai' or 'simple'
-let aiCoverDataUrl = null;
 let coverDesign = null;
 let selectedProduct = 'digital'; // 'digital', 'physical', 'gift'
 
@@ -1819,8 +1794,6 @@ function submitKey(){
   }
   apiKey = v;
   sessionStorage.setItem('ms_api', apiKey);
-  const ov = (document.getElementById('openai-inp')?.value||'').trim();
-  if(ov){ openaiKey = ov; sessionStorage.setItem('openai_key', openaiKey); }
   document.getElementById('modal-api').classList.remove('open');
   err.style.display='none';
   curStep=1; ans={}; selectedLang='ko';
@@ -2668,47 +2641,12 @@ ${chaptersHTML}
 function showCoverSelect(type){
   selectedProduct = type || 'digital';
   if(!story){ startStory(); return; }
-  aiCoverDataUrl = null;
   coverDesign = null;
-  selectedCover = 'ai';
   showPage('page-cover-loading');
   generateFullCover();
 }
 
 function goBackFromCoverSelect(){ showPage('page-story'); }
-
-function selectCoverCard(type){
-  selectedCover = type;
-  const aiCard = document.getElementById('cover-card-ai');
-  const simCard = document.getElementById('cover-card-simple');
-  if(aiCard) aiCard.classList.toggle('sel', type==='ai');
-  if(simCard) simCard.classList.toggle('sel', type==='simple');
-}
-
-function drawSimpleCover(){
-  const canvas = document.getElementById('simple-cover-canvas');
-  if(!canvas || !story) return;
-  const design = coverDesign || {
-    coverColor:'#3D5A47', textColor:'#FDFAF5', accentColor:'#C4A882',
-    titleLines:[story.title], authorPosition:'bottom_center'
-  };
-  renderSimpleCover(canvas, design, story.title, ans.author||'어나더북');
-}
-
-function coverWrapText(ctx, text, x, y, maxW, lh){
-  if(ctx.measureText(text).width <= maxW){ ctx.fillText(text,x,y); return; }
-  let line='', lines=[];
-  for(const ch of text){
-    const tl = line+ch;
-    if(ctx.measureText(tl).width > maxW && line){ lines.push(line); line=ch; }
-    else line=tl;
-  }
-  if(line) lines.push(line);
-  const startY = y - (lines.length-1)*lh/2;
-  lines.forEach((l,i)=>ctx.fillText(l, x, startY+i*lh));
-}
-
-function retryAiCover(){ regenerateCover(); }
 
 // ──────────── COVER LOADING HELPERS ────────────
 function setCoverLoadMsg(msg){
@@ -2826,55 +2764,6 @@ async function renderCover(canvas, design, bookTitle, authorName){
   ctx.textAlign   = 'left';
 }
 
-// ──────────── SIMPLE COVER RENDER ────────────
-function renderSimpleCover(canvas, design, bookTitle, authorName){
-  const W=800, H=1200;
-  canvas.width=W; canvas.height=H;
-  const ctx=canvas.getContext('2d');
-  const isKo=selectedLang==='ko';
-  const fontFam=isKo?'"Noto Serif KR","Noto Sans KR",serif':'"Playfair Display",Georgia,serif';
-
-  ctx.fillStyle=design.coverColor; ctx.fillRect(0,0,W,H);
-
-  const lineW=W*0.35;
-  ctx.strokeStyle=design.accentColor; ctx.lineWidth=1.5;
-  ctx.beginPath(); ctx.moveTo((W-lineW)/2,H*.08); ctx.lineTo((W+lineW)/2,H*.08); ctx.stroke();
-  ctx.fillStyle=design.accentColor;
-  ctx.fillRect((W-lineW)/2-2, H*.08-2, 4, 4);
-  ctx.fillRect((W+lineW)/2-2, H*.08-2, 4, 4);
-
-  const lines=(design.titleLines&&design.titleLines.length>0)?design.titleLines:[bookTitle];
-  const longestLine=lines.reduce((a,b)=>a.length>b.length?a:b,'');
-  const sz=Math.min(72,(W*0.8)/(longestLine.length*0.6));
-  const lh=sz*1.1;
-  let startY=(H-lines.length*lh)/2-40;
-  ctx.fillStyle=design.textColor; ctx.textAlign='center';
-  lines.forEach((line,i)=>{
-    let s=sz; ctx.font=`bold ${s}px ${fontFam}`;
-    while(ctx.measureText(line).width>W*.82&&s>18){s-=4;ctx.font=`bold ${s}px ${fontFam}`;}
-    ctx.fillText(line,W/2,startY+i*lh);
-  });
-  const lastY=startY+(lines.length-1)*lh;
-
-  ctx.fillStyle=design.accentColor; ctx.font='24px sans-serif'; ctx.fillText('✦',W/2,lastY+65);
-
-  ctx.fillStyle=design.textColor; ctx.globalAlpha=0.85;
-  ctx.letterSpacing='3px'; ctx.font=`13px ${fontFam}`;
-  ctx.fillText(authorName.toUpperCase(),W/2,lastY+110);
-  ctx.globalAlpha=1.0; ctx.letterSpacing='0px';
-
-  ctx.strokeStyle=design.accentColor; ctx.lineWidth=1.5;
-  ctx.beginPath(); ctx.moveTo((W-lineW)/2,H-H*.08); ctx.lineTo((W+lineW)/2,H-H*.08); ctx.stroke();
-  ctx.fillStyle=design.accentColor;
-  ctx.fillRect((W-lineW)/2-2, H-H*.08-2, 4, 4);
-  ctx.fillRect((W+lineW)/2-2, H-H*.08-2, 4, 4);
-
-  ctx.globalAlpha=0.7; ctx.fillStyle=design.accentColor;
-  ctx.font=`11px ${fontFam}`; ctx.textAlign='center';
-  ctx.fillText(selectedLang==='ko'?'어나더북':'anotherbook',W/2,H-H*.028);
-  ctx.globalAlpha=1.0;
-}
-
 // ──────────── FULL COVER GENERATION FLOW ────────────
 async function generateFullCover(){
   setCoverLoadMsg('🎨 AI가 표지 디자인을 구상하고 있어요...');
@@ -2902,14 +2791,9 @@ async function generateFullCover(){
   const bookTitle = story?.title||'';
   const authorName = ans.author||'어나더북';
 
-  const aiCanvas = document.getElementById('ai-cover-canvas');
-  await renderCover(aiCanvas, coverDesign, bookTitle, authorName);
+  const canvas = document.getElementById('cover-canvas');
+  await renderCover(canvas, coverDesign, bookTitle, authorName);
 
-  const simpleCanvas = document.getElementById('simple-cover-canvas');
-  renderSimpleCover(simpleCanvas, coverDesign, bookTitle, authorName);
-
-  selectedCover = 'ai';
-  selectCoverCard('ai');
   showPage('page-cover-select');
 }
 
@@ -3139,9 +3023,7 @@ async function generatePDFPrimary(sp) {
   }
 
   // Cover page (use pre-rendered canvas)
-  const coverCanvas = document.getElementById(
-    selectedCover==='ai' ? 'ai-cover-canvas' : 'simple-cover-canvas'
-  );
+  const coverCanvas = document.getElementById('cover-canvas');
   if(coverCanvas){
     doc.addImage(coverCanvas.toDataURL('image/jpeg',0.95),'JPEG',0,0,127,188);
   }
