@@ -1,0 +1,8 @@
+[phases.setup]
+nixPkgs = ["chromium", "nss", "freetype", "harfbuzz", "ca-certificates", "fontconfig", "dbus", "glib", "expat"]
+
+[phases.install]
+cmds = ["PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install"]
+
+[start]
+cmd = "PUPPETEER_EXECUTABLE_PATH=$(which chromium) node server.js"

@@ -1,0 +1,7 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "PUPPETEER_EXECUTABLE_PATH=$(which chromium) node server.js"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
