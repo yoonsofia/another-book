@@ -3655,18 +3655,18 @@ async function devTestPDF() {
 let testCoverIndex = 0;
 
 function devTestCover() {
-  const canvas = document.getElementById('coverCanvas') || document.createElement('canvas');
+  let canvas = document.getElementById('coverCanvas');
+  if (!canvas) { canvas = document.createElement('canvas'); }
   canvas.width = 600;
   canvas.height = 900;
   const ctx = canvas.getContext('2d');
 
-  // Helper: draw text that always fits within maxWidth
-  function fitText(text, maxWidth, maxSize, fontWeight, fontFamily) {
+  function fitText(text, maxWidth, maxSize, weight, family) {
     let size = maxSize;
-    ctx.font = `${fontWeight} ${size}px ${fontFamily}`;
-    while (ctx.measureText(text).width > maxWidth && size > 30) {
+    ctx.font = weight + ' ' + size + 'px ' + family;
+    while (ctx.measureText(text).width > maxWidth && size > 28) {
       size -= 3;
-      ctx.font = `${fontWeight} ${size}px ${fontFamily}`;
+      ctx.font = weight + ' ' + size + 'px ' + family;
     }
     return size;
   }
@@ -3674,23 +3674,19 @@ function devTestCover() {
   const idx = testCoverIndex % 3;
 
   if (idx === 0) {
-    // DESIGN A: Black + Yellow split (best one - refine it)
     ctx.fillStyle = '#0D0D0D';
     ctx.fillRect(0, 0, 600, 900);
-    // Yellow bottom half
     ctx.fillStyle = '#FFD600';
     ctx.fillRect(0, 480, 600, 420);
-    // Draw title lines - each auto-fitted
-    const lines = ['THE', 'LIGHT I', 'ALMOST', 'FORGOT'];
-    const colors = ['#FFD600', '#FFD600', '#FFD600', '#0D0D0D'];
-    const yPositions = [150, 270, 390, 590];
-    lines.forEach((line, i) => {
-      const size = fitText(line, 520, 148, '900', "'Barlow Condensed', Arial Black, sans-serif");
-      ctx.fillStyle = colors[i];
+    const lines0 = ['THE', 'LIGHT I', 'ALMOST', 'FORGOT'];
+    const colors0 = ['#FFD600','#FFD600','#FFD600','#0D0D0D'];
+    const y0 = [150, 270, 390, 590];
+    lines0.forEach(function(line, i) {
+      fitText(line, 520, 148, '900', "'Barlow Condensed', Arial Black, sans-serif");
+      ctx.fillStyle = colors0[i];
       ctx.textAlign = 'left';
-      ctx.fillText(line, 40, yPositions[i]);
+      ctx.fillText(line, 40, y0[i]);
     });
-    // Author name
     ctx.font = "400 18px 'Montserrat', Arial, sans-serif";
     ctx.fillStyle = '#0D0D0D';
     ctx.textAlign = 'left';
@@ -3698,29 +3694,24 @@ function devTestCover() {
   }
 
   if (idx === 1) {
-    // DESIGN B: Hot pink + large black circle
     ctx.fillStyle = '#E8157B';
     ctx.fillRect(0, 0, 600, 900);
-    // Giant black circle bottom right
     ctx.beginPath();
     ctx.arc(580, 820, 380, 0, Math.PI * 2);
     ctx.fillStyle = '#0D0D0D';
     ctx.fill();
-    // Medium white circle
     ctx.beginPath();
     ctx.arc(480, 700, 160, 0, Math.PI * 2);
     ctx.fillStyle = '#F5F0E8';
     ctx.fill();
-    // Title all white, top left
-    const lines = ['THE', 'LIGHT', 'I ALMOST', 'FORGOT'];
-    const yPositions = [160, 290, 420, 550];
-    lines.forEach((line, i) => {
-      const size = fitText(line, 520, 138, '900', "'Barlow Condensed', Arial Black, sans-serif");
+    const lines1 = ['THE', 'LIGHT', 'I ALMOST', 'FORGOT'];
+    const y1 = [160, 290, 420, 550];
+    lines1.forEach(function(line, i) {
+      fitText(line, 520, 138, '900', "'Barlow Condensed', Arial Black, sans-serif");
       ctx.fillStyle = '#FFFFFF';
       ctx.textAlign = 'left';
-      ctx.fillText(line, 40, yPositions[i]);
+      ctx.fillText(line, 40, y1[i]);
     });
-    // Author
     ctx.font = "400 18px 'Montserrat', Arial, sans-serif";
     ctx.fillStyle = '#FFFFFF';
     ctx.textAlign = 'left';
@@ -3728,16 +3719,12 @@ function devTestCover() {
   }
 
   if (idx === 2) {
-    // DESIGN C: Cream + navy elegant with bold geometric
     ctx.fillStyle = '#F0EBE3';
     ctx.fillRect(0, 0, 600, 900);
-    // Bold navy vertical bar on left
     ctx.fillStyle = '#1A1A2E';
     ctx.fillRect(0, 0, 18, 900);
-    // Large navy rectangle bottom
     ctx.fillStyle = '#1A1A2E';
     ctx.fillRect(0, 720, 600, 180);
-    // Accent circle mid right
     ctx.beginPath();
     ctx.arc(480, 500, 120, 0, Math.PI * 2);
     ctx.fillStyle = '#8B1A1A';
@@ -3746,28 +3733,27 @@ function devTestCover() {
     ctx.arc(480, 500, 80, 0, Math.PI * 2);
     ctx.fillStyle = '#F0EBE3';
     ctx.fill();
-    // Title navy, left aligned, large serif
-    const lines = ['THE', 'LIGHT', 'I ALMOST', 'FORGOT'];
-    const yPositions = [150, 270, 390, 510];
-    lines.forEach((line, i) => {
-      const size = fitText(line, 380, 118, '700', "'Libre Baskerville', Georgia, serif");
+    const lines2 = ['THE', 'LIGHT', 'I ALMOST', 'FORGOT'];
+    const y2 = [150, 270, 390, 510];
+    lines2.forEach(function(line, i) {
+      fitText(line, 380, 118, '700', "'Libre Baskerville', Georgia, serif");
       ctx.fillStyle = '#1A1A2E';
       ctx.textAlign = 'left';
-      ctx.fillText(line, 50, yPositions[i]);
+      ctx.fillText(line, 50, y2[i]);
     });
-    // Author on dark bottom bar
     ctx.font = "400 18px 'Montserrat', Arial, sans-serif";
     ctx.fillStyle = '#F0EBE3';
     ctx.textAlign = 'left';
     ctx.fillText('SARA KIM', 50, 800);
   }
 
-  // Show canvas in modal
   testCoverIndex++;
-  const modal = document.getElementById('coverTestModal') || createCoverModal();
-  const img = canvas.toDataURL('image/png');
-  document.getElementById('coverTestImage').src = img;
-  modal.style.display = 'flex';
+
+  const existingModal = document.getElementById('coverTestModal');
+  if (existingModal) {
+    document.getElementById('coverTestImage').src = canvas.toDataURL('image/png');
+    existingModal.style.display = 'flex';
+  }
 }
 
 document.addEventListener('keydown', function(e) {
