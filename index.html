@@ -3665,6 +3665,16 @@ function devTestCover() {
   const idx = testCoverIndex % 3;
   testCoverIndex++;
 
+  function drawFit(text, x, y, weight, size, family) {
+    let fs = size;
+    ctx.font = `${weight} ${fs}px ${family}`;
+    while (ctx.measureText(text).width > 520 && fs > 40) {
+      fs -= 4;
+      ctx.font = `${weight} ${fs}px ${family}`;
+    }
+    ctx.fillText(text, x, y);
+  }
+
   if (idx === 0) {
     // Cover 0: Deep purple + layered circles
     ctx.fillStyle = '#1A0A2E';
@@ -3683,19 +3693,15 @@ function devTestCover() {
     ctx.fillStyle = '#1A0A2E';
     ctx.fill();
     ctx.globalAlpha = 1.0;
-    ctx.font = "900 118px 'Barlow Condensed', Arial Black, sans-serif";
     ctx.textAlign = 'left';
-    ctx.fillStyle = '#F5F0E8'; ctx.fillText('THE LIGHT', 40, 200);
-    ctx.fillStyle = '#FF6B35'; ctx.fillText('I ALMOST', 40, 335);
-    ctx.fillStyle = '#F5F0E8'; ctx.fillText('FORGOT', 40, 470);
-    ctx.font = "300 15px 'Montserrat', Arial, sans-serif";
+    ctx.fillStyle = '#F5F0E8'; drawFit('THE LIGHT', 40, 210, '900', 100, "'Barlow Condensed', Arial Black, sans-serif");
+    ctx.fillStyle = '#FF6B35'; drawFit('I ALMOST',  40, 338, '900', 100, "'Barlow Condensed', Arial Black, sans-serif");
+    ctx.fillStyle = '#F5F0E8'; drawFit('FORGOT',    40, 466, '900', 100, "'Barlow Condensed', Arial Black, sans-serif");
+    ctx.font = "300 18px 'Montserrat', Arial, sans-serif";
+    ctx.letterSpacing = '8px';
     ctx.fillStyle = '#F5F0E8';
     ctx.fillText('SARA KIM', 40, 840);
-    ctx.font = "300 11px 'Montserrat', Arial, sans-serif";
-    ctx.globalAlpha = 0.35;
-    ctx.textAlign = 'right';
-    ctx.fillText('anotherbook', 560, 878);
-    ctx.globalAlpha = 1.0;
+    ctx.letterSpacing = '0px';
   }
 
   if (idx === 1) {
@@ -3703,25 +3709,23 @@ function devTestCover() {
     ctx.fillStyle = '#F0EBE3';
     ctx.fillRect(0, 0, 600, 900);
     ctx.beginPath();
+    ctx.moveTo(600, 220);
     ctx.arc(600, 500, 280, -Math.PI / 2, Math.PI / 2);
+    ctx.closePath();
     ctx.fillStyle = '#1A1A2E';
     ctx.fill();
     ctx.fillStyle = '#1A1A2E';
     ctx.fillRect(40, 520, 200, 3);
-    ctx.font = "700 82px 'Libre Baskerville', Georgia, serif";
     ctx.textAlign = 'center';
     ctx.fillStyle = '#1A1A2E';
-    ctx.fillText('THE LIGHT', 300, 190);
-    ctx.fillText('I ALMOST', 300, 295);
-    ctx.fillText('FORGOT', 300, 400);
-    ctx.font = "300 14px 'Montserrat', Arial, sans-serif";
+    drawFit('THE LIGHT', 300, 190, '700', 82, "'Libre Baskerville', Georgia, serif");
+    drawFit('I ALMOST',  300, 295, '700', 82, "'Libre Baskerville', Georgia, serif");
+    drawFit('FORGOT',    300, 400, '700', 82, "'Libre Baskerville', Georgia, serif");
+    ctx.font = "300 18px 'Montserrat', Arial, sans-serif";
+    ctx.letterSpacing = '8px';
     ctx.fillStyle = '#1A1A2E';
     ctx.fillText('SARA KIM', 300, 560);
-    ctx.font = "300 11px 'Montserrat', Arial, sans-serif";
-    ctx.globalAlpha = 0.35;
-    ctx.textAlign = 'right';
-    ctx.fillText('anotherbook', 560, 878);
-    ctx.globalAlpha = 1.0;
+    ctx.letterSpacing = '0px';
   }
 
   if (idx === 2) {
@@ -3730,19 +3734,15 @@ function devTestCover() {
     ctx.fillRect(0, 0, 600, 900);
     ctx.fillStyle = '#FFD600';
     ctx.fillRect(0, 520, 600, 380);
-    ctx.font = "900 128px 'Barlow Condensed', Arial Black, sans-serif";
     ctx.textAlign = 'left';
-    ctx.fillStyle = '#FFD600'; ctx.fillText('THE LIGHT', 40, 185);
-    ctx.fillStyle = '#FFD600'; ctx.fillText('I ALMOST', 40, 328);
-    ctx.fillStyle = '#0D0D0D'; ctx.fillText('FORGOT', 40, 620);
-    ctx.font = "300 15px 'Montserrat', Arial, sans-serif";
+    ctx.fillStyle = '#FFD600'; drawFit('THE LIGHT', 40, 175, '900', 108, "'Barlow Condensed', Arial Black, sans-serif");
+    ctx.fillStyle = '#FFD600'; drawFit('I ALMOST',  40, 305, '900', 108, "'Barlow Condensed', Arial Black, sans-serif");
+    ctx.fillStyle = '#0D0D0D'; drawFit('FORGOT',    40, 610, '900', 108, "'Barlow Condensed', Arial Black, sans-serif");
+    ctx.font = "300 18px 'Montserrat', Arial, sans-serif";
+    ctx.letterSpacing = '8px';
     ctx.fillStyle = '#0D0D0D';
     ctx.fillText('SARA KIM', 40, 840);
-    ctx.font = "300 11px 'Montserrat', Arial, sans-serif";
-    ctx.globalAlpha = 0.35;
-    ctx.textAlign = 'right';
-    ctx.fillText('anotherbook', 560, 878);
-    ctx.globalAlpha = 1.0;
+    ctx.letterSpacing = '0px';
   }
 
   document.getElementById('dev-cover-modal').style.display = 'flex';
