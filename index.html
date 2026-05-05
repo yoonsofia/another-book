@@ -3569,16 +3569,24 @@ async function devTestPDF() {
   }
 }
 
+let testCoverIndex = 0;
+
 async function devTestCover() {
   if (!DEV_MODE) return;
-  showToast('🔧 Dev Mode: Cover Test');
 
-  if (!apiKey) { showToast('⚠️ Set your Claude API key first'); return; }
+  const testCovers = [
+    { coverColor: '#1A0A2E', textColor: '#F5F0E8', accentColor: '#E8A020', titleLines: ['THE LIGHT', 'I ALMOST', 'FORGOT'], fontStyle: 'BARLOW',   layoutStyle: 'STACKED_LARGE',    titleAlign: 'left'   },
+    { coverColor: '#1C0A00', textColor: '#F5F0E8', accentColor: '#CC5500', titleLines: ['THE LIGHT', 'I ALMOST', 'FORGOT'], fontStyle: 'ABRIL',    layoutStyle: 'STACKED_MID',      titleAlign: 'left'   },
+    { coverColor: '#F5F0E8', textColor: '#0D0D0D', accentColor: '#8B1A1A', titleLines: ['THE LIGHT', 'I ALMOST', 'FORGOT'], fontStyle: 'LIBRE',    layoutStyle: 'CENTERED_MINIMAL', titleAlign: 'center' },
+    { coverColor: '#1B3A2D', textColor: '#F5F0E8', accentColor: '#F5C842', titleLines: ['THE LIGHT', 'I ALMOST', 'FORGOT'], fontStyle: 'DANCING',  layoutStyle: 'STACKED_MID',      titleAlign: 'left'   },
+    { coverColor: '#0D0D1A', textColor: '#FFFFFF',  accentColor: '#E63946', titleLines: ['THE LIGHT', 'I ALMOST', 'FORGOT'], fontStyle: 'SPECTRAL', layoutStyle: 'STACKED_LARGE',    titleAlign: 'left'   }
+  ];
+
+  const design = testCovers[testCoverIndex % testCovers.length];
+  testCoverIndex++;
 
   const DEV_TITLE  = "The Light I Almost Forgot";
   const DEV_AUTHOR = "Sara Kim";
-  const DEV_TOPIC  = "a woman rediscovering herself after years of overworking";
-  const DEV_MOOD   = "quiet, melancholic, hopeful";
 
   const overlay = document.getElementById('pdf-progress-overlay');
   const msgEl   = document.getElementById('pdf-progress-msg');
@@ -3590,31 +3598,8 @@ async function devTestCover() {
   }
 
   try {
-    sp(15, 'Claude designing cover...');
-
-    const sysPrompt = `You are a bold, modern book cover designer for publishers like Penguin, Faber & Faber, and Riverhead Books. You create striking, contemporary covers that look like award-winning literary fiction. Always return valid JSON only.`;
-    const usrPrompt = `Design a bold typography book cover for:
-- Title: ${DEV_TITLE}
-- Theme: ${DEV_TOPIC}
-- Mood: ${DEV_MOOD}
-- Language: English
-
-COLOR — You MUST choose a bold, dramatic, unexpected color. NEVER use teal, gray, blue-gray, navy, or any safe corporate color unless the story is specifically about the ocean or sky. Instead choose from: deep crimson #8B0000, rich purple #4A0E6E, burnt orange #C1440E, forest green #1B4332, deep black #0D0D0D, dusty rose #8B3A52, warm terracotta #A0522D. The color MUST reflect the emotional core of the story.
-
-Return exactly this JSON:
-{
-  "coverColor": "[bold unexpected color based on mood]",
-  "textColor": "[high contrast color, usually white #FFFFFF or cream #F5F0E8]",
-  "accentColor": "[second color for divider line]",
-  "titleLines": ["group words if 5+, e.g. THE LIGHT | I ALMOST | FORGOT — never leave a single short word like I alone on a line"],
-  "layout": "title_dominant"
-}`;
-
-    const rawDesign = await apiCall(usrPrompt, 400, sysPrompt);
-    const design = extractJSON(rawDesign);
-    console.log('[DEV] Cover design from Claude:', design);
-
     sp(85, 'Rendering cover...');
+    console.log('[DEV] Cover design:', design);
 
     const canvas   = document.getElementById('dev-cover-canvas');
     const prevLang = selectedLang;
@@ -3624,7 +3609,7 @@ Return exactly this JSON:
 
     if (overlay) overlay.style.display = 'none';
     document.getElementById('dev-cover-modal').style.display = 'flex';
-    showToast('✅ Cover test done — Ctrl+Shift+P to test in PDF');
+    showToast(`✅ ${design.fontStyle} / ${design.layoutStyle} — Ctrl+Shift+C for next`);
 
   } catch (err) {
     if (overlay) overlay.style.display = 'none';
