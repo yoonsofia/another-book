@@ -2676,20 +2676,14 @@ async function getCoverDesign(){
 - Mood: ${ans.mood}
 - Language: ${selectedLang === 'ko' ? 'Korean' : 'English'}
 
-COLOR PALETTE RULES — always choose bold, unexpected literary colors that match the story's emotional tone. Never safe corporate colors, never beige, never grey, never muted pastels:
-- Warm/romantic mood: deep crimson #8B0000, hot coral #FF4433, dusty rose #C4687A, magenta #C2185B
-- Sad/melancholic mood: electric indigo #4B0082, deep slate #1B2A4A, dark teal #1B4B5A, midnight blue #191970
-- Hopeful/uplifting mood: forest black #1A3A2A with cream text, burnt orange #CC5500, acid yellow #FFD700 with dark text
-- Mystery/tense mood: deep purple #2C1B5E, charcoal #1A1A1A, oxblood #6B2737, ink black #0D0D0D
-- Bright/joyful mood: electric indigo #4B0082, vivid orange #FF6B35, hot coral #FF4433, acid yellow #FFD700
-- When in doubt: pick the color that would look arresting on a bookstore shelf — bold, literary, surprising
+COLOR — You MUST choose a bold, dramatic, unexpected color. NEVER use teal, gray, blue-gray, navy, or any safe corporate color unless the story is specifically about the ocean or sky. Instead choose from: deep crimson #8B0000, rich purple #4A0E6E, burnt orange #C1440E, forest green #1B4332, deep black #0D0D0D, dusty rose #8B3A52, warm terracotta #A0522D. The color MUST reflect the emotional core of the story.
 
 Return exactly this JSON:
 {
   "coverColor": "[bold unexpected color based on mood]",
   "textColor": "[high contrast color, usually white #FFFFFF or cream #F5F0E8]",
   "accentColor": "[second color for divider line]",
-  "titleLines": ["EACH", "WORD", "ON", "ITS", "OWN", "LINE"],
+  "titleLines": ["group words if 5+, e.g. THE LIGHT | I ALMOST | FORGOT — never leave a single short word like I alone on a line"],
   "layout": "title_dominant"
 }`;
   const raw = await apiCall(userPrompt, 400, systemPrompt);
@@ -2716,10 +2710,23 @@ async function renderCover(canvas, design, bookTitle, authorName){
   ctx.fillStyle = design.coverColor || '#1B2A4A';
   ctx.fillRect(0, 0, W, H);
 
-  // 2. Title — each word on its own line, huge Bebas Neue / Noto
-  const lines = (design.titleLines && design.titleLines.length > 0)
+  // 2. Title — group words for 5+ word titles, huge Bebas Neue / Noto
+  function groupTitleLines(raw) {
+    const words = raw.filter(w => w.trim().length > 0);
+    if (words.length < 5) return words;
+    // split into ~3 balanced groups, avoid orphaned short words
+    const target = Math.ceil(words.length / 3);
+    const groups = [];
+    for (let i = 0; i < words.length; i += target) {
+      groups.push(words.slice(i, i + target).join(' '));
+    }
+    return groups;
+  }
+
+  const rawLines = (design.titleLines && design.titleLines.length > 0)
     ? design.titleLines
     : bookTitle.split(' ');
+  const lines = groupTitleLines(rawLines);
 
   const fontSize   = 130;
   const leftMargin = W * 0.08;
@@ -2754,10 +2761,10 @@ async function renderCover(canvas, design, bookTitle, authorName){
   ctx.globalAlpha   = 1.0;
   ctx.letterSpacing = '0px';
 
-  // 5. Logo — bottom right, very subtle
+  // 5. Logo — anchored to bottom right, leaving bottom 40% as clean negative space
   ctx.font        = `300 11px ${bodyFont}`;
   ctx.fillStyle   = design.textColor || '#F5F0E8';
-  ctx.globalAlpha = 0.4;
+  ctx.globalAlpha = 0.35;
   ctx.textAlign   = 'right';
   ctx.fillText(isKo ? '어나더북' : 'anotherbook', W * 0.92, H * 0.96);
   ctx.globalAlpha = 1.0;
@@ -3569,20 +3576,14 @@ async function devTestCover() {
 - Mood: ${DEV_MOOD}
 - Language: English
 
-COLOR PALETTE RULES — always choose bold, unexpected literary colors that match the story's emotional tone. Never safe corporate colors, never beige, never grey, never muted pastels:
-- Warm/romantic mood: deep crimson #8B0000, hot coral #FF4433, dusty rose #C4687A, magenta #C2185B
-- Sad/melancholic mood: electric indigo #4B0082, deep slate #1B2A4A, dark teal #1B4B5A, midnight blue #191970
-- Hopeful/uplifting mood: forest black #1A3A2A with cream text, burnt orange #CC5500, acid yellow #FFD700 with dark text
-- Mystery/tense mood: deep purple #2C1B5E, charcoal #1A1A1A, oxblood #6B2737, ink black #0D0D0D
-- Bright/joyful mood: electric indigo #4B0082, vivid orange #FF6B35, hot coral #FF4433, acid yellow #FFD700
-- When in doubt: pick the color that would look arresting on a bookstore shelf — bold, literary, surprising
+COLOR — You MUST choose a bold, dramatic, unexpected color. NEVER use teal, gray, blue-gray, navy, or any safe corporate color unless the story is specifically about the ocean or sky. Instead choose from: deep crimson #8B0000, rich purple #4A0E6E, burnt orange #C1440E, forest green #1B4332, deep black #0D0D0D, dusty rose #8B3A52, warm terracotta #A0522D. The color MUST reflect the emotional core of the story.
 
 Return exactly this JSON:
 {
   "coverColor": "[bold unexpected color based on mood]",
   "textColor": "[high contrast color, usually white #FFFFFF or cream #F5F0E8]",
   "accentColor": "[second color for divider line]",
-  "titleLines": ["EACH", "WORD", "ON", "ITS", "OWN", "LINE"],
+  "titleLines": ["group words if 5+, e.g. THE LIGHT | I ALMOST | FORGOT — never leave a single short word like I alone on a line"],
   "layout": "title_dominant"
 }`;
 
