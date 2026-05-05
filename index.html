@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>어나더북 | 세상에 하나뿐인 나만의 소설</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:wght@900&family=DM+Serif+Display&family=Cormorant+Garamond:wght@700&family=Anton&family=Spectral:wght@800&family=Barlow+Condensed:wght@800,900&family=Dancing+Script:wght@700&family=DM+Sans:wght@700,900&family=Caveat:wght@700&family=Plus+Jakarta+Sans:wght@800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:wght@900&family=DM+Serif+Display&family=Cormorant+Garamond:wght@700&family=Anton&family=Spectral:wght@800&family=Barlow+Condensed:wght@800,900&family=Dancing+Script:wght@700&family=DM+Sans:wght@700,900&family=Caveat:wght@700&family=Plus+Jakarta+Sans:wght@800&family=Abril+Fatface&family=Libre+Baskerville:wght@700&display=swap" rel="stylesheet">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
@@ -2669,7 +2669,7 @@ function setCoverLoadDot(step){
 // ──────────── STEP 1: CLAUDE COVER DESIGN ────────────
 async function getCoverDesign(){
   const bookTitle = story?.title || '';
-  const systemPrompt = `You are a bold graphic designer for a premium literary fiction publisher. Based on this story, output ONLY a JSON object with no explanation. STRICT COLOR RULES: NEVER use teal, blue-gray, navy, gray, or muted safe colors. For sad/longing mood use #1C0A00 or #2D0A0A. For romantic/warm use #8B1A1A or #7B2D8B. For hopeful/growth use #1B3A2D or #2D4A1E. For mysterious/tense use #0D0D1A or #1A0A2E. For joyful/bright use #8B3A00 or #CC5500. For modern/bold use #1A1A1A or #F5F0E8. textColor always #F5F0E8 or #FFFFFF. accentColor always bold and contrasting. STRICT FONT RULES: For sad/longing choose SPECTRAL or CORMORANT. For romantic/warm choose PLAYFAIR or DANCING. For mysterious/tense choose SPECTRAL or ANTON. For hopeful/uplifting choose DM_SERIF or JAKARTA. For dramatic/intense choose BARLOW or ANTON. For literary/quiet choose CORMORANT or DM_SERIF. For modern/contemporary choose DM_SANS or JAKARTA. For bold/political choose BARLOW or BEBAS. STRICT TITLE RULES: never put a single short word like I, A, or THE alone on one line. Maximum 3 lines. Group words so lines are roughly equal length. Return JSON: { coverColor, textColor, accentColor, titleLines, fontStyle, mood }`;
+  const systemPrompt = `You are a bold graphic designer for a premium literary fiction publisher. Based on this story, output ONLY a JSON object with no explanation. STRICT COLOR RULES: NEVER use teal, blue-gray, navy, gray, or muted safe colors. For sad/longing mood use #1C0A00 or #2D0A0A. For romantic/warm use #8B1A1A or #7B2D8B. For hopeful/growth use #1B3A2D or #2D4A1E. For mysterious/tense use #0D0D1A or #1A0A2E. For joyful/bright use #8B3A00 or #CC5500. For modern/bold use #1A1A1A or #F5F0E8. textColor always #F5F0E8 or #FFFFFF. accentColor always bold and contrasting. STRICT FONT RULES: For sad/longing choose SPECTRAL or CORMORANT. For romantic/warm choose PLAYFAIR or DANCING. For mysterious/tense choose SPECTRAL or ANTON. For hopeful/uplifting choose DM_SERIF or JAKARTA. For dramatic/intense choose BARLOW or ANTON. For literary/quiet choose CORMORANT or DM_SERIF. For modern/contemporary choose DM_SANS or JAKARTA. For bold/political choose BARLOW or BEBAS. For quiet/minimal/literary (Sally Rooney style) choose LIBRE or CORMORANT. For dark/dramatic/deep sea choose ABRIL or SPECTRAL. STRICT LAYOUT RULES: Use layoutStyle STACKED_LARGE for full-width dramatic covers (Amanda Gorman style) — titleAlign left, fontSize 130px. Use layoutStyle CENTERED_MINIMAL for quiet literary covers (Sally Rooney style) — titleAlign center, fontSize 72px, letterSpacing 8px. Use layoutStyle STACKED_MID for balanced default covers — titleAlign left, fontSize 110px. STRICT TITLE RULES: never put a single short word like I, A, or THE alone on one line. Maximum 3 lines. Group words so lines are roughly equal length. Return JSON: { coverColor, textColor, accentColor, titleLines, fontStyle, layoutStyle, mood }`;
   const userPrompt = `Title: ${bookTitle}
 Theme: ${ans.topic}
 Mood: ${ans.mood}
@@ -2697,15 +2697,25 @@ async function renderCover(canvas, design, bookTitle, authorName){
     'BARLOW':    { family: "'Barlow Condensed'",   weight: '900', size: 130 },
     'DANCING':   { family: "'Dancing Script'",     weight: '700', size: 95  },
     'DM_SANS':   { family: "'DM Sans'",            weight: '900', size: 115 },
-    'JAKARTA':   { family: "'Plus Jakarta Sans'",  weight: '800', size: 110 }
+    'JAKARTA':   { family: "'Plus Jakarta Sans'",  weight: '800', size: 110 },
+    'ABRIL':     { family: "'Abril Fatface'",      weight: '400', size: 105 },
+    'LIBRE':     { family: "'Libre Baskerville'",  weight: '700', size: 72  }
   };
   const chosen = fontMap[design.fontStyle] || fontMap['BARLOW'];
+
+  const layoutMap = {
+    'STACKED_LARGE':    { fontSize: 130, titleAlign: 'left',   letterSpacing: '0px' },
+    'CENTERED_MINIMAL': { fontSize: 72,  titleAlign: 'center', letterSpacing: '8px' },
+    'STACKED_MID':      { fontSize: 110, titleAlign: 'left',   letterSpacing: '0px' }
+  };
+  const layout   = layoutMap[design.layoutStyle] || layoutMap['STACKED_MID'];
+  const fontSize = isKo ? 120 : layout.fontSize;
 
   try {
     await Promise.all([
       isKo
         ? document.fonts.load(`900 130px ${titleFont}`)
-        : document.fonts.load(`${chosen.weight} ${chosen.size}px ${chosen.family}`),
+        : document.fonts.load(`${chosen.weight} ${fontSize}px ${chosen.family}`),
       document.fonts.load(`400 16px ${bodyFont}`)
     ]);
   } catch(e){ /* non-fatal */ }
@@ -2732,23 +2742,26 @@ async function renderCover(canvas, design, bookTitle, authorName){
     : bookTitle.split(' ');
   const lines = groupTitleLines(rawLines);
 
-  const fontSize   = isKo ? 120 : chosen.size;
   const leftMargin = W * 0.08;
   const startY     = H * 0.18;
-  const lineH      = (design.fontStyle === 'DANCING') ? 110 : 125;
+  const lineH      = (design.fontStyle === 'DANCING') ? 110 : (layout.titleAlign === 'center' ? 85 : 125);
+  const titleX     = (isKo || layout.titleAlign !== 'center') ? leftMargin : W / 2;
 
-  ctx.fillStyle = design.textColor || '#F5F0E8';
-  ctx.textAlign = 'left';
+  ctx.fillStyle     = design.textColor || '#F5F0E8';
+  ctx.textAlign     = isKo ? 'left' : layout.titleAlign;
+  ctx.letterSpacing = layout.letterSpacing;
   if (isKo) {
     ctx.font = `800 ${fontSize}px ${titleFont}`;
   } else {
     ctx.font = design.fontStyle === 'DANCING'
-      ? `italic ${chosen.weight} ${chosen.size}px ${chosen.family}, Arial Black, sans-serif`
-      : `${chosen.weight} ${chosen.size}px ${chosen.family}, Arial Black, sans-serif`;
+      ? `italic ${chosen.weight} ${fontSize}px ${chosen.family}, Arial Black, sans-serif`
+      : `${chosen.weight} ${fontSize}px ${chosen.family}, Arial Black, sans-serif`;
   }
   lines.forEach((line, i) => {
-    ctx.fillText(line, leftMargin, startY + fontSize + i * lineH);
+    ctx.fillText(line, titleX, startY + fontSize + i * lineH);
   });
+  ctx.letterSpacing = '0px';
+  ctx.textAlign     = 'left';
 
   // 3. Thin divider line — accentColor at 70% opacity
   const lastLineY = startY + fontSize + (lines.length - 1) * lineH;
