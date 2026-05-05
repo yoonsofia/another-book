@@ -2724,7 +2724,80 @@ async function renderCover(canvas, design, bookTitle, authorName){
   ctx.fillStyle = design.coverColor || '#1B2A4A';
   ctx.fillRect(0, 0, W, H);
 
-  // 2. Title — group words for 5+ word titles
+  // 2. Visual style element
+  const visualStyle = design.visualStyle || null;
+
+  if (visualStyle === 'COLOR_BLOCK') {
+    ctx.beginPath();
+    ctx.arc(W * 0.85, H * 0.75, W * 0.7, 0, Math.PI * 2);
+    ctx.fillStyle = design.accentColor;
+    ctx.globalAlpha = 0.15;
+    ctx.fill();
+    ctx.globalAlpha = 1.0;
+    ctx.beginPath();
+    ctx.arc(W, H * 0.3, W * 0.55, 0, Math.PI * 2);
+    ctx.fillStyle = design.accentColor;
+    ctx.globalAlpha = 0.25;
+    ctx.fill();
+    ctx.globalAlpha = 1.0;
+    ctx.beginPath();
+    ctx.arc(W * 0.75, H * 0.6, W * 0.12, 0, Math.PI * 2);
+    ctx.fillStyle = design.accentColor;
+    ctx.globalAlpha = 1.0;
+    ctx.fill();
+  }
+
+  if (visualStyle === 'ORGANIC_SHAPE') {
+    ctx.beginPath();
+    ctx.moveTo(W * 0.0, H * 0.55);
+    ctx.bezierCurveTo(W * 0.2, H * 0.35, W * 0.8, H * 0.45, W * 1.0, H * 0.5);
+    ctx.bezierCurveTo(W * 1.0, H * 0.8, W * 0.7, H * 1.05, W * 0.0, H * 1.0);
+    ctx.closePath();
+    ctx.fillStyle = design.accentColor;
+    ctx.globalAlpha = 0.12;
+    ctx.fill();
+    ctx.globalAlpha = 1.0;
+    ctx.beginPath();
+    ctx.moveTo(W * 0.3, H * 0.65);
+    ctx.bezierCurveTo(W * 0.5, H * 0.5, W * 0.9, H * 0.6, W * 1.0, H * 0.75);
+    ctx.bezierCurveTo(W * 0.9, H * 0.95, W * 0.4, H * 1.0, W * 0.3, H * 0.65);
+    ctx.closePath();
+    ctx.fillStyle = design.accentColor;
+    ctx.globalAlpha = 0.18;
+    ctx.fill();
+    ctx.globalAlpha = 1.0;
+    ctx.strokeStyle = design.textColor;
+    ctx.globalAlpha = 0.04;
+    ctx.lineWidth = 1;
+    for (let y = 0; y < H; y += 6) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(W, y);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1.0;
+  }
+
+  if (visualStyle === 'RISOGRAPH') {
+    ctx.fillStyle = design.accentColor;
+    ctx.globalAlpha = 1.0;
+    ctx.fillRect(W * 0.08, H * 0.08, W * 0.88, H * 0.88);
+    ctx.fillStyle = design.coverColor;
+    ctx.globalAlpha = 1.0;
+    ctx.fillRect(0, 0, W * 0.88, H * 0.88);
+    ctx.strokeStyle = design.accentColor;
+    ctx.globalAlpha = 0.08;
+    ctx.lineWidth = 8;
+    for (let i = -H; i < W + H; i += 40) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i + H, H);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1.0;
+  }
+
+  // 3. Title — group words for 5+ word titles
   function groupTitleLines(raw) {
     const words = raw.filter(w => w.trim().length > 0);
     if (words.length < 5) return words;
@@ -2743,28 +2816,38 @@ async function renderCover(canvas, design, bookTitle, authorName){
   const lines = groupTitleLines(rawLines);
 
   const leftMargin = W * 0.08;
-  const startY     = H * 0.18;
   const lineH      = (design.fontStyle === 'DANCING') ? 110 : (layout.titleAlign === 'center' ? 85 : 125);
   const titleX     = (isKo || layout.titleAlign !== 'center') ? leftMargin : W / 2;
+
+  const totalTitleHeight = lines.length * lineH;
+  const startY = (H * 0.65 - totalTitleHeight) / 2 + lineH;
 
   ctx.fillStyle     = design.textColor || '#F5F0E8';
   ctx.textAlign     = isKo ? 'left' : layout.titleAlign;
   ctx.letterSpacing = layout.letterSpacing;
-  if (isKo) {
-    ctx.font = `800 ${fontSize}px ${titleFont}`;
-  } else {
-    ctx.font = design.fontStyle === 'DANCING'
-      ? `italic ${chosen.weight} ${fontSize}px ${chosen.family}, Arial Black, sans-serif`
-      : `${chosen.weight} ${fontSize}px ${chosen.family}, Arial Black, sans-serif`;
-  }
+
   lines.forEach((line, i) => {
-    ctx.fillText(line, titleX, startY + fontSize + i * lineH);
+    if (isKo) {
+      ctx.font = `800 ${fontSize}px ${titleFont}`;
+    } else {
+      let lineFontSize = fontSize;
+      ctx.font = design.fontStyle === 'DANCING'
+        ? `italic ${chosen.weight} ${lineFontSize}px ${chosen.family}, Arial Black, sans-serif`
+        : `${chosen.weight} ${lineFontSize}px ${chosen.family}, Arial Black, sans-serif`;
+      while (ctx.measureText(line).width > W * 0.85 && lineFontSize > 40) {
+        lineFontSize -= 3;
+        ctx.font = design.fontStyle === 'DANCING'
+          ? `italic ${chosen.weight} ${lineFontSize}px ${chosen.family}, Arial Black, sans-serif`
+          : `${chosen.weight} ${lineFontSize}px ${chosen.family}, Arial Black, sans-serif`;
+      }
+    }
+    ctx.fillText(line, titleX, startY + i * lineH);
   });
   ctx.letterSpacing = '0px';
   ctx.textAlign     = 'left';
 
   // 3. Thin divider line — accentColor at 70% opacity
-  const lastLineY = startY + fontSize + (lines.length - 1) * lineH;
+  const lastLineY = startY + (lines.length - 1) * lineH;
   const dividerY  = lastLineY + 15;
   ctx.globalAlpha = 0.7;
   ctx.strokeStyle = design.accentColor || '#C4A882';
@@ -3575,11 +3658,39 @@ async function devTestCover() {
   if (!DEV_MODE) return;
 
   const testCovers = [
-    { coverColor: '#1A0A2E', textColor: '#F5F0E8', accentColor: '#E8A020', titleLines: ['THE LIGHT', 'I ALMOST', 'FORGOT'], fontStyle: 'BARLOW',   layoutStyle: 'STACKED_LARGE',    titleAlign: 'left'   },
-    { coverColor: '#1C0A00', textColor: '#F5F0E8', accentColor: '#CC5500', titleLines: ['THE LIGHT', 'I ALMOST', 'FORGOT'], fontStyle: 'ABRIL',    layoutStyle: 'STACKED_MID',      titleAlign: 'left'   },
-    { coverColor: '#F5F0E8', textColor: '#0D0D0D', accentColor: '#8B1A1A', titleLines: ['THE LIGHT', 'I ALMOST', 'FORGOT'], fontStyle: 'LIBRE',    layoutStyle: 'CENTERED_MINIMAL', titleAlign: 'center' },
-    { coverColor: '#1B3A2D', textColor: '#F5F0E8', accentColor: '#F5C842', titleLines: ['THE LIGHT', 'I ALMOST', 'FORGOT'], fontStyle: 'DANCING',  layoutStyle: 'STACKED_MID',      titleAlign: 'left'   },
-    { coverColor: '#0D0D1A', textColor: '#FFFFFF',  accentColor: '#E63946', titleLines: ['THE LIGHT', 'I ALMOST', 'FORGOT'], fontStyle: 'SPECTRAL', layoutStyle: 'STACKED_LARGE',    titleAlign: 'left'   }
+    // OPTION A - Bold Color Block (large circle behind title)
+    {
+      coverColor: '#1A0A2E',
+      textColor: '#F5F0E8',
+      accentColor: '#E8A020',
+      titleLines: ['THE LIGHT', 'I ALMOST', 'FORGOT'],
+      fontStyle: 'BARLOW',
+      layoutStyle: 'STACKED_LARGE',
+      titleAlign: 'left',
+      visualStyle: 'COLOR_BLOCK'
+    },
+    // OPTION B - Organic Shape + Texture
+    {
+      coverColor: '#F5F0E8',
+      textColor: '#0D0D0D',
+      accentColor: '#8B1A1A',
+      titleLines: ['THE LIGHT', 'I ALMOST', 'FORGOT'],
+      fontStyle: 'LIBRE',
+      layoutStyle: 'CENTERED_MINIMAL',
+      titleAlign: 'center',
+      visualStyle: 'ORGANIC_SHAPE'
+    },
+    // OPTION C - Risograph Layered
+    {
+      coverColor: '#CC5500',
+      textColor: '#F5F0E8',
+      accentColor: '#1A0A2E',
+      titleLines: ['THE LIGHT', 'I ALMOST', 'FORGOT'],
+      fontStyle: 'ABRIL',
+      layoutStyle: 'STACKED_MID',
+      titleAlign: 'left',
+      visualStyle: 'RISOGRAPH'
+    }
   ];
 
   const design = testCovers[testCoverIndex % testCovers.length];
