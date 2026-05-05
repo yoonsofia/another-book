@@ -3655,7 +3655,7 @@ async function devTestPDF() {
 let testCoverIndex = 0;
 
 function devTestCover() {
-  let canvas = document.getElementById('coverCanvas');
+  let canvas = document.getElementById('dev-cover-canvas');
   if (!canvas) { canvas = document.createElement('canvas'); }
   canvas.width = 600;
   canvas.height = 900;
@@ -3749,11 +3749,8 @@ function devTestCover() {
 
   testCoverIndex++;
 
-  const existingModal = document.getElementById('coverTestModal');
-  if (existingModal) {
-    document.getElementById('coverTestImage').src = canvas.toDataURL('image/png');
-    existingModal.style.display = 'flex';
-  }
+  const existingModal = document.getElementById('dev-cover-modal');
+  if (existingModal) { existingModal.style.display = 'flex'; }
 }
 
 document.addEventListener('keydown', function(e) {
