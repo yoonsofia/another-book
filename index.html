@@ -3655,109 +3655,64 @@ async function devTestPDF() {
 let testCoverIndex = 0;
 
 function devTestCover() {
-  let canvas = document.getElementById('dev-cover-canvas');
-  if (!canvas) { canvas = document.createElement('canvas'); }
+  const canvas = document.getElementById("dev-cover-canvas");
+  if (!canvas) { alert("Canvas not found"); return; }
   canvas.width = 600;
   canvas.height = 900;
-  const ctx = canvas.getContext('2d');
-
-  function fitText(text, maxWidth, maxSize, weight, family) {
-    let size = maxSize;
-    ctx.font = weight + ' ' + size + 'px ' + family;
-    while (ctx.measureText(text).width > maxWidth && size > 28) {
-      size -= 3;
-      ctx.font = weight + ' ' + size + 'px ' + family;
-    }
-    return size;
-  }
-
+  const ctx = canvas.getContext("2d");
   const idx = testCoverIndex % 3;
 
   if (idx === 0) {
-    ctx.fillStyle = '#0D0D0D';
+    ctx.fillStyle = "#0D0D0D";
     ctx.fillRect(0, 0, 600, 900);
-    ctx.fillStyle = '#FFD600';
-    ctx.fillRect(0, 480, 600, 420);
-    const lines0 = ['THE LIGHT', 'I ALMOST', 'FORGOT'];
-    const colors0 = ['#FFD600', '#FFD600', '#0D0D0D'];
-    const y0 = [160, 300, 590];
-    lines0.forEach(function(line, i) {
-      fitText(line, 500, 110, '900', "'Barlow Condensed', Arial Black, sans-serif");
-      ctx.fillStyle = colors0[i];
-      ctx.textAlign = 'left';
-      ctx.fillText(line, 40, y0[i]);
-    });
+    ctx.fillStyle = "#FFD600";
+    ctx.fillRect(0, 500, 600, 400);
+    ctx.font = "900 108px 'Barlow Condensed', Arial Black, sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#FFD600"; ctx.fillText("THE LIGHT", 36, 170);
+    ctx.fillStyle = "#FFD600"; ctx.fillText("I ALMOST", 36, 295);
+    ctx.fillStyle = "#0D0D0D"; ctx.fillText("FORGOT", 36, 610);
     ctx.font = "400 18px 'Montserrat', Arial, sans-serif";
-    ctx.fillStyle = '#0D0D0D';
-    ctx.textAlign = 'left';
-    ctx.fillText('SARA KIM', 40, 860);
+    ctx.fillStyle = "#0D0D0D"; ctx.fillText("SARA KIM", 36, 860);
   }
 
   if (idx === 1) {
-    ctx.fillStyle = '#E8157B';
+    ctx.fillStyle = "#E8157B";
     ctx.fillRect(0, 0, 600, 900);
-    ctx.beginPath();
-    ctx.arc(580, 820, 380, 0, Math.PI * 2);
-    ctx.fillStyle = '#0D0D0D';
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(480, 700, 160, 0, Math.PI * 2);
-    ctx.fillStyle = '#F5F0E8';
-    ctx.fill();
-    const lines1 = ['THE LIGHT', 'I ALMOST', 'FORGOT'];
-    const y1 = [170, 310, 450];
-    lines1.forEach(function(line, i) {
-      fitText(line, 500, 110, '900', "'Barlow Condensed', Arial Black, sans-serif");
-      ctx.fillStyle = '#FFFFFF';
-      ctx.textAlign = 'left';
-      ctx.fillText(line, 40, y1[i]);
-    });
+    ctx.beginPath(); ctx.arc(560, 800, 360, 0, Math.PI * 2);
+    ctx.fillStyle = "#0D0D0D"; ctx.fill();
+    ctx.beginPath(); ctx.arc(460, 680, 150, 0, Math.PI * 2);
+    ctx.fillStyle = "#F5F0E8"; ctx.fill();
+    ctx.font = "900 108px 'Barlow Condensed', Arial Black, sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#FFFFFF"; ctx.fillText("THE LIGHT", 36, 170);
+    ctx.fillStyle = "#FFFFFF"; ctx.fillText("I ALMOST", 36, 295);
+    ctx.fillStyle = "#FFFFFF"; ctx.fillText("FORGOT", 36, 420);
     ctx.font = "400 18px 'Montserrat', Arial, sans-serif";
-    ctx.fillStyle = '#FFFFFF';
-    ctx.textAlign = 'left';
-    ctx.fillText('SARA KIM', 40, 860);
+    ctx.fillStyle = "#FFFFFF"; ctx.fillText("SARA KIM", 36, 860);
   }
 
   if (idx === 2) {
-    ctx.fillStyle = '#F0EBE3';
+    ctx.fillStyle = "#F0EBE3";
     ctx.fillRect(0, 0, 600, 900);
-    ctx.fillStyle = '#1A1A2E';
-    ctx.fillRect(0, 0, 18, 900);
-    ctx.fillStyle = '#1A1A2E';
-    ctx.fillRect(0, 720, 600, 180);
-    ctx.beginPath();
-    ctx.moveTo(600, 220);
-    ctx.lineTo(600, 780);
-    ctx.arc(600, 500, 280, 0, -Math.PI, true);
-    ctx.closePath();
-    ctx.fillStyle = '#1A1A2E';
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(480, 500, 120, 0, Math.PI * 2);
-    ctx.fillStyle = '#8B1A1A';
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(480, 500, 80, 0, Math.PI * 2);
-    ctx.fillStyle = '#F0EBE3';
-    ctx.fill();
-    const lines2 = ['THE LIGHT', 'I ALMOST', 'FORGOT'];
-    const y2 = [160, 270, 380];
-    lines2.forEach(function(line, i) {
-      fitText(line, 360, 90, '700', "'Libre Baskerville', Georgia, serif");
-      ctx.fillStyle = '#1A1A2E';
-      ctx.textAlign = 'left';
-      ctx.fillText(line, 50, y2[i]);
-    });
+    ctx.fillStyle = "#1A1A2E"; ctx.fillRect(0, 0, 16, 900);
+    ctx.fillStyle = "#1A1A2E"; ctx.fillRect(0, 730, 600, 170);
+    ctx.beginPath(); ctx.arc(460, 490, 115, 0, Math.PI * 2);
+    ctx.fillStyle = "#8B1A1A"; ctx.fill();
+    ctx.beginPath(); ctx.arc(460, 490, 75, 0, Math.PI * 2);
+    ctx.fillStyle = "#F0EBE3"; ctx.fill();
+    ctx.font = "700 88px 'Libre Baskerville', Georgia, serif";
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#1A1A2E"; ctx.fillText("THE LIGHT", 36, 160);
+    ctx.fillStyle = "#1A1A2E"; ctx.fillText("I ALMOST", 36, 268);
+    ctx.fillStyle = "#1A1A2E"; ctx.fillText("FORGOT", 36, 376);
     ctx.font = "400 18px 'Montserrat', Arial, sans-serif";
-    ctx.fillStyle = '#F0EBE3';
-    ctx.textAlign = 'left';
-    ctx.fillText('SARA KIM', 50, 860);
+    ctx.fillStyle = "#F0EBE3"; ctx.fillText("SARA KIM", 36, 800);
   }
 
   testCoverIndex++;
-
-  const existingModal = document.getElementById('dev-cover-modal');
-  if (existingModal) { existingModal.style.display = 'flex'; }
+  const modal = document.getElementById("dev-cover-modal");
+  if (modal) modal.style.display = "flex";
 }
 
 document.addEventListener('keydown', function(e) {
