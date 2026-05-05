@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@900&family=Libre+Baskerville:wght@700&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+<style>
+body { background: #111; display: flex; flex-direction: column; align-items: center; padding: 20px; gap: 20px; }
+canvas { border: 1px solid #333; }
+button { padding: 12px 24px; font-size: 16px; cursor: pointer; background: white; border: none; border-radius: 8px; }
+</style>
+</head>
+<body>
+<button onclick="draw(0)">Cover 1: Black + Yellow</button>
+<button onclick="draw(1)">Cover 2: Pink + Circles</button>
+<button onclick="draw(2)">Cover 3: Cream + Navy</button>
+<canvas id="c" width="600" height="900"></canvas>
+<script>
+function draw(idx) {
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, 600, 900);
+
+  if (idx === 0) {
+    ctx.fillStyle = '#0D0D0D';
+    ctx.fillRect(0, 0, 600, 900);
+    ctx.fillStyle = '#FFD600';
+    ctx.fillRect(0, 500, 600, 400);
+    ctx.font = "900 108px 'Barlow Condensed', Arial Black, sans-serif";
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#FFD600'; ctx.fillText('THE LIGHT', 36, 170);
+    ctx.fillStyle = '#FFD600'; ctx.fillText('I ALMOST', 36, 295);
+    ctx.font = "900 108px 'Barlow Condensed', Arial Black, sans-serif";
+    ctx.fillStyle = '#0D0D0D'; ctx.fillText('FORGOT', 36, 610);
+    ctx.font = "400 18px 'Montserrat', Arial, sans-serif";
+    ctx.fillStyle = '#0D0D0D'; ctx.fillText('SARA KIM', 36, 860);
+  }
+
+  if (idx === 1) {
+    ctx.fillStyle = '#E8157B';
+    ctx.fillRect(0, 0, 600, 900);
+    ctx.beginPath(); ctx.arc(560, 800, 360, 0, Math.PI * 2);
+    ctx.fillStyle = '#0D0D0D'; ctx.fill();
+    ctx.beginPath(); ctx.arc(460, 680, 150, 0, Math.PI * 2);
+    ctx.fillStyle = '#F5F0E8'; ctx.fill();
+    ctx.font = "900 108px 'Barlow Condensed', Arial Black, sans-serif";
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#FFFFFF'; ctx.fillText('THE LIGHT', 36, 170);
+    ctx.fillStyle = '#FFFFFF'; ctx.fillText('I ALMOST', 36, 295);
+    ctx.fillStyle = '#FFFFFF'; ctx.fillText('FORGOT', 36, 420);
+    ctx.font = "400 18px 'Montserrat', Arial, sans-serif";
+    ctx.fillStyle = '#FFFFFF'; ctx.fillText('SARA KIM', 36, 860);
+  }
+
+  if (idx === 2) {
+    ctx.fillStyle = '#F0EBE3';
+    ctx.fillRect(0, 0, 600, 900);
+    ctx.fillStyle = '#1A1A2E'; ctx.fillRect(0, 0, 16, 900);
+    ctx.fillStyle = '#1A1A2E'; ctx.fillRect(0, 730, 600, 170);
+    ctx.beginPath(); ctx.arc(460, 490, 115, 0, Math.PI * 2);
+    ctx.fillStyle = '#8B1A1A'; ctx.fill();
+    ctx.beginPath(); ctx.arc(460, 490, 75, 0, Math.PI * 2);
+    ctx.fillStyle = '#F0EBE3'; ctx.fill();
+    ctx.font = "700 88px 'Libre Baskerville', Georgia, serif";
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#1A1A2E'; ctx.fillText('THE LIGHT', 36, 160);
+    ctx.fillStyle = '#1A1A2E'; ctx.fillText('I ALMOST', 36, 268);
+    ctx.fillStyle = '#1A1A2E'; ctx.fillText('FORGOT', 36, 376);
+    ctx.font = "400 18px 'Montserrat', Arial, sans-serif";
+    ctx.fillStyle = '#F0EBE3'; ctx.fillText('SARA KIM', 36, 800);
+  }
+}
+draw(0);
+</script>
+</body>
+</html>
