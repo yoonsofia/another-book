@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>어나더북 | 세상에 하나뿐인 나만의 소설</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=Bebas+Neue&family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:wght@900&family=DM+Serif+Display&family=Cormorant+Garamond:wght@700&family=Anton&family=Spectral:wght@800&family=Barlow+Condensed:wght@800,900&family=Dancing+Script:wght@700&family=DM+Sans:wght@700,900&family=Caveat:wght@700&family=Plus+Jakarta+Sans:wght@800&display=swap" rel="stylesheet">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
@@ -2669,7 +2669,7 @@ function setCoverLoadDot(step){
 // ──────────── STEP 1: CLAUDE COVER DESIGN ────────────
 async function getCoverDesign(){
   const bookTitle = story?.title || '';
-  const systemPrompt = `You are a bold graphic designer for a premium literary fiction publisher. Based on this story, output ONLY a JSON object with no explanation. STRICT COLOR RULES: NEVER use teal, blue-gray, navy, gray, or muted safe colors. For sad/longing mood use #1C0A00 or #2D0A0A. For romantic/warm use #8B1A1A or #7B2D8B. For hopeful use #1B3A2D or #2D4A1E. For mysterious use #0D0D1A or #1A0A2E. For joyful use #8B3A00 or #7B4A00. textColor must always be #F5F0E8. accentColor must be bold and contrasting. STRICT TITLE RULES: never put a single short word like I, A, or THE alone on one line. Maximum 3 lines. Group words so lines are roughly equal length. Return JSON: { coverColor, textColor, accentColor, titleLines, mood }`;
+  const systemPrompt = `You are a bold graphic designer for a premium literary fiction publisher. Based on this story, output ONLY a JSON object with no explanation. STRICT COLOR RULES: NEVER use teal, blue-gray, navy, gray, or muted safe colors. For sad/longing mood use #1C0A00 or #2D0A0A. For romantic/warm use #8B1A1A or #7B2D8B. For hopeful/growth use #1B3A2D or #2D4A1E. For mysterious/tense use #0D0D1A or #1A0A2E. For joyful/bright use #8B3A00 or #CC5500. For modern/bold use #1A1A1A or #F5F0E8. textColor always #F5F0E8 or #FFFFFF. accentColor always bold and contrasting. STRICT FONT RULES: For sad/longing choose SPECTRAL or CORMORANT. For romantic/warm choose PLAYFAIR or DANCING. For mysterious/tense choose SPECTRAL or ANTON. For hopeful/uplifting choose DM_SERIF or JAKARTA. For dramatic/intense choose BARLOW or ANTON. For literary/quiet choose CORMORANT or DM_SERIF. For modern/contemporary choose DM_SANS or JAKARTA. For bold/political choose BARLOW or BEBAS. STRICT TITLE RULES: never put a single short word like I, A, or THE alone on one line. Maximum 3 lines. Group words so lines are roughly equal length. Return JSON: { coverColor, textColor, accentColor, titleLines, fontStyle, mood }`;
   const userPrompt = `Title: ${bookTitle}
 Theme: ${ans.topic}
 Mood: ${ans.mood}
@@ -2687,9 +2687,25 @@ async function renderCover(canvas, design, bookTitle, authorName){
   const titleFont = isKo ? '"Noto Sans KR",sans-serif' : '"Bebas Neue",sans-serif';
   const bodyFont  = '"Montserrat",sans-serif';
 
+  const fontMap = {
+    'BEBAS':     { family: "'Bebas Neue'",        weight: '400', size: 120 },
+    'PLAYFAIR':  { family: "'Playfair Display'",   weight: '900', size: 100 },
+    'ANTON':     { family: "'Anton'",              weight: '400', size: 115 },
+    'CORMORANT': { family: "'Cormorant Garamond'", weight: '700', size: 105 },
+    'SPECTRAL':  { family: "'Spectral'",           weight: '800', size: 100 },
+    'DM_SERIF':  { family: "'DM Serif Display'",   weight: '400', size: 105 },
+    'BARLOW':    { family: "'Barlow Condensed'",   weight: '900', size: 130 },
+    'DANCING':   { family: "'Dancing Script'",     weight: '700', size: 95  },
+    'DM_SANS':   { family: "'DM Sans'",            weight: '900', size: 115 },
+    'JAKARTA':   { family: "'Plus Jakarta Sans'",  weight: '800', size: 110 }
+  };
+  const chosen = fontMap[design.fontStyle] || fontMap['BARLOW'];
+
   try {
     await Promise.all([
-      document.fonts.load(`${isKo ? '900 130px' : '130px'} ${titleFont}`),
+      isKo
+        ? document.fonts.load(`900 130px ${titleFont}`)
+        : document.fonts.load(`${chosen.weight} ${chosen.size}px ${chosen.family}`),
       document.fonts.load(`400 16px ${bodyFont}`)
     ]);
   } catch(e){ /* non-fatal */ }
@@ -2698,7 +2714,7 @@ async function renderCover(canvas, design, bookTitle, authorName){
   ctx.fillStyle = design.coverColor || '#1B2A4A';
   ctx.fillRect(0, 0, W, H);
 
-  // 2. Title — group words for 5+ word titles, huge Bebas Neue / Noto
+  // 2. Title — group words for 5+ word titles
   function groupTitleLines(raw) {
     const words = raw.filter(w => w.trim().length > 0);
     if (words.length < 5) return words;
@@ -2716,14 +2732,20 @@ async function renderCover(canvas, design, bookTitle, authorName){
     : bookTitle.split(' ');
   const lines = groupTitleLines(rawLines);
 
-  const fontSize   = 120;
+  const fontSize   = isKo ? 120 : chosen.size;
   const leftMargin = W * 0.08;
   const startY     = H * 0.18;
-  const lineH      = 125;
+  const lineH      = (design.fontStyle === 'DANCING') ? 110 : 125;
 
   ctx.fillStyle = design.textColor || '#F5F0E8';
   ctx.textAlign = 'left';
-  ctx.font = isKo ? `800 ${fontSize}px ${titleFont}` : `800 ${fontSize}px "Bebas Neue", "Arial Black", sans-serif`;
+  if (isKo) {
+    ctx.font = `800 ${fontSize}px ${titleFont}`;
+  } else {
+    ctx.font = design.fontStyle === 'DANCING'
+      ? `italic ${chosen.weight} ${chosen.size}px ${chosen.family}, Arial Black, sans-serif`
+      : `${chosen.weight} ${chosen.size}px ${chosen.family}, Arial Black, sans-serif`;
+  }
   lines.forEach((line, i) => {
     ctx.fillText(line, leftMargin, startY + fontSize + i * lineH);
   });
