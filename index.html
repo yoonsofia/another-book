@@ -2669,23 +2669,11 @@ function setCoverLoadDot(step){
 // ──────────── STEP 1: CLAUDE COVER DESIGN ────────────
 async function getCoverDesign(){
   const bookTitle = story?.title || '';
-  const systemPrompt = `You are a bold, modern book cover designer for publishers like Penguin, Faber & Faber, and Riverhead Books. You create striking, contemporary covers that look like award-winning literary fiction. Always return valid JSON only.`;
-  const userPrompt = `Design a bold typography book cover for:
-- Title: ${bookTitle}
-- Theme: ${ans.topic}
-- Mood: ${ans.mood}
-- Language: ${selectedLang === 'ko' ? 'Korean' : 'English'}
-
-COLOR — You MUST choose a bold, dramatic, unexpected color. NEVER use teal, gray, blue-gray, navy, or any safe corporate color unless the story is specifically about the ocean or sky. Instead choose from: deep crimson #8B0000, rich purple #4A0E6E, burnt orange #C1440E, forest green #1B4332, deep black #0D0D0D, dusty rose #8B3A52, warm terracotta #A0522D. The color MUST reflect the emotional core of the story.
-
-Return exactly this JSON:
-{
-  "coverColor": "[bold unexpected color based on mood]",
-  "textColor": "[high contrast color, usually white #FFFFFF or cream #F5F0E8]",
-  "accentColor": "[second color for divider line]",
-  "titleLines": ["group words if 5+, e.g. THE LIGHT | I ALMOST | FORGOT — never leave a single short word like I alone on a line"],
-  "layout": "title_dominant"
-}`;
+  const systemPrompt = `You are a bold graphic designer for a premium literary fiction publisher. Based on this story, output ONLY a JSON object with no explanation. STRICT COLOR RULES: NEVER use teal, blue-gray, navy, gray, or muted safe colors. For sad/longing mood use #1C0A00 or #2D0A0A. For romantic/warm use #8B1A1A or #7B2D8B. For hopeful use #1B3A2D or #2D4A1E. For mysterious use #0D0D1A or #1A0A2E. For joyful use #8B3A00 or #7B4A00. textColor must always be #F5F0E8. accentColor must be bold and contrasting. STRICT TITLE RULES: never put a single short word like I, A, or THE alone on one line. Maximum 3 lines. Group words so lines are roughly equal length. Return JSON: { coverColor, textColor, accentColor, titleLines, mood }`;
+  const userPrompt = `Title: ${bookTitle}
+Theme: ${ans.topic}
+Mood: ${ans.mood}
+Language: ${selectedLang === 'ko' ? 'Korean' : 'English'}`;
   const raw = await apiCall(userPrompt, 400, systemPrompt);
   return extractJSON(raw);
 }
@@ -2728,14 +2716,14 @@ async function renderCover(canvas, design, bookTitle, authorName){
     : bookTitle.split(' ');
   const lines = groupTitleLines(rawLines);
 
-  const fontSize   = 130;
+  const fontSize   = 120;
   const leftMargin = W * 0.08;
-  const startY     = H * 0.12;
-  const lineH      = 135;
+  const startY     = H * 0.18;
+  const lineH      = 125;
 
   ctx.fillStyle = design.textColor || '#F5F0E8';
   ctx.textAlign = 'left';
-  ctx.font = isKo ? `900 ${fontSize}px ${titleFont}` : `${fontSize}px ${titleFont}`;
+  ctx.font = isKo ? `800 ${fontSize}px ${titleFont}` : `800 ${fontSize}px "Bebas Neue", "Arial Black", sans-serif`;
   lines.forEach((line, i) => {
     ctx.fillText(line, leftMargin, startY + fontSize + i * lineH);
   });
