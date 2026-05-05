@@ -3678,11 +3678,11 @@ function devTestCover() {
     ctx.fillRect(0, 0, 600, 900);
     ctx.fillStyle = '#FFD600';
     ctx.fillRect(0, 480, 600, 420);
-    const lines0 = ['THE', 'LIGHT I', 'ALMOST', 'FORGOT'];
-    const colors0 = ['#FFD600','#FFD600','#FFD600','#0D0D0D'];
-    const y0 = [150, 270, 390, 590];
+    const lines0 = ['THE LIGHT', 'I ALMOST', 'FORGOT'];
+    const colors0 = ['#FFD600', '#FFD600', '#0D0D0D'];
+    const y0 = [160, 300, 590];
     lines0.forEach(function(line, i) {
-      fitText(line, 520, 148, '900', "'Barlow Condensed', Arial Black, sans-serif");
+      fitText(line, 500, 110, '900', "'Barlow Condensed', Arial Black, sans-serif");
       ctx.fillStyle = colors0[i];
       ctx.textAlign = 'left';
       ctx.fillText(line, 40, y0[i]);
@@ -3690,7 +3690,7 @@ function devTestCover() {
     ctx.font = "400 18px 'Montserrat', Arial, sans-serif";
     ctx.fillStyle = '#0D0D0D';
     ctx.textAlign = 'left';
-    ctx.fillText('SARA KIM', 40, 840);
+    ctx.fillText('SARA KIM', 40, 860);
   }
 
   if (idx === 1) {
@@ -3704,10 +3704,10 @@ function devTestCover() {
     ctx.arc(480, 700, 160, 0, Math.PI * 2);
     ctx.fillStyle = '#F5F0E8';
     ctx.fill();
-    const lines1 = ['THE', 'LIGHT', 'I ALMOST', 'FORGOT'];
-    const y1 = [160, 290, 420, 550];
+    const lines1 = ['THE LIGHT', 'I ALMOST', 'FORGOT'];
+    const y1 = [170, 310, 450];
     lines1.forEach(function(line, i) {
-      fitText(line, 520, 138, '900', "'Barlow Condensed', Arial Black, sans-serif");
+      fitText(line, 500, 110, '900', "'Barlow Condensed', Arial Black, sans-serif");
       ctx.fillStyle = '#FFFFFF';
       ctx.textAlign = 'left';
       ctx.fillText(line, 40, y1[i]);
@@ -3715,7 +3715,7 @@ function devTestCover() {
     ctx.font = "400 18px 'Montserrat', Arial, sans-serif";
     ctx.fillStyle = '#FFFFFF';
     ctx.textAlign = 'left';
-    ctx.fillText('SARA KIM', 40, 840);
+    ctx.fillText('SARA KIM', 40, 860);
   }
 
   if (idx === 2) {
@@ -3726,6 +3726,13 @@ function devTestCover() {
     ctx.fillStyle = '#1A1A2E';
     ctx.fillRect(0, 720, 600, 180);
     ctx.beginPath();
+    ctx.moveTo(600, 220);
+    ctx.lineTo(600, 780);
+    ctx.arc(600, 500, 280, 0, -Math.PI, true);
+    ctx.closePath();
+    ctx.fillStyle = '#1A1A2E';
+    ctx.fill();
+    ctx.beginPath();
     ctx.arc(480, 500, 120, 0, Math.PI * 2);
     ctx.fillStyle = '#8B1A1A';
     ctx.fill();
@@ -3733,10 +3740,10 @@ function devTestCover() {
     ctx.arc(480, 500, 80, 0, Math.PI * 2);
     ctx.fillStyle = '#F0EBE3';
     ctx.fill();
-    const lines2 = ['THE', 'LIGHT', 'I ALMOST', 'FORGOT'];
-    const y2 = [150, 270, 390, 510];
+    const lines2 = ['THE LIGHT', 'I ALMOST', 'FORGOT'];
+    const y2 = [160, 270, 380];
     lines2.forEach(function(line, i) {
-      fitText(line, 380, 118, '700', "'Libre Baskerville', Georgia, serif");
+      fitText(line, 360, 90, '700', "'Libre Baskerville', Georgia, serif");
       ctx.fillStyle = '#1A1A2E';
       ctx.textAlign = 'left';
       ctx.fillText(line, 50, y2[i]);
@@ -3744,7 +3751,7 @@ function devTestCover() {
     ctx.font = "400 18px 'Montserrat', Arial, sans-serif";
     ctx.fillStyle = '#F0EBE3';
     ctx.textAlign = 'left';
-    ctx.fillText('SARA KIM', 50, 800);
+    ctx.fillText('SARA KIM', 50, 860);
   }
 
   testCoverIndex++;
