@@ -3654,79 +3654,132 @@ async function devTestPDF() {
 
 let testCoverIndex = 0;
 
-async function devTestCover() {
+function devTestCover() {
   if (!DEV_MODE) return;
 
-  const testCovers = [
-    // OPTION A - Bold Color Block (large circle behind title)
-    {
-      coverColor: '#1A0A2E',
-      textColor: '#F5F0E8',
-      accentColor: '#E8A020',
-      titleLines: ['THE LIGHT', 'I ALMOST', 'FORGOT'],
-      fontStyle: 'BARLOW',
-      layoutStyle: 'STACKED_LARGE',
-      titleAlign: 'left',
-      visualStyle: 'COLOR_BLOCK'
-    },
-    // OPTION B - Organic Shape + Texture
-    {
-      coverColor: '#F5F0E8',
-      textColor: '#0D0D0D',
-      accentColor: '#8B1A1A',
-      titleLines: ['THE LIGHT', 'I ALMOST', 'FORGOT'],
-      fontStyle: 'LIBRE',
-      layoutStyle: 'CENTERED_MINIMAL',
-      titleAlign: 'center',
-      visualStyle: 'ORGANIC_SHAPE'
-    },
-    // OPTION C - Risograph Layered
-    {
-      coverColor: '#CC5500',
-      textColor: '#F5F0E8',
-      accentColor: '#1A0A2E',
-      titleLines: ['THE LIGHT', 'I ALMOST', 'FORGOT'],
-      fontStyle: 'ABRIL',
-      layoutStyle: 'STACKED_MID',
-      titleAlign: 'left',
-      visualStyle: 'RISOGRAPH'
-    }
-  ];
+  const canvas = document.getElementById('dev-cover-canvas');
+  const ctx    = canvas.getContext('2d');
+  canvas.width  = 600;
+  canvas.height = 900;
 
-  const design = testCovers[testCoverIndex % testCovers.length];
+  const idx = testCoverIndex % 3;
   testCoverIndex++;
 
-  const DEV_TITLE  = "The Light I Almost Forgot";
-  const DEV_AUTHOR = "Sara Kim";
+  if (idx === 0) {
+    // OPTION A: Sunburst
+    ctx.fillStyle = '#D4D8E0';
+    ctx.fillRect(0, 0, 600, 900);
 
-  const overlay = document.getElementById('pdf-progress-overlay');
-  const msgEl   = document.getElementById('pdf-progress-msg');
-  const barEl   = document.getElementById('pdf-progress-bar');
-  function sp(pct, msg) {
-    if (overlay) overlay.style.display = 'flex';
-    if (barEl)   barEl.style.width = pct + '%';
-    if (msgEl)   msgEl.textContent = msg;
+    for (let i = 0; i < 20; i++) {
+      const angle = (i / 20) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(300, 400);
+      ctx.lineTo(300 + Math.cos(angle) * 800, 400 + Math.sin(angle) * 800);
+      ctx.strokeStyle = '#FFD600';
+      ctx.lineWidth   = 30;
+      ctx.globalAlpha = i % 2 === 0 ? 0.6 : 0.3;
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1.0;
+
+    ctx.fillStyle = '#E8157B';
+    ctx.font      = "900 128px 'Barlow Condensed', Arial Black";
+    ctx.textAlign = 'left';
+    ctx.fillText('THE LIGHT', 40, 220);
+    ctx.fillText('I ALMOST',  40, 365);
+    ctx.fillText('FORGOT',    40, 510);
+
+    ctx.fillStyle     = '#0D0D0D';
+    ctx.font          = '300 16px Montserrat, sans-serif';
+    ctx.letterSpacing = '5px';
+    ctx.fillText('SARA KIM', 40, 800);
+    ctx.letterSpacing = '0px';
+
+    ctx.globalAlpha = 0.4;
+    ctx.fillStyle   = '#0D0D0D';
+    ctx.font        = '300 11px Montserrat, sans-serif';
+    ctx.textAlign   = 'right';
+    ctx.fillText('anotherbook', 560, 880);
+    ctx.globalAlpha = 1.0;
+    ctx.textAlign   = 'left';
   }
 
-  try {
-    sp(85, 'Rendering cover...');
-    console.log('[DEV] Cover design:', design);
+  if (idx === 1) {
+    // OPTION B: Dark multi-color
+    ctx.fillStyle = '#0D0D0D';
+    ctx.fillRect(0, 0, 600, 900);
 
-    const canvas   = document.getElementById('dev-cover-canvas');
-    const prevLang = selectedLang;
-    selectedLang   = 'en';
-    await renderCover(canvas, design, DEV_TITLE, DEV_AUTHOR);
-    selectedLang   = prevLang;
+    ctx.textAlign = 'left';
+    ctx.font      = "900 128px 'Barlow Condensed', Arial Black";
+    ctx.fillStyle = '#FFD600';
+    ctx.fillText('THE LIGHT', 40, 220);
+    ctx.fillStyle = '#E8157B';
+    ctx.fillText('I ALMOST',  40, 365);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText('FORGOT',    40, 510);
 
-    if (overlay) overlay.style.display = 'none';
-    document.getElementById('dev-cover-modal').style.display = 'flex';
-    showToast(`✅ ${design.fontStyle} / ${design.layoutStyle} — Ctrl+Shift+C for next`);
+    ctx.fillStyle = '#E8157B';
+    ctx.fillRect(40, 560, 120, 3);
 
-  } catch (err) {
-    if (overlay) overlay.style.display = 'none';
-    showToast('⚠️ Cover test failed: ' + err.message);
-    console.error('[DEV] Cover test failed:', err);
+    ctx.fillStyle     = '#FFD600';
+    ctx.font          = '300 16px Montserrat, sans-serif';
+    ctx.letterSpacing = '5px';
+    ctx.fillText('SARA KIM', 40, 800);
+    ctx.letterSpacing = '0px';
+
+    ctx.globalAlpha = 0.35;
+    ctx.fillStyle   = '#FFD600';
+    ctx.font        = '300 11px Montserrat, sans-serif';
+    ctx.textAlign   = 'right';
+    ctx.fillText('anotherbook', 560, 880);
+    ctx.globalAlpha = 1.0;
+    ctx.textAlign   = 'left';
   }
+
+  if (idx === 2) {
+    // OPTION C: Deep purple + ring
+    ctx.fillStyle = '#1A0A2E';
+    ctx.fillRect(0, 0, 600, 900);
+
+    ctx.beginPath();
+    ctx.arc(480, 680, 220, 0, Math.PI * 2);
+    ctx.fillStyle   = '#FF6B35';
+    ctx.globalAlpha = 1.0;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(480, 680, 180, 0, Math.PI * 2);
+    ctx.fillStyle   = '#1A0A2E';
+    ctx.globalAlpha = 1.0;
+    ctx.fill();
+
+    ctx.textAlign = 'left';
+    ctx.font      = "400 105px 'Abril Fatface', serif";
+    ctx.fillStyle = '#F5F0E8';
+    ctx.fillText('THE LIGHT', 40, 220);
+    ctx.fillStyle = '#FF6B35';
+    ctx.fillText('I ALMOST',  40, 345);
+    ctx.fillStyle = '#F5F0E8';
+    ctx.fillText('FORGOT',    40, 470);
+
+    ctx.fillStyle     = '#F5F0E8';
+    ctx.font          = '300 16px Montserrat, sans-serif';
+    ctx.letterSpacing = '5px';
+    ctx.fillText('SARA KIM', 40, 800);
+    ctx.letterSpacing = '0px';
+
+    ctx.globalAlpha = 0.35;
+    ctx.fillStyle   = '#F5F0E8';
+    ctx.font        = '300 11px Montserrat, sans-serif';
+    ctx.textAlign   = 'right';
+    ctx.fillText('anotherbook', 560, 880);
+    ctx.globalAlpha = 1.0;
+    ctx.textAlign   = 'left';
+  }
+
+  document.getElementById('dev-cover-modal').style.display = 'flex';
+  const labels = ['A: Sunburst', 'B: Dark Multi-Color', 'C: Purple + Ring'];
+  showToast(`✅ Cover ${labels[idx]} — Ctrl+Shift+C for next`);
 }
 
 document.addEventListener('keydown', function(e) {
