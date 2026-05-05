@@ -3655,99 +3655,119 @@ async function devTestPDF() {
 let testCoverIndex = 0;
 
 function devTestCover() {
-  if (!DEV_MODE) return;
-
-  const canvas = document.getElementById('dev-cover-canvas');
-  const ctx    = canvas.getContext('2d');
-  canvas.width  = 600;
+  const canvas = document.getElementById('coverCanvas') || document.createElement('canvas');
+  canvas.width = 600;
   canvas.height = 900;
+  const ctx = canvas.getContext('2d');
 
-  const idx = testCoverIndex % 3;
-  testCoverIndex++;
-
-  function drawFit(text, x, y, weight, size, family) {
-    let fs = size;
-    ctx.font = `${weight} ${fs}px ${family}`;
-    while (ctx.measureText(text).width > 520 && fs > 40) {
-      fs -= 4;
-      ctx.font = `${weight} ${fs}px ${family}`;
+  // Helper: draw text that always fits within maxWidth
+  function fitText(text, maxWidth, maxSize, fontWeight, fontFamily) {
+    let size = maxSize;
+    ctx.font = `${fontWeight} ${size}px ${fontFamily}`;
+    while (ctx.measureText(text).width > maxWidth && size > 30) {
+      size -= 3;
+      ctx.font = `${fontWeight} ${size}px ${fontFamily}`;
     }
-    ctx.fillText(text, x, y);
+    return size;
   }
 
+  const idx = testCoverIndex % 3;
+
   if (idx === 0) {
-    // Cover 0: Deep purple + layered circles
-    ctx.fillStyle = '#1A0A2E';
+    // DESIGN A: Black + Yellow split (best one - refine it)
+    ctx.fillStyle = '#0D0D0D';
     ctx.fillRect(0, 0, 600, 900);
-    ctx.beginPath();
-    ctx.arc(520, 750, 320, 0, Math.PI * 2);
-    ctx.fillStyle = '#7B2D8B';
-    ctx.globalAlpha = 1.0;
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(420, 620, 160, 0, Math.PI * 2);
-    ctx.fillStyle = '#FF6B35';
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(460, 580, 60, 0, Math.PI * 2);
-    ctx.fillStyle = '#1A0A2E';
-    ctx.fill();
-    ctx.globalAlpha = 1.0;
+    // Yellow bottom half
+    ctx.fillStyle = '#FFD600';
+    ctx.fillRect(0, 480, 600, 420);
+    // Draw title lines - each auto-fitted
+    const lines = ['THE', 'LIGHT I', 'ALMOST', 'FORGOT'];
+    const colors = ['#FFD600', '#FFD600', '#FFD600', '#0D0D0D'];
+    const yPositions = [150, 270, 390, 590];
+    lines.forEach((line, i) => {
+      const size = fitText(line, 520, 148, '900', "'Barlow Condensed', Arial Black, sans-serif");
+      ctx.fillStyle = colors[i];
+      ctx.textAlign = 'left';
+      ctx.fillText(line, 40, yPositions[i]);
+    });
+    // Author name
+    ctx.font = "400 18px 'Montserrat', Arial, sans-serif";
+    ctx.fillStyle = '#0D0D0D';
     ctx.textAlign = 'left';
-    ctx.fillStyle = '#F5F0E8'; drawFit('THE LIGHT', 40, 210, '900', 100, "'Barlow Condensed', Arial Black, sans-serif");
-    ctx.fillStyle = '#FF6B35'; drawFit('I ALMOST',  40, 338, '900', 100, "'Barlow Condensed', Arial Black, sans-serif");
-    ctx.fillStyle = '#F5F0E8'; drawFit('FORGOT',    40, 466, '900', 100, "'Barlow Condensed', Arial Black, sans-serif");
-    ctx.font = "300 18px 'Montserrat', Arial, sans-serif";
-    ctx.letterSpacing = '8px';
-    ctx.fillStyle = '#F5F0E8';
     ctx.fillText('SARA KIM', 40, 840);
-    ctx.letterSpacing = '0px';
   }
 
   if (idx === 1) {
-    // Cover 1: Warm cream + bold D-shape half circle
-    ctx.fillStyle = '#F0EBE3';
+    // DESIGN B: Hot pink + large black circle
+    ctx.fillStyle = '#E8157B';
     ctx.fillRect(0, 0, 600, 900);
+    // Giant black circle bottom right
     ctx.beginPath();
-    ctx.moveTo(600, 220);
-    ctx.arc(600, 500, 280, -Math.PI / 2, Math.PI / 2);
-    ctx.closePath();
-    ctx.fillStyle = '#1A1A2E';
+    ctx.arc(580, 820, 380, 0, Math.PI * 2);
+    ctx.fillStyle = '#0D0D0D';
     ctx.fill();
-    ctx.fillStyle = '#1A1A2E';
-    ctx.fillRect(40, 520, 200, 3);
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#1A1A2E';
-    drawFit('THE LIGHT', 300, 190, '700', 82, "'Libre Baskerville', Georgia, serif");
-    drawFit('I ALMOST',  300, 295, '700', 82, "'Libre Baskerville', Georgia, serif");
-    drawFit('FORGOT',    300, 400, '700', 82, "'Libre Baskerville', Georgia, serif");
-    ctx.font = "300 18px 'Montserrat', Arial, sans-serif";
-    ctx.letterSpacing = '8px';
-    ctx.fillStyle = '#1A1A2E';
-    ctx.fillText('SARA KIM', 300, 560);
-    ctx.letterSpacing = '0px';
+    // Medium white circle
+    ctx.beginPath();
+    ctx.arc(480, 700, 160, 0, Math.PI * 2);
+    ctx.fillStyle = '#F5F0E8';
+    ctx.fill();
+    // Title all white, top left
+    const lines = ['THE', 'LIGHT', 'I ALMOST', 'FORGOT'];
+    const yPositions = [160, 290, 420, 550];
+    lines.forEach((line, i) => {
+      const size = fitText(line, 520, 138, '900', "'Barlow Condensed', Arial Black, sans-serif");
+      ctx.fillStyle = '#FFFFFF';
+      ctx.textAlign = 'left';
+      ctx.fillText(line, 40, yPositions[i]);
+    });
+    // Author
+    ctx.font = "400 18px 'Montserrat', Arial, sans-serif";
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'left';
+    ctx.fillText('SARA KIM', 40, 840);
   }
 
   if (idx === 2) {
-    // Cover 2: Black + yellow color block split
-    ctx.fillStyle = '#0D0D0D';
+    // DESIGN C: Cream + navy elegant with bold geometric
+    ctx.fillStyle = '#F0EBE3';
     ctx.fillRect(0, 0, 600, 900);
-    ctx.fillStyle = '#FFD600';
-    ctx.fillRect(0, 520, 600, 380);
+    // Bold navy vertical bar on left
+    ctx.fillStyle = '#1A1A2E';
+    ctx.fillRect(0, 0, 18, 900);
+    // Large navy rectangle bottom
+    ctx.fillStyle = '#1A1A2E';
+    ctx.fillRect(0, 720, 600, 180);
+    // Accent circle mid right
+    ctx.beginPath();
+    ctx.arc(480, 500, 120, 0, Math.PI * 2);
+    ctx.fillStyle = '#8B1A1A';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(480, 500, 80, 0, Math.PI * 2);
+    ctx.fillStyle = '#F0EBE3';
+    ctx.fill();
+    // Title navy, left aligned, large serif
+    const lines = ['THE', 'LIGHT', 'I ALMOST', 'FORGOT'];
+    const yPositions = [150, 270, 390, 510];
+    lines.forEach((line, i) => {
+      const size = fitText(line, 380, 118, '700', "'Libre Baskerville', Georgia, serif");
+      ctx.fillStyle = '#1A1A2E';
+      ctx.textAlign = 'left';
+      ctx.fillText(line, 50, yPositions[i]);
+    });
+    // Author on dark bottom bar
+    ctx.font = "400 18px 'Montserrat', Arial, sans-serif";
+    ctx.fillStyle = '#F0EBE3';
     ctx.textAlign = 'left';
-    ctx.fillStyle = '#FFD600'; drawFit('THE LIGHT', 40, 175, '900', 108, "'Barlow Condensed', Arial Black, sans-serif");
-    ctx.fillStyle = '#FFD600'; drawFit('I ALMOST',  40, 305, '900', 108, "'Barlow Condensed', Arial Black, sans-serif");
-    ctx.fillStyle = '#0D0D0D'; drawFit('FORGOT',    40, 610, '900', 108, "'Barlow Condensed', Arial Black, sans-serif");
-    ctx.font = "300 18px 'Montserrat', Arial, sans-serif";
-    ctx.letterSpacing = '8px';
-    ctx.fillStyle = '#0D0D0D';
-    ctx.fillText('SARA KIM', 40, 840);
-    ctx.letterSpacing = '0px';
+    ctx.fillText('SARA KIM', 50, 800);
   }
 
-  document.getElementById('dev-cover-modal').style.display = 'flex';
-  const labels = ['A: Sunburst', 'B: Dark Multi-Color', 'C: Purple + Ring'];
-  showToast(`✅ Cover ${labels[idx]} — Ctrl+Shift+C for next`);
+  // Show canvas in modal
+  testCoverIndex++;
+  const modal = document.getElementById('coverTestModal') || createCoverModal();
+  const img = canvas.toDataURL('image/png');
+  document.getElementById('coverTestImage').src = img;
+  modal.style.display = 'flex';
 }
 
 document.addEventListener('keydown', function(e) {
