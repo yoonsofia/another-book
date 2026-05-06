@@ -36,6 +36,43 @@ app.get('/', (req, res) => {
   res.json({ status: 'AnotherBook PDF Server running' });
 });
 
+// ── COVER GENERATION ENDPOINT ──
+app.post('/generate-cover', async (req, res) => {
+  const { prompt } = req.body;
+
+  if (!prompt) {
+    return res.status(400).json({ error: 'prompt is required' });
+  }
+  if (!process.env.IDEOGRAM_API_KEY) {
+    return res.status(500).json({ error: 'IDEOGRAM_API_KEY not configured on server' });
+  }
+
+  try {
+    const response = await fetch('https://api.ideogram.ai/generate', {
+      method: 'POST',
+      headers: {
+        'Api-Key': process.env.IDEOGRAM_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        image_request: {
+          prompt: prompt,
+          aspect_ratio: 'ASPECT_2_3',
+          model: 'V_3_TURBO',
+          magic_prompt_option: 'OFF',
+          num_images: 4
+        }
+      })
+    });
+
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error('Ideogram API error:', error.message);
+    res.status(500).json({ error: 'Cover generation failed', message: error.message });
+  }
+});
+
 // ── HELPERS ──
 function hasKorean(str) {
   return /[가-힣ᄀ-ᇿ㄰-㆏]/.test(str || '');
