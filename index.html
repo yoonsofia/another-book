@@ -1716,6 +1716,8 @@ body{
 </div>
 
 <script>
+window.IDEOGRAM_API_KEY = '';
+
 // ──────────── DEV MODE ────────────
 // Set to true to bypass chapter lock and show all 10 chapters without payment.
 // Set to false before shipping to production.
@@ -1726,7 +1728,6 @@ const DEV_MODE = true;
 const TEST_CH1_ONLY = false;
 
 const PDF_SERVER_URL = 'https://anotherbook-server-production.up.railway.app';
-const IDEOGRAM_API_KEY = '';
 
 // ──────────── STATE ────────────
 let curStep = 1;
@@ -2321,7 +2322,30 @@ After generating the story, also output a JSON block wrapped in <coverBrief> tag
       chapters: [{number:1, title:ch1Title, content:ch1Content}]
     };
     stopLoading();
-    displayStory(story);
+
+    const coverBrief = storedCoverBrief;
+    const bookTitle = outline.title;
+    const authorName = ans.author || '어나더북';
+
+    if (coverBrief) {
+      showStatus('Generating your book covers...');
+      const ideogramKey = window.IDEOGRAM_API_KEY || '';
+      if (!ideogramKey) {
+        console.warn('No Ideogram API key set');
+        proceedToPDF(null, coverBrief, bookTitle, authorName);
+        return;
+      }
+      const imageUrls = await generateBookCover(coverBrief, ideogramKey);
+      if (imageUrls && imageUrls.length > 0) {
+        showStatus('Choose your cover...');
+        const selectedCover = await showCoverSelection(imageUrls, coverBrief, bookTitle, authorName);
+        proceedToPDF(selectedCover, coverBrief, bookTitle, authorName);
+      } else {
+        proceedToPDF(null, coverBrief, bookTitle, authorName);
+      }
+    } else {
+      displayStory(story);
+    }
 
   } catch(err){
     stopLoading();
@@ -2407,6 +2431,15 @@ function displayStory(d){
 
   showPage('page-story');
   window.scrollTo(0,0);
+}
+
+function showStatus(msg){
+  setLoadMsg(msg);
+}
+
+function proceedToPDF(selectedCover, coverBrief, bookTitle, authorName){
+  if(selectedCover) selectedCoverImage = selectedCover;
+  displayStory(story);
 }
 
 function fmtContent(txt){
@@ -2669,6 +2702,127 @@ ${chaptersHTML}
 </div>`;
 }
 
+// ──────────── COMPOSE COVER ────────────
+async function composeCover(imageUrl, coverBrief, title, author) {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 600;
+    canvas.height = 900;
+    const ctx = canvas.getContext('2d');
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function() {
+      ctx.drawImage(img, 0, 0, 600, 900);
+      drawCoverText(canvas, coverBrief, title, author);
+      resolve(canvas.toDataURL('image/jpeg', 0.95));
+    };
+    img.onerror = function() {
+      ctx.fillStyle = coverBrief.coverColor || '#1A0A2E';
+      ctx.fillRect(0, 0, 600, 900);
+      drawCoverText(canvas, coverBrief, title, author);
+      resolve(canvas.toDataURL('image/jpeg', 0.95));
+    };
+    img.src = imageUrl;
+  });
+}
+
+// ──────────── COVER SELECTION MODAL ────────────
+async function showCoverSelection(imageUrls, coverBrief, title, author) {
+  const composedCovers = await Promise.all(
+    imageUrls.map(url => composeCover(url, coverBrief, title, author))
+  );
+
+  const modal = document.createElement('div');
+  modal.id = 'cover-selection-modal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.92);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+  `;
+
+  modal.innerHTML = `
+    <h2 style="color: #F5F0E8; font-family: 'Montserrat', sans-serif;
+               font-weight: 300; letter-spacing: 6px; font-size: 14px;
+               text-transform: uppercase; margin-bottom: 24px;">
+      Choose Your Cover
+    </h2>
+    <div id="cover-grid" style="
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      max-width: 640px;
+      width: 100%;
+      margin-bottom: 24px;
+    ">
+      ${composedCovers.map((dataUrl, i) => `
+        <div class="cover-option" data-index="${i}" style="
+          cursor: pointer;
+          border: 3px solid transparent;
+          border-radius: 4px;
+          overflow: hidden;
+          transition: border-color 0.2s;
+        ">
+          <img src="${dataUrl}" style="
+            width: 100%;
+            display: block;
+          " />
+        </div>
+      `).join('')}
+    </div>
+    <button id="use-cover-btn" style="
+      padding: 16px 48px;
+      background: #FFD600;
+      color: #0D0D0D;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      opacity: 0.4;
+      pointer-events: none;
+    ">Use This Cover</button>
+  `;
+
+  document.body.appendChild(modal);
+
+  let selectedIndex = null;
+  let selectedDataUrl = null;
+
+  modal.querySelectorAll('.cover-option').forEach(option => {
+    option.addEventListener('click', function() {
+      modal.querySelectorAll('.cover-option').forEach(o => {
+        o.style.borderColor = 'transparent';
+      });
+      this.style.borderColor = '#FFD600';
+      selectedIndex = parseInt(this.dataset.index);
+      selectedDataUrl = composedCovers[selectedIndex];
+      const btn = document.getElementById('use-cover-btn');
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
+    });
+  });
+
+  return new Promise((resolve) => {
+    document.getElementById('use-cover-btn').addEventListener('click', function() {
+      modal.remove();
+      resolve(selectedDataUrl);
+    });
+  });
+}
+
 // ──────────── COVER SELECT ────────────
 function showCoverSelect(type){
   selectedProduct = type || 'digital';
@@ -2691,7 +2845,7 @@ async function showIdeogramCoverPicker(){
   const grid    = document.getElementById('ideogram-grid');
   const errorEl = document.getElementById('ideogram-error');
   const errorMsg= document.getElementById('ideogram-error-msg');
-  const useBtn  = document.getElementById('use-cover-btn');
+  const useBtn  = document.getElementById('ideogram-use-cover-btn');
 
   selectedCoverImage = null;
   grid.innerHTML = '';
@@ -2745,7 +2899,7 @@ function selectCoverOption(url, el){
   el.style.borderColor = '#3D5A47';
   el.style.boxShadow   = '0 0 0 2px #3D5A47';
   selectedCoverImage = url;
-  const useBtn = document.getElementById('use-cover-btn');
+  const useBtn = document.getElementById('ideogram-use-cover-btn');
   useBtn.disabled = false;
   useBtn.style.opacity = '1';
   useBtn.style.cursor  = 'pointer';
@@ -3943,7 +4097,7 @@ document.addEventListener('keydown', function(e) {
 
     <!-- action -->
     <div style="text-align:center;">
-      <button id="use-cover-btn" onclick="useSelectedCover()" disabled
+      <button id="ideogram-use-cover-btn" onclick="useSelectedCover()" disabled
         style="background:#3D5A47;color:#fff;border:none;width:100%;padding:17px 32px;font-size:16px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border-radius:50px;cursor:not-allowed;opacity:.4;transition:opacity .25s,box-shadow .25s;box-shadow:none;">
         Use This Cover →
       </button>
