@@ -58,7 +58,7 @@ app.post('/generate-cover', async (req, res) => {
         image_request: {
           prompt: prompt,
           aspect_ratio: 'ASPECT_2_3',
-          model: 'V_3_TURBO',
+          model: 'V_3',
           magic_prompt_option: 'OFF',
           num_images: 4
         }
