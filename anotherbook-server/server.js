@@ -48,20 +48,16 @@ app.post('/generate-cover', async (req, res) => {
   }
 
   try {
-    const response = await fetch('https://api.ideogram.ai/generate', {
+    const response = await fetch('https://api.ideogram.ai/v1/ideogram-v3/generate', {
       method: 'POST',
       headers: {
         'Api-Key': process.env.IDEOGRAM_API_KEY,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        image_request: {
-          prompt: prompt,
-          aspect_ratio: 'ASPECT_2_3',
-          model: 'V_3',
-          magic_prompt_option: 'OFF',
-          num_images: 4
-        }
+        prompt: prompt,
+        aspect_ratio: 'ASPECT_2_3',
+        num_images: 4
       })
     });
 
