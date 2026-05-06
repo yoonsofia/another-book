@@ -39,14 +39,9 @@ app.get('/', (req, res) => {
 // ── COVER GENERATION ENDPOINT ──
 app.post('/generate-cover', async (req, res) => {
   const { prompt } = req.body;
-
-  if (!prompt) {
-    return res.status(400).json({ error: 'prompt is required' });
-  }
   if (!process.env.IDEOGRAM_API_KEY) {
-    return res.status(500).json({ error: 'IDEOGRAM_API_KEY not configured on server' });
+    return res.status(500).json({ error: 'IDEOGRAM_API_KEY not configured' });
   }
-
   try {
     const response = await fetch('https://api.ideogram.ai/v1/ideogram-v3/generate', {
       method: 'POST',
@@ -57,15 +52,14 @@ app.post('/generate-cover', async (req, res) => {
       body: JSON.stringify({
         prompt: prompt,
         aspect_ratio: 'ASPECT_2_3',
-        num_images: 4
+        num_images: 4,
+        rendering_speed: 'DEFAULT'
       })
     });
-
     const data = await response.json();
     res.json(data);
-  } catch (error) {
-    console.error('Ideogram API error:', error.message);
-    res.status(500).json({ error: 'Cover generation failed', message: error.message });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
