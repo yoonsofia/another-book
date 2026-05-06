@@ -1726,6 +1726,7 @@ const DEV_MODE = true;
 const TEST_CH1_ONLY = false;
 
 const PDF_SERVER_URL = 'https://anotherbook-server-production.up.railway.app';
+const IDEOGRAM_API_KEY = '';
 
 // ──────────── STATE ────────────
 let curStep = 1;
@@ -1736,6 +1737,8 @@ let apiKey = sessionStorage.getItem('ms_api') || '';
 let loadTimer = null;
 let coverDesign = null;
 let selectedProduct = 'digital'; // 'digital', 'physical', 'gift'
+let selectedCoverImage = null;
+let storedCoverBrief = null;
 
 // ──────────── QUESTIONNAIRE DATA ────────────
 const TOPICS = [
@@ -2303,6 +2306,7 @@ After generating the story, also output a JSON block wrapped in <coverBrief> tag
     const ch1Part3Raw = await apiCall(ch1Part3Prompt, 3000);
     const ch1Part3Content = ch1Part3Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
     const ch1Content = ch1Part1Content + '\n\n' + ch1Part2Content + '\n\n' + ch1Part3Content;
+    storedCoverBrief = parseCoverBrief(ch1Part3Raw) || null;
     markLoadStep('ls3');
 
     // ── Step 4: Done ──
@@ -2669,12 +2673,93 @@ ${chaptersHTML}
 function showCoverSelect(type){
   selectedProduct = type || 'digital';
   if(!story){ startStory(); return; }
-  coverDesign = null;
-  showPage('page-cover-loading');
-  generateFullCover();
+  if(IDEOGRAM_API_KEY){
+    showIdeogramCoverPicker();
+  } else {
+    coverDesign = null;
+    showPage('page-cover-loading');
+    generateFullCover();
+  }
 }
 
 function goBackFromCoverSelect(){ showPage('page-story'); }
+
+// ──────────── IDEOGRAM COVER PICKER ────────────
+async function showIdeogramCoverPicker(){
+  const modal   = document.getElementById('ideogram-cover-modal');
+  const loading = document.getElementById('ideogram-loading');
+  const grid    = document.getElementById('ideogram-grid');
+  const errorEl = document.getElementById('ideogram-error');
+  const errorMsg= document.getElementById('ideogram-error-msg');
+  const useBtn  = document.getElementById('use-cover-btn');
+
+  selectedCoverImage = null;
+  grid.innerHTML = '';
+  grid.style.display  = 'none';
+  loading.style.display = 'block';
+  errorEl.style.display = 'none';
+  useBtn.disabled = true;
+  useBtn.style.opacity = '0.4';
+  useBtn.style.cursor  = 'not-allowed';
+  modal.style.display  = 'flex';
+
+  if(!storedCoverBrief){
+    loading.style.display = 'none';
+    errorEl.style.display = 'block';
+    errorMsg.textContent = '표지 정보가 없어요. 이야기를 다시 생성해주세요.';
+    return;
+  }
+
+  const urls = await generateBookCover(storedCoverBrief, IDEOGRAM_API_KEY);
+  loading.style.display = 'none';
+
+  if(!urls || urls.length === 0){
+    errorEl.style.display = 'block';
+    errorMsg.textContent = '이미지 생성에 실패했어요. API 키를 확인하고 다시 시도해주세요.';
+    return;
+  }
+
+  urls.forEach((url, i) => {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'cursor:pointer;border-radius:8px;overflow:hidden;border:3px solid transparent;transition:border-color .2s,box-shadow .2s;';
+    wrap.onclick = () => selectCoverOption(url, wrap);
+
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = `Cover option ${i + 1}`;
+    img.style.cssText = 'width:100%;display:block;aspect-ratio:2/3;object-fit:cover;';
+    img.loading = 'lazy';
+
+    wrap.appendChild(img);
+    grid.appendChild(wrap);
+  });
+
+  grid.style.display = 'grid';
+}
+
+function selectCoverOption(url, el){
+  document.querySelectorAll('#ideogram-grid > div').forEach(d => {
+    d.style.borderColor = 'transparent';
+    d.style.boxShadow   = 'none';
+  });
+  el.style.borderColor = '#3D5A47';
+  el.style.boxShadow   = '0 0 0 2px #3D5A47';
+  selectedCoverImage = url;
+  const useBtn = document.getElementById('use-cover-btn');
+  useBtn.disabled = false;
+  useBtn.style.opacity = '1';
+  useBtn.style.cursor  = 'pointer';
+}
+
+function closeIdeogramPicker(){
+  document.getElementById('ideogram-cover-modal').style.display = 'none';
+}
+
+function useSelectedCover(){
+  if(!selectedCoverImage) return;
+  closeIdeogramPicker();
+  confirmCoverAndMakePDF();
+}
 
 // ──────────── COVER LOADING HELPERS ────────────
 function setCoverLoadMsg(msg){
@@ -3826,6 +3911,55 @@ document.addEventListener('keydown', function(e) {
     </button>
   </div>
 </div>
+
+<!-- ══════════ IDEOGRAM COVER PICKER MODAL ══════════ -->
+<div id="ideogram-cover-modal"
+  style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:9100;overflow-y:auto;padding:32px 16px;align-items:flex-start;justify-content:center;">
+  <div style="max-width:580px;width:100%;margin:0 auto;background:#fff;border-radius:18px;padding:40px 28px 32px;position:relative;box-shadow:0 24px 64px rgba(0,0,0,.4);">
+
+    <!-- close -->
+    <button onclick="closeIdeogramPicker()"
+      style="position:absolute;top:16px;right:18px;background:none;border:none;font-size:22px;line-height:1;cursor:pointer;color:#bbb;">✕</button>
+
+    <!-- heading -->
+    <h2 style="text-align:center;font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:#2C2C2C;margin:0 0 6px;">Choose Your Cover</h2>
+    <p style="text-align:center;font-family:'Noto Sans KR',sans-serif;font-size:13px;color:#999;margin:0 0 28px;">4가지 AI 생성 표지 중 마음에 드는 것을 선택하세요</p>
+
+    <!-- loading -->
+    <div id="ideogram-loading" style="text-align:center;padding:56px 0;">
+      <div style="font-size:44px;margin-bottom:14px;animation:spin 2s linear infinite;display:inline-block;">🎨</div>
+      <p style="font-family:'Noto Sans KR',sans-serif;color:#777;font-size:14px;line-height:1.7;">AI가 표지 이미지를 생성하고 있어요…<br>약 10–20초 소요됩니다</p>
+    </div>
+
+    <!-- 2x2 image grid -->
+    <div id="ideogram-grid"
+      style="display:none;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px;"></div>
+
+    <!-- error -->
+    <div id="ideogram-error" style="display:none;text-align:center;padding:40px 0;">
+      <div style="font-size:36px;margin-bottom:12px;">⚠️</div>
+      <p id="ideogram-error-msg" style="font-family:'Noto Sans KR',sans-serif;color:#c00;font-size:14px;line-height:1.6;"></p>
+    </div>
+
+    <!-- action -->
+    <div style="text-align:center;">
+      <button id="use-cover-btn" onclick="useSelectedCover()" disabled
+        style="background:#3D5A47;color:#fff;border:none;width:100%;padding:17px 32px;font-size:16px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border-radius:50px;cursor:not-allowed;opacity:.4;transition:opacity .25s,box-shadow .25s;box-shadow:none;">
+        Use This Cover →
+      </button>
+      <p style="margin-top:14px;">
+        <button onclick="closeIdeogramPicker()"
+          style="background:none;border:none;color:#aaa;cursor:pointer;font-size:13px;font-family:'Noto Sans KR',sans-serif;">
+          ← 취소
+        </button>
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
 
 </body>
 </html>
