@@ -62,8 +62,8 @@ app.post('/generate-cover', async (req, res) => {
       body: JSON.stringify({
         prompt: prompt,
         aspect_ratio: '2x3',
-        num_images: 4,
-        rendering_speed: 'DEFAULT'
+        num_images: 1,
+        rendering_speed: 'TURBO'
       })
     });
     const data = await response.json();

@@ -2267,7 +2267,7 @@ After writing the story chapter, you MUST output a cover brief on a new line in 
 
 <coverBrief>
 {
-  "imagePrompt": "[Vivid art direction for the book cover background — describe colors, textures, shapes, atmosphere matching the story mood. No faces, no people. Abstract and artistic. Print quality portrait.]",
+  "imagePrompt": "Write a big-type dominant book cover prompt using this structure: 'Big type dominant book cover design, the title text [ACTUAL TITLE] in massive oversized [FONT] font filling the entire cover, bold condensed letters edge to edge, [mood-appropriate painterly illustration] visible behind and through the large title letters, [color palette], abstract painterly background illustration bleeding through typography, contemporary literary publishing aesthetic, editorial design, high contrast, print quality portrait book cover'. Always include the actual book title in the prompt. Typography must dominate — at least 60% of the cover filled with title text. Match background illustration to mood: dramatic/intense → fractured geometric shapes, bold color blocks, sharp diagonals, deep reds and blacks | mysterious/tense → dark atmospheric washes, shadowy abstract forms, deep navy or charcoal | sad/longing → soft muted watercolor washes, faded organic shapes, muted greens or grays | romantic/warm → warm flowing organic shapes, soft overlapping forms, amber and rose tones | hopeful/growth → bright open washes, upward organic lines, greens and warm yellows | literary/quiet → minimal single abstract object, lots of negative space, muted sophisticated palette | bold/political → flat high contrast color blocks, primary colors, stark geometric forms | modern/contemporary → clean gradient washes, subtle geometric accents, cool neutral tones. Style reference: Ottessa Moshfegh covers, A24 aesthetic, modern Minumsa Korean publishing.",
   "fontStyle": "[BARLOW for dramatic/intense | PLAYFAIR for romantic/warm | LIBRE for literary/quiet | CORMORANT for elegant/sad | NOTO_SANS_KR for Korean dramatic | NOTO_SERIF_KR for Korean literary]",
   "textColor": "[#FFFFFF for dark backgrounds | #0D0D0D for light backgrounds]",
   "accentColor": "[a bold contrasting hex color]",
@@ -2299,7 +2299,7 @@ ${lotteryRule}
 
 <coverBrief>
 {
-  "imagePrompt": "[스토리 분위기에 맞는 책 표지 배경의 생생한 아트 디렉션 — 색상, 질감, 형태, 분위기를 묘사하세요. 얼굴이나 사람 없이. 추상적이고 예술적으로. 인쇄 품질 세로 구도.]",
+  "imagePrompt": "빅타입 도미넌트 북커버 프롬프트를 다음 구조로 작성하세요: 'Big type dominant book cover design, the title text [실제 제목] in massive oversized [FONT] font filling the entire cover, bold condensed letters edge to edge, [분위기에 맞는 페인터리 일러스트] visible behind and through the large title letters, [색상 팔레트], abstract painterly background illustration bleeding through typography, contemporary literary publishing aesthetic, editorial design, high contrast, print quality portrait book cover'. 반드시 실제 책 제목을 프롬프트에 포함하세요. 타이포그래피가 커버의 60% 이상을 차지해야 합니다. 분위기별 배경 일러스트: dramatic/intense → 파편 기하학 형태, 굵은 색 블록, 날카로운 대각선, 진한 빨강과 검정 | mysterious/tense → 어두운 분위기의 워시, 그림자 추상 형태, 짙은 네이비나 차콜 | sad/longing → 부드러운 수채화 워시, 흐릿한 유기적 형태, 차분한 초록이나 회색 | romantic/warm → 따뜻하게 흐르는 유기적 형태, 부드럽게 겹치는 형태, 앰버와 로즈 톤 | hopeful/growth → 밝고 열린 워시, 위로 향하는 유기적 선, 초록과 따뜻한 노랑 | literary/quiet → 미니멀 단일 추상 오브젝트, 넓은 네거티브 스페이스, 절제된 세련된 팔레트 | bold/political → 고대비 색상 블록, 원색, 강렬한 기하학 형태 | modern/contemporary → 깔끔한 그라디언트 워시, 미묘한 기하학 포인트, 쿨 뉴트럴 톤. 스타일 레퍼런스: Ottessa Moshfegh 커버, A24 미학, 현대 민음사 한국 출판.",
   "fontStyle": "[BARLOW: 극적/강렬 | PLAYFAIR: 로맨틱/따뜻 | LIBRE: 문학적/차분 | CORMORANT: 우아/슬픔 | NOTO_SANS_KR: 한국어 극적 | NOTO_SERIF_KR: 한국어 문학적]",
   "textColor": "[어두운 배경은 #FFFFFF | 밝은 배경은 #0D0D0D]",
   "accentColor": "[강한 대비의 hex 색상]",
@@ -3735,28 +3735,23 @@ function isKorean(text) {
 
 // ──────────── IDEOGRAM API ────────────
 async function generateBookCover(coverBrief) {
-  const prompt = coverBrief.imagePrompt;
+  const styles = [
+    `Big type dominant, title '${coverBrief.titleLines.join(' ')}' in massive oversized font filling entire cover, painterly illustration bleeding through letters, ${coverBrief.imagePrompt}`,
+    `Centered minimal, title '${coverBrief.titleLines.join(' ')}' centered, lots of negative space, single abstract object, ${coverBrief.imagePrompt}`,
+    `Split composition, top half painterly illustration, bottom half solid color block with title '${coverBrief.titleLines.join(' ')}', ${coverBrief.imagePrompt}`,
+    `Full bleed bold, solid deep color background, stark white oversized title '${coverBrief.titleLines.join(' ')}', minimal graphic accent, ${coverBrief.imagePrompt}`
+  ];
 
-  try {
-    const response = await fetch(`${PDF_SERVER_URL}/generate-cover`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt })
-    });
-
-    const data = await response.json();
-    console.log('Ideogram response:', data);
-
-    if (data.data && data.data.length > 0) {
-      return data.data.map(img => img.url);
-    } else {
-      console.error('Ideogram error:', data);
-      return null;
-    }
-  } catch (error) {
-    console.error('Ideogram API call failed:', error);
-    return null;
-  }
+  const results = await Promise.all(
+    styles.map(prompt =>
+      fetch(`${window.PDF_SERVER_URL}/generate-cover`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      }).then(r => r.json()).then(data => data.data[0].url)
+    )
+  );
+  return results;
 }
 
 // ──────────── CANVAS COVER TEXT ────────────
