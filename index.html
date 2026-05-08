@@ -1729,6 +1729,7 @@ const DEV_MODE = true;
 const TEST_CH1_ONLY = false;
 
 const PDF_SERVER_URL = 'https://anotherbook-server-production.up.railway.app';
+window.PDF_SERVER_URL = PDF_SERVER_URL;
 
 // ──────────── STATE ────────────
 let curStep = 1;
@@ -2746,7 +2747,8 @@ async function composeCover(imageUrl, coverBrief, title, author) {
       drawCoverText(canvas, coverBrief, title, author);
       resolve(canvas.toDataURL('image/jpeg', 0.95));
     };
-    img.src = imageUrl;
+    const proxiedUrl = `${window.PDF_SERVER_URL}/proxy-image?url=${encodeURIComponent(imageUrl)}`;
+    img.src = proxiedUrl;
   });
 }
 

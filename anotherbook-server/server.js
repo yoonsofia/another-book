@@ -36,6 +36,16 @@ app.get('/', (req, res) => {
   res.json({ status: 'AnotherBook PDF Server running' });
 });
 
+// ── IMAGE PROXY ENDPOINT ──
+app.get('/proxy-image', async (req, res) => {
+  const { url } = req.query;
+  const response = await fetch(url);
+  const buffer = await response.arrayBuffer();
+  const contentType = response.headers.get('content-type') || 'image/png';
+  res.set('Content-Type', contentType);
+  res.send(Buffer.from(buffer));
+});
+
 // ── COVER GENERATION ENDPOINT ──
 app.post('/generate-cover', async (req, res) => {
   const { prompt } = req.body;
