@@ -3370,7 +3370,7 @@ function cleanMarkdownForPDF(text) {
     .replace(/\*(.*?)\*/g, '$1')
     .replace(/_(.*?)_/g, '$1')
     .replace(/^#{1,6}\s+/gm, '')
-    .replace(/^---+$/gm, '\n─────────────\n')
+    .replace(/^---+$/gm, '\n* * *\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
@@ -3763,14 +3763,14 @@ async function generatePDFFallback() {
 
       const lines = doc.splitTextToSize(cleanMarkdownForPDF(story.chapters[i].content || ''), textWidth);
       let y = 35;
+      const bottomMargin = margin + 15;
 
       lines.forEach(line => {
-        if (y + lineHeight > pageHeight - margin) {
+        if (y + lineHeight > pageHeight - bottomMargin) {
           doc.addPage();
-          y = margin;
           doc.setFont('helvetica', 'normal');
           doc.setFontSize(11);
-          doc.setTextColor(44, 44, 44);
+          y = margin + 10;
         }
         doc.text(line, margin, y);
         y += lineHeight;
