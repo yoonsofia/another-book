@@ -3362,12 +3362,15 @@ async function setupKoreanPDFFont(doc) {
 
 function cleanMarkdownForPDF(text) {
   return text
+    .replace(/[\u{1F000}-\u{1FFFF}]/gu, '')
+    .replace(/[\u{2600}-\u{27FF}]/gu, '')
+    .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
     .replace(/\*\*\*(.*?)\*\*\*/g, '$1')
     .replace(/\*\*(.*?)\*\*/g, '$1')
     .replace(/\*(.*?)\*/g, '$1')
     .replace(/_(.*?)_/g, '$1')
     .replace(/^#{1,6}\s+/gm, '')
-    .replace(/^---+$/gm, '──────────')
+    .replace(/^---+$/gm, '\n─────────────\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
@@ -3391,6 +3394,9 @@ async function generatePDFPrimary(sp) {
 
   const {jsPDF} = window.jspdf;
   const doc = new jsPDF({orientation:'portrait', unit:'mm', format:[127,188], compress:true});
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  doc.setCharSpace(0);
 
   // Load Korean font if needed
   let bodyFont = 'helvetica';
@@ -3720,6 +3726,9 @@ async function generatePDFFallback() {
     }
     const {jsPDF} = window.jspdf;
     const doc = new jsPDF('p', 'mm', [127, 188]);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.setCharSpace(0);
 
     // Page 1: Full cover image (canvas has the selected Ideogram image drawn on it)
     const coverCanvas = document.getElementById('cover-canvas');
