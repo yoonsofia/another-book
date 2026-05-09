@@ -1692,6 +1692,8 @@ em{font-style:italic;color:inherit;}
     <p style="text-align:center;color:var(--txt-lt);font-family:'Noto Sans KR',sans-serif;font-size:14px;margin-bottom:44px;">AI가 디자인한 표지예요</p>
 
     <div style="display:flex;justify-content:center;margin-bottom:32px;">
+      <img id="cover-preview-img"
+        style="width:240px;height:360px;border-radius:3px 8px 8px 3px;box-shadow:-4px 4px 20px rgba(0,0,0,.32);display:none;object-fit:cover;" />
       <canvas id="cover-canvas" width="800" height="1200"
         style="width:240px;height:360px;border-radius:3px 8px 8px 3px;box-shadow:-4px 4px 20px rgba(0,0,0,.32);display:block;"></canvas>
     </div>
@@ -2267,12 +2269,13 @@ After writing the story chapter, you MUST output a cover brief on a new line in 
 
 <coverBrief>
 {
-  "imagePrompt": "Write a big-type dominant book cover prompt using this structure: 'Big type dominant book cover design, the title text [ACTUAL TITLE] in massive oversized [FONT] font filling the entire cover, bold condensed letters edge to edge, [mood-appropriate painterly illustration] visible behind and through the large title letters, [color palette], abstract painterly background illustration bleeding through typography, contemporary literary publishing aesthetic, editorial design, high contrast, print quality portrait book cover'. Always include the actual book title in the prompt. Typography must dominate — at least 60% of the cover filled with title text. Match background illustration to mood: dramatic/intense → fractured geometric shapes, bold color blocks, sharp diagonals, deep reds and blacks | mysterious/tense → dark atmospheric washes, shadowy abstract forms, deep navy or charcoal | sad/longing → soft muted watercolor washes, faded organic shapes, muted greens or grays | romantic/warm → warm flowing organic shapes, soft overlapping forms, amber and rose tones | hopeful/growth → bright open washes, upward organic lines, greens and warm yellows | literary/quiet → minimal single abstract object, lots of negative space, muted sophisticated palette | bold/political → flat high contrast color blocks, primary colors, stark geometric forms | modern/contemporary → clean gradient washes, subtle geometric accents, cool neutral tones. Style reference: Ottessa Moshfegh covers, A24 aesthetic, modern Minumsa Korean publishing.",
+  "imagePrompt": "Write a big-type dominant book cover prompt using this structure: 'Big type dominant book cover design, the title text [ACTUAL TITLE] in massive oversized [FONT] font filling the entire cover, bold condensed letters edge to edge, [mood-appropriate painterly illustration] visible behind and through the large title letters, [color palette], abstract painterly background illustration bleeding through typography, contemporary literary publishing aesthetic, high contrast, print quality portrait book cover'. Always include the actual book title in the prompt. Typography must dominate — at least 60% of the cover filled with title text. Match background illustration to mood: dramatic/intense → fractured geometric shapes, bold color blocks, sharp diagonals, deep reds and blacks | mysterious/tense → dark atmospheric washes, shadowy abstract forms, deep navy or charcoal | sad/longing → soft muted watercolor washes, faded organic shapes, muted greens or grays | romantic/warm → warm flowing organic shapes, soft overlapping forms, amber and rose tones | hopeful/growth → bright open washes, upward organic lines, greens and warm yellows | literary/quiet → minimal single abstract object, lots of negative space, muted sophisticated palette | bold/political → flat high contrast color blocks, primary colors, stark geometric forms | modern/contemporary → clean gradient washes, subtle geometric accents, cool neutral tones | cute/playful → soft rounded bubbly typography, pastel watercolor illustration bleeding through letters, warm blush pink and creamy yellow palette, gentle floral or nature elements, soft and inviting, cozy storybook feel. ",
   "fontStyle": "[BARLOW for dramatic/intense | PLAYFAIR for romantic/warm | LIBRE for literary/quiet | CORMORANT for elegant/sad | NOTO_SANS_KR for Korean dramatic | NOTO_SERIF_KR for Korean literary]",
   "textColor": "[#FFFFFF for dark backgrounds | #0D0D0D for light backgrounds]",
   "accentColor": "[a bold contrasting hex color]",
   "titleLines": ["[TITLE LINE 1]", "[TITLE LINE 2 if needed]"],
   "titleAlign": "[left or center]",
+  "authorName": "[the full name of the book's author exactly as entered by the user]",
   "mood": "[one word]",
   "language": "[en or ko]"
 }
@@ -2299,12 +2302,13 @@ ${lotteryRule}
 
 <coverBrief>
 {
-  "imagePrompt": "빅타입 도미넌트 북커버 프롬프트를 다음 구조로 작성하세요: 'Big type dominant book cover design, the title text [실제 제목] in massive oversized [FONT] font filling the entire cover, bold condensed letters edge to edge, [분위기에 맞는 페인터리 일러스트] visible behind and through the large title letters, [색상 팔레트], abstract painterly background illustration bleeding through typography, contemporary literary publishing aesthetic, editorial design, high contrast, print quality portrait book cover'. 반드시 실제 책 제목을 프롬프트에 포함하세요. 타이포그래피가 커버의 60% 이상을 차지해야 합니다. 분위기별 배경 일러스트: dramatic/intense → 파편 기하학 형태, 굵은 색 블록, 날카로운 대각선, 진한 빨강과 검정 | mysterious/tense → 어두운 분위기의 워시, 그림자 추상 형태, 짙은 네이비나 차콜 | sad/longing → 부드러운 수채화 워시, 흐릿한 유기적 형태, 차분한 초록이나 회색 | romantic/warm → 따뜻하게 흐르는 유기적 형태, 부드럽게 겹치는 형태, 앰버와 로즈 톤 | hopeful/growth → 밝고 열린 워시, 위로 향하는 유기적 선, 초록과 따뜻한 노랑 | literary/quiet → 미니멀 단일 추상 오브젝트, 넓은 네거티브 스페이스, 절제된 세련된 팔레트 | bold/political → 고대비 색상 블록, 원색, 강렬한 기하학 형태 | modern/contemporary → 깔끔한 그라디언트 워시, 미묘한 기하학 포인트, 쿨 뉴트럴 톤. 스타일 레퍼런스: Ottessa Moshfegh 커버, A24 미학, 현대 민음사 한국 출판.",
+  "imagePrompt": "빅타입 도미넌트 북커버 프롬프트를 다음 구조로 작성하세요: 'Big type dominant book cover design, the title text [실제 제목] in massive oversized [FONT] font filling the entire cover, bold condensed letters edge to edge, [분위기에 맞는 페인터리 일러스트] visible behind and through the large title letters, [색상 팔레트], abstract painterly background illustration bleeding through typography, contemporary literary publishing aesthetic, high contrast, print quality portrait book cover'. 반드시 실제 책 제목을 프롬프트에 포함하세요. 타이포그래피가 커버의 60% 이상을 차지해야 합니다. 분위기별 배경 일러스트: dramatic/intense → 파편 기하학 형태, 굵은 색 블록, 날카로운 대각선, 진한 빨강과 검정 | mysterious/tense → 어두운 분위기의 워시, 그림자 추상 형태, 짙은 네이비나 차콜 | sad/longing → 부드러운 수채화 워시, 흐릿한 유기적 형태, 차분한 초록이나 회색 | romantic/warm → 따뜻하게 흐르는 유기적 형태, 부드럽게 겹치는 형태, 앰버와 로즈 톤 | hopeful/growth → 밝고 열린 워시, 위로 향하는 유기적 선, 초록과 따뜻한 노랑 | literary/quiet → 미니멀 단일 추상 오브젝트, 넓은 네거티브 스페이스, 절제된 세련된 팔레트 | bold/political → 고대비 색상 블록, 원색, 강렬한 기하학 형태 | modern/contemporary → 깔끔한 그라디언트 워시, 미묘한 기하학 포인트, 쿨 뉴트럴 톤 | cute/playful → soft rounded bubbly typography, pastel watercolor illustration bleeding through letters, warm blush pink and creamy yellow palette, gentle floral or nature elements, soft and inviting, cozy storybook feel. ",
   "fontStyle": "[BARLOW: 극적/강렬 | PLAYFAIR: 로맨틱/따뜻 | LIBRE: 문학적/차분 | CORMORANT: 우아/슬픔 | NOTO_SANS_KR: 한국어 극적 | NOTO_SERIF_KR: 한국어 문학적]",
   "textColor": "[어두운 배경은 #FFFFFF | 밝은 배경은 #0D0D0D]",
   "accentColor": "[강한 대비의 hex 색상]",
   "titleLines": ["[제목 1줄]", "[필요시 2줄]"],
   "titleAlign": "[left 또는 center]",
+  "authorName": "[the full name of the book's author exactly as entered by the user]",
   "mood": "[한 단어 분위기]",
   "language": "[en 또는 ko]"
 }
@@ -2342,6 +2346,7 @@ ${lotteryRule}
     const authorName = ans.author || '어나더북';
 
     if (coverBrief) {
+      coverBrief.authorName = authorName;
       showStatus('Generating your book covers...');
       const imageUrls = await generateBookCover(coverBrief);
       if (imageUrls && imageUrls.length > 0) {
@@ -2726,25 +2731,32 @@ async function composeCover(imageUrl, coverBrief, title, author) {
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = function() {
-      try {
+      if (coverBrief.language === 'ko') {
+        try {
+          ctx.drawImage(img, 0, 0, 600, 900);
+          drawCoverText(canvas, coverBrief, title, author);
+          resolve(canvas.toDataURL('image/jpeg', 0.95));
+        } catch (e) {
+          // Canvas tainted by CORS — use fresh canvas with solid background
+          const fb = document.createElement('canvas');
+          fb.width = 600; fb.height = 900;
+          const fbCtx = fb.getContext('2d');
+          fbCtx.fillStyle = coverBrief.coverColor || '#1A0A2E';
+          fbCtx.fillRect(0, 0, 600, 900);
+          drawCoverText(fb, coverBrief, title, author);
+          resolve(fb.toDataURL('image/jpeg', 0.95));
+        }
+      } else {
         ctx.drawImage(img, 0, 0, 600, 900);
-        drawCoverText(canvas, coverBrief, title, author);
         resolve(canvas.toDataURL('image/jpeg', 0.95));
-      } catch (e) {
-        // Canvas tainted by CORS — use fresh canvas with solid background
-        const fb = document.createElement('canvas');
-        fb.width = 600; fb.height = 900;
-        const fbCtx = fb.getContext('2d');
-        fbCtx.fillStyle = coverBrief.coverColor || '#1A0A2E';
-        fbCtx.fillRect(0, 0, 600, 900);
-        drawCoverText(fb, coverBrief, title, author);
-        resolve(fb.toDataURL('image/jpeg', 0.95));
       }
     };
     img.onerror = function() {
-      ctx.fillStyle = coverBrief.coverColor || '#1A0A2E';
-      ctx.fillRect(0, 0, 600, 900);
-      drawCoverText(canvas, coverBrief, title, author);
+      if (coverBrief.language === 'ko') {
+        ctx.fillStyle = coverBrief.coverColor || '#1A0A2E';
+        ctx.fillRect(0, 0, 600, 900);
+        drawCoverText(canvas, coverBrief, title, author);
+      }
       resolve(canvas.toDataURL('image/jpeg', 0.95));
     };
     const proxiedUrl = `${window.PDF_SERVER_URL}/proxy-image?url=${encodeURIComponent(imageUrl)}`;
@@ -2790,7 +2802,7 @@ async function showCoverSelection(imageUrls, coverBrief, title, author) {
       margin-bottom: 24px;
     ">
       ${composedCovers.map((dataUrl, i) => `
-        <div class="cover-option" data-index="${i}" style="
+        <div class="cover-option" data-index="${i}" data-ideogram-url="${imageUrls[i]}" style="
           cursor: pointer;
           border: 3px solid transparent;
           border-radius: 4px;
@@ -2824,7 +2836,7 @@ async function showCoverSelection(imageUrls, coverBrief, title, author) {
   document.body.appendChild(modal);
 
   let selectedIndex = null;
-  let selectedDataUrl = null;
+  let selectedImageUrl = null;
 
   modal.querySelectorAll('.cover-option').forEach(option => {
     option.addEventListener('click', function() {
@@ -2833,7 +2845,8 @@ async function showCoverSelection(imageUrls, coverBrief, title, author) {
       });
       this.style.borderColor = '#FFD600';
       selectedIndex = parseInt(this.dataset.index);
-      selectedDataUrl = composedCovers[selectedIndex];
+      selectedImageUrl = this.dataset.ideogramUrl || imageUrls[selectedIndex];
+      console.log('Selected cover index:', selectedIndex, '| Ideogram URL:', selectedImageUrl);
       const btn = document.getElementById('use-cover-btn');
       btn.style.opacity = '1';
       btn.style.pointerEvents = 'auto';
@@ -2843,7 +2856,7 @@ async function showCoverSelection(imageUrls, coverBrief, title, author) {
   return new Promise((resolve) => {
     document.getElementById('use-cover-btn').addEventListener('click', function() {
       modal.remove();
-      resolve(selectedDataUrl);
+      resolve(selectedImageUrl);
     });
   });
 }
@@ -3116,7 +3129,36 @@ async function generateFullCover(){
   const authorName = ans.author||'어나더북';
 
   const canvas = document.getElementById('cover-canvas');
-  await renderCover(canvas, coverDesign, bookTitle, authorName);
+  const previewImg = document.getElementById('cover-preview-img');
+
+  if (selectedCoverImage && !selectedCoverImage.startsWith('data:')) {
+    const proxiedUrl = `${window.PDF_SERVER_URL}/proxy-image?url=${encodeURIComponent(selectedCoverImage)}`;
+    console.log('Confirmation screen: showing Ideogram URL:', selectedCoverImage);
+
+    // Show the selected Ideogram image directly via <img> — no canvas re-render
+    if (previewImg) {
+      previewImg.src = proxiedUrl;
+      previewImg.style.display = 'block';
+    }
+    if (canvas) canvas.style.display = 'none';
+
+    // Also draw on the hidden canvas so jsPDF fallback can use it
+    await new Promise((res) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        res();
+      };
+      img.onerror = async () => { await renderCover(canvas, coverDesign, bookTitle, authorName); res(); };
+      img.src = proxiedUrl;
+    });
+  } else {
+    if (previewImg) previewImg.style.display = 'none';
+    if (canvas) canvas.style.display = 'block';
+    await renderCover(canvas, coverDesign, bookTitle, authorName);
+  }
 
   showPage('page-cover-select');
 }
@@ -3318,6 +3360,18 @@ async function setupKoreanPDFFont(doc) {
   }
 }
 
+function cleanMarkdownForPDF(text) {
+  return text
+    .replace(/\*\*\*(.*?)\*\*\*/g, '$1')
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/_(.*?)_/g, '$1')
+    .replace(/^#{1,6}\s+/gm, '')
+    .replace(/^---+$/gm, '──────────')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 async function generatePDFPrimary(sp) {
   const overlay = document.getElementById('pdf-progress-overlay');
 
@@ -3475,7 +3529,7 @@ async function generatePDFPrimary(sp) {
     doc.setFontSize(11);
     doc.setTextColor(44,44,44);
 
-    const paras = ch.content.split(/\n\n+|\n/).filter(p=>p.trim());
+    const paras = cleanMarkdownForPDF(ch.content).split(/\n\n+|\n/).filter(p=>p.trim());
     let isFirstParagraph = true;
 
     for (const para of paras) {
@@ -3667,37 +3721,51 @@ async function generatePDFFallback() {
     const {jsPDF} = window.jspdf;
     const doc = new jsPDF('p', 'mm', [127, 188]);
 
-    let r=61, g=90, b=71;
-    if(coverDesign?.coverColor){
-      const hex = coverDesign.coverColor.replace('#','');
-      if(hex.length===6){
-        r=parseInt(hex.slice(0,2),16);
-        g=parseInt(hex.slice(2,4),16);
-        b=parseInt(hex.slice(4,6),16);
-      }
+    // Page 1: Full cover image (canvas has the selected Ideogram image drawn on it)
+    const coverCanvas = document.getElementById('cover-canvas');
+    if (coverCanvas) {
+      doc.addImage(coverCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0,
+        doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight());
+    } else {
+      // Fallback solid color cover if canvas isn't available
+      doc.setFillColor(61, 90, 71);
+      doc.rect(0, 0, 127, 188, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('times', 'bold');
+      doc.setFontSize(20);
+      doc.text(story.title || 'My Story', 63.5, 80, {align: 'center', maxWidth: 100});
     }
-    doc.setFillColor(r, g, b);
-    doc.rect(0, 0, 127, 188, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFont('times', 'bold');
-    doc.setFontSize(20);
-    doc.text(story.title || 'My Story', 63.5, 80, {align: 'center', maxWidth: 100});
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(12);
-    doc.text(ans.author || '', 63.5, 110, {align: 'center'});
-    doc.setFontSize(9);
-    doc.text('anotherbook', 63.5, 178, {align: 'center'});
+    doc.addPage();
+
+    const pageWidth  = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin     = 13;
+    const lineHeight = 7;
+    const textWidth  = pageWidth - margin * 2;
 
     for (let i = 0; i < story.chapters.length; i++) {
       doc.addPage();
       doc.setTextColor(44, 44, 44);
       doc.setFont('times', 'bold');
       doc.setFontSize(14);
-      doc.text('CHAPTER ' + (i + 1), 63.5, 20, {align: 'center'});
+      doc.text('CHAPTER ' + (i + 1), pageWidth / 2, 20, {align: 'center'});
       doc.setFont('times', 'normal');
       doc.setFontSize(10);
-      const lines = doc.splitTextToSize(story.chapters[i].content || '', 100);
-      doc.text(lines, 13, 35);
+
+      const lines = doc.splitTextToSize(cleanMarkdownForPDF(story.chapters[i].content || ''), textWidth);
+      let y = 35;
+
+      lines.forEach(line => {
+        if (y + lineHeight > pageHeight - margin) {
+          doc.addPage();
+          y = margin;
+          doc.setFont('times', 'normal');
+          doc.setFontSize(10);
+          doc.setTextColor(44, 44, 44);
+        }
+        doc.text(line, margin, y);
+        y += lineHeight;
+      });
     }
 
     doc.save((story.title || 'my-story') + '.pdf');
@@ -3735,11 +3803,34 @@ function isKorean(text) {
 
 // ──────────── IDEOGRAM API ────────────
 async function generateBookCover(coverBrief) {
+  const typeWeight = {
+    'dramatic': 'massive bold condensed typography',
+    'intense': 'massive bold condensed typography',
+    'mysterious': 'large sharp serif typography',
+    'tense': 'large sharp condensed typography',
+    'sad': 'large delicate light serif typography',
+    'longing': 'large elegant thin serif typography',
+    'romantic': 'large flowing medium weight serif typography',
+    'warm': 'large soft medium weight typography',
+    'cute': 'large soft rounded bubbly typography',
+    'playful': 'large bouncy rounded typography',
+    'literary': 'large refined elegant serif typography',
+    'quiet': 'large minimal spaced serif typography',
+    'hopeful': 'large clean modern sans-serif typography',
+    'bold': 'massive heavy block typography'
+  };
+
+  const weight = Object.entries(typeWeight).find(([key]) =>
+    coverBrief.mood?.toLowerCase().includes(key)
+  )?.[1] || 'large bold typography';
+
+  const authorName = coverBrief.authorName || coverBrief.author || 'Unknown Author';
+
   const styles = [
-    `Big type dominant, title '${coverBrief.titleLines.join(' ')}' in massive oversized font filling entire cover, painterly illustration bleeding through letters, ${coverBrief.imagePrompt}`,
-    `Centered minimal, title '${coverBrief.titleLines.join(' ')}' centered, lots of negative space, single abstract object, ${coverBrief.imagePrompt}`,
-    `Split composition, top half painterly illustration, bottom half solid color block with title '${coverBrief.titleLines.join(' ')}', ${coverBrief.imagePrompt}`,
-    `Full bleed bold, solid deep color background, stark white oversized title '${coverBrief.titleLines.join(' ')}', minimal graphic accent, ${coverBrief.imagePrompt}`
+    `Big type dominant, title '${coverBrief.titleLines.join(' ')}' in ${weight} filling entire cover, painterly illustration bleeding through letters, ${coverBrief.imagePrompt}, the book title '${coverBrief.titleLines.join(' ')}' dominates 75% of the cover in very large bold typography, the author name '${authorName}' takes up 25% of the cover in medium weight text at the bottom, clear size hierarchy between title and author name, no vertical text, no rotated text, all text horizontal only, no decorative words, no extra labels`,
+    `Centered minimal, title '${coverBrief.titleLines.join(' ')}' centered in ${weight}, lots of negative space, single abstract object, ${coverBrief.imagePrompt}, the book title '${coverBrief.titleLines.join(' ')}' dominates 75% of the cover in very large bold typography, the author name '${authorName}' takes up 25% of the cover in medium weight text at the bottom, clear size hierarchy between title and author name, no vertical text, no rotated text, all text horizontal only, no decorative words, no extra labels`,
+    `Split composition, top half painterly illustration, bottom half solid color block with title '${coverBrief.titleLines.join(' ')}' in ${weight}, ${coverBrief.imagePrompt}, the book title '${coverBrief.titleLines.join(' ')}' dominates 75% of the cover in very large bold typography, the author name '${authorName}' takes up 25% of the cover in medium weight text at the bottom, clear size hierarchy between title and author name, no vertical text, no rotated text, all text horizontal only, no decorative words, no extra labels`,
+    `Full bleed bold, solid deep color background, title '${coverBrief.titleLines.join(' ')}' in ${weight}, minimal graphic accent, ${coverBrief.imagePrompt}, the book title '${coverBrief.titleLines.join(' ')}' dominates 75% of the cover in very large bold typography, the author name '${authorName}' takes up 25% of the cover in medium weight text at the bottom, clear size hierarchy between title and author name, no vertical text, no rotated text, all text horizontal only, no decorative words, no extra labels`
   ];
 
   const results = await Promise.all(
@@ -3832,7 +3923,9 @@ function parseCoverBrief(claudeResponse) {
   try {
     const match = claudeResponse.match(/<coverBrief>([\s\S]*?)<\/coverBrief>/);
     if (match) {
-      return JSON.parse(match[1].trim());
+      const brief = JSON.parse(match[1].trim());
+      if (!brief.authorName && brief.author) brief.authorName = brief.author;
+      return brief;
     }
   } catch (e) {
     console.error('Failed to parse cover brief:', e);
