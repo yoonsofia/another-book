@@ -3393,7 +3393,7 @@ async function generatePDFPrimary(sp) {
   const doc = new jsPDF({orientation:'portrait', unit:'mm', format:[127,188], compress:true});
 
   // Load Korean font if needed
-  let bodyFont = 'times';
+  let bodyFont = 'helvetica';
   if (selectedLang === 'ko') {
     sp(66, '한국어 폰트 로딩 중...');
     const koreanFont = await setupKoreanPDFFont(doc);
@@ -3407,7 +3407,7 @@ async function generatePDFPrimary(sp) {
   }
 
   const PW=127, PH=188;
-  const mL=13, mR=13, mTop=15, mBot=18;
+  const mL=25, mR=25, mTop=15, mBot=18;
   const textW = PW - mL - mR;
   let globalPage = 1;
 
@@ -3739,18 +3739,18 @@ async function generatePDFFallback() {
 
     const pageWidth  = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    const margin     = 13;
+    const margin     = 25;
     const lineHeight = 7;
-    const textWidth  = pageWidth - margin * 2;
+    const textWidth  = pageWidth - (margin * 2);
 
     for (let i = 0; i < story.chapters.length; i++) {
       doc.addPage();
       doc.setTextColor(44, 44, 44);
-      doc.setFont('times', 'bold');
+      doc.setFont('helvetica', 'bold');
       doc.setFontSize(14);
       doc.text('CHAPTER ' + (i + 1), pageWidth / 2, 20, {align: 'center'});
-      doc.setFont('times', 'normal');
-      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
 
       const lines = doc.splitTextToSize(cleanMarkdownForPDF(story.chapters[i].content || ''), textWidth);
       let y = 35;
@@ -3759,8 +3759,8 @@ async function generatePDFFallback() {
         if (y + lineHeight > pageHeight - margin) {
           doc.addPage();
           y = margin;
-          doc.setFont('times', 'normal');
-          doc.setFontSize(10);
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(11);
           doc.setTextColor(44, 44, 44);
         }
         doc.text(line, margin, y);
