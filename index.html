@@ -2267,9 +2267,19 @@ ${lotteryRule}
 
 After writing the story chapter, you MUST output a cover brief on a new line in this exact format with no variations:
 
+Generate 4 completely different Ideogram image prompts for this book cover. Each one must have a genuinely different visual style, layout, color palette, and typography direction.
+
+Rules for all 4:
+- Include the exact title '${outline.title}' and author name '${ans.author?.trim() || 'AnotherBook'}'
+- Match the mood and genre of the story
+- Each must look like it belongs to a different design school
+
 <coverBrief>
 {
-  "imagePrompt": "Write a big-type dominant book cover prompt using this structure: 'Big type dominant book cover design, the title text [ACTUAL TITLE] in massive oversized [FONT] font filling the entire cover, bold condensed letters edge to edge, [mood-appropriate painterly illustration] visible behind and through the large title letters, [color palette], abstract painterly background illustration bleeding through typography, contemporary literary publishing aesthetic, high contrast, print quality portrait book cover'. Always include the actual book title in the prompt. Typography must dominate — at least 60% of the cover filled with title text. Match background illustration to mood: dramatic/intense → fractured geometric shapes, bold color blocks, sharp diagonals, deep reds and blacks | mysterious/tense → dark atmospheric washes, shadowy abstract forms, deep navy or charcoal | sad/longing → soft muted watercolor washes, faded organic shapes, muted greens or grays | romantic/warm → warm flowing organic shapes, soft overlapping forms, amber and rose tones | hopeful/growth → bright open washes, upward organic lines, greens and warm yellows | literary/quiet → minimal single abstract object, lots of negative space, muted sophisticated palette | bold/political → flat high contrast color blocks, primary colors, stark geometric forms | modern/contemporary → clean gradient washes, subtle geometric accents, cool neutral tones | cute/playful → soft rounded bubbly typography, pastel watercolor illustration bleeding through letters, warm blush pink and creamy yellow palette, gentle floral or nature elements, soft and inviting, cozy storybook feel. ",
+  "cover1": "full ideogram prompt here...",
+  "cover2": "full ideogram prompt here...",
+  "cover3": "full ideogram prompt here...",
+  "cover4": "full ideogram prompt here...",
   "fontStyle": "[BARLOW for dramatic/intense | PLAYFAIR for romantic/warm | LIBRE for literary/quiet | CORMORANT for elegant/sad | NOTO_SANS_KR for Korean dramatic | NOTO_SERIF_KR for Korean literary]",
   "textColor": "[#FFFFFF for dark backgrounds | #0D0D0D for light backgrounds]",
   "accentColor": "[a bold contrasting hex color]",
@@ -2300,9 +2310,19 @@ ${lotteryRule}
 
 스토리 챕터를 쓴 후, 반드시 새 줄에 아래 형식 그대로 커버 브리프를 출력하세요. 형식을 바꾸지 마세요:
 
+이 책의 표지를 위해 완전히 다른 Ideogram 이미지 프롬프트 4개를 생성하세요. 각각은 시각적 스타일, 레이아웃, 색상 팔레트, 타이포그래피 방향이 진정으로 달라야 합니다.
+
+모든 4개의 규칙:
+- 정확한 제목 '${outline.title}'과 저자 이름 '${ans.author?.trim() || 'AnotherBook'}'을 포함하세요
+- 이야기의 분위기와 장르에 맞추세요
+- 각각은 다른 디자인 학파에 속하는 것처럼 보여야 합니다
+
 <coverBrief>
 {
-  "imagePrompt": "빅타입 도미넌트 북커버 프롬프트를 다음 구조로 작성하세요: 'Big type dominant book cover design, the title text [실제 제목] in massive oversized [FONT] font filling the entire cover, bold condensed letters edge to edge, [분위기에 맞는 페인터리 일러스트] visible behind and through the large title letters, [색상 팔레트], abstract painterly background illustration bleeding through typography, contemporary literary publishing aesthetic, high contrast, print quality portrait book cover'. 반드시 실제 책 제목을 프롬프트에 포함하세요. 타이포그래피가 커버의 60% 이상을 차지해야 합니다. 분위기별 배경 일러스트: dramatic/intense → 파편 기하학 형태, 굵은 색 블록, 날카로운 대각선, 진한 빨강과 검정 | mysterious/tense → 어두운 분위기의 워시, 그림자 추상 형태, 짙은 네이비나 차콜 | sad/longing → 부드러운 수채화 워시, 흐릿한 유기적 형태, 차분한 초록이나 회색 | romantic/warm → 따뜻하게 흐르는 유기적 형태, 부드럽게 겹치는 형태, 앰버와 로즈 톤 | hopeful/growth → 밝고 열린 워시, 위로 향하는 유기적 선, 초록과 따뜻한 노랑 | literary/quiet → 미니멀 단일 추상 오브젝트, 넓은 네거티브 스페이스, 절제된 세련된 팔레트 | bold/political → 고대비 색상 블록, 원색, 강렬한 기하학 형태 | modern/contemporary → 깔끔한 그라디언트 워시, 미묘한 기하학 포인트, 쿨 뉴트럴 톤 | cute/playful → soft rounded bubbly typography, pastel watercolor illustration bleeding through letters, warm blush pink and creamy yellow palette, gentle floral or nature elements, soft and inviting, cozy storybook feel. ",
+  "cover1": "full ideogram prompt here...",
+  "cover2": "full ideogram prompt here...",
+  "cover3": "full ideogram prompt here...",
+  "cover4": "full ideogram prompt here...",
   "fontStyle": "[BARLOW: 극적/강렬 | PLAYFAIR: 로맨틱/따뜻 | LIBRE: 문학적/차분 | CORMORANT: 우아/슬픔 | NOTO_SANS_KR: 한국어 극적 | NOTO_SERIF_KR: 한국어 문학적]",
   "textColor": "[어두운 배경은 #FFFFFF | 밝은 배경은 #0D0D0D]",
   "accentColor": "[강한 대비의 hex 색상]",
@@ -2343,7 +2363,7 @@ ${lotteryRule}
 
     const coverBrief = storedCoverBrief;
     const bookTitle = outline.title;
-    const authorName = ans.author || '어나더북';
+    const authorName = ans.author?.trim() || 'AnotherBook';
 
     if (coverBrief) {
       coverBrief.authorName = authorName;
@@ -3126,7 +3146,7 @@ async function generateFullCover(){
   await document.fonts.ready;
 
   const bookTitle = story?.title||'';
-  const authorName = ans.author||'어나더북';
+  const authorName = ans.author?.trim() || 'AnotherBook';
 
   const canvas = document.getElementById('cover-canvas');
   const previewImg = document.getElementById('cover-preview-img');
@@ -3504,6 +3524,7 @@ async function generatePDFPrimary(sp) {
     sp(65 + Math.round((ci+1)/story.chapters.length*30), `챕터 ${ch.number} PDF 작성 중...`);
     doc.addPage();
     globalPage++;
+    ch.pageNumber = doc.internal.getCurrentPageInfo().pageNumber;
 
     drawPageHeader();
     let y = mTop + 10;
@@ -3725,43 +3746,56 @@ async function generatePDFFallback() {
       });
     }
     const {jsPDF} = window.jspdf;
-    const doc = new jsPDF('p', 'mm', [127, 188]);
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: [139.7, 215.9] // 5.5 x 8.5 inches in mm (standard novel size)
+    });
+
+    const margin = 20; // 20mm margins
+    const pageWidth = doc.internal.pageSize.getWidth();   // 139.7mm
+    const pageHeight = doc.internal.pageSize.getHeight(); // 215.9mm
+    const textWidth = pageWidth - (margin * 2);           // 99.7mm usable
+
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(11);
+    doc.setFontSize(10.5);
+    const lineHeight = 5.5;
+    const paragraphSpacing = 4;
     doc.setCharSpace(0);
 
     // Page 1: Full cover image (canvas has the selected Ideogram image drawn on it)
     const coverCanvas = document.getElementById('cover-canvas');
     if (coverCanvas) {
       doc.addImage(coverCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0,
-        doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight());
+        pageWidth, pageHeight);
     } else {
       // Fallback solid color cover if canvas isn't available
       doc.setFillColor(61, 90, 71);
-      doc.rect(0, 0, 127, 188, 'F');
+      doc.rect(0, 0, pageWidth, pageHeight, 'F');
       doc.setTextColor(255, 255, 255);
       doc.setFont('times', 'bold');
       doc.setFontSize(20);
-      doc.text(story.title || 'My Story', 63.5, 80, {align: 'center', maxWidth: 100});
+      doc.text(story.title || 'My Story', pageWidth / 2, pageHeight / 2, {align: 'center', maxWidth: 100});
     }
+    const tocLineHeight = 10;
+    const chapters = story.chapters;
+
+    // Reserve TOC page — will be filled in after chapters are rendered
     doc.addPage();
+    const tocPageNum = doc.internal.getCurrentPageInfo().pageNumber;
 
-    const pageWidth  = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const margin     = 25;
-    const lineHeight = 7;
-    const textWidth  = pageWidth - (margin * 2);
-
-    for (let i = 0; i < story.chapters.length; i++) {
+    // Pass 1: render all chapter pages to capture accurate starting page numbers
+    for (let i = 0; i < chapters.length; i++) {
       doc.addPage();
-      doc.setTextColor(44, 44, 44);
+      chapters[i].pageNumber = doc.internal.getCurrentPageInfo().pageNumber;
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(14);
-      doc.text('CHAPTER ' + (i + 1), pageWidth / 2, 20, {align: 'center'});
+      doc.setFontSize(13);
+      doc.setTextColor(44, 44, 44);
+      doc.text(chapters[i].title, pageWidth / 2, 20, {align: 'center'});
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(11);
+      doc.setFontSize(10.5);
 
-      const lines = doc.splitTextToSize(cleanMarkdownForPDF(story.chapters[i].content || ''), textWidth);
+      const lines = doc.splitTextToSize(cleanMarkdownForPDF(chapters[i].content || ''), textWidth);
       let y = 35;
       const bottomMargin = margin + 15;
 
@@ -3769,13 +3803,44 @@ async function generatePDFFallback() {
         if (y + lineHeight > pageHeight - bottomMargin) {
           doc.addPage();
           doc.setFont('helvetica', 'normal');
-          doc.setFontSize(11);
+          doc.setFontSize(10.5);
           y = margin + 10;
         }
         doc.text(line, margin, y);
         y += lineHeight;
       });
     }
+
+    // Pass 2: go back to the reserved TOC page and fill it in with accurate page numbers
+    doc.setPage(tocPageNum);
+    doc.setFillColor(255, 255, 255);
+    doc.rect(0, 0, pageWidth, pageHeight, 'F');
+
+    doc.setTextColor(0);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.text('Contents', margin, margin + 10);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    let tocY = margin + 30;
+
+    chapters.forEach((chapter, index) => {
+      const chapterTitle = chapter.title || `Chapter ${index + 1}`;
+      const pageNum = chapter.pageNumber || '';
+
+      doc.setTextColor(0);
+      doc.text(chapterTitle, margin, tocY);
+      doc.text(String(pageNum), pageWidth - margin, tocY, { align: 'right' });
+
+      const dotsWidth = pageWidth - margin * 2 - doc.getTextWidth(chapterTitle) - doc.getTextWidth(String(pageNum)) - 4;
+      const dotCount = Math.floor(dotsWidth / doc.getTextWidth('.'));
+      doc.setTextColor(180);
+      doc.text('.'.repeat(dotCount), margin + doc.getTextWidth(chapterTitle) + 2, tocY);
+      doc.setTextColor(0);
+
+      tocY += 9;
+    });
 
     doc.save((story.title || 'my-story') + '.pdf');
     if(overlay) overlay.style.display = 'none';
@@ -3812,38 +3877,15 @@ function isKorean(text) {
 
 // ──────────── IDEOGRAM API ────────────
 async function generateBookCover(coverBrief) {
-  const typeWeight = {
-    'dramatic': 'massive bold condensed typography',
-    'intense': 'massive bold condensed typography',
-    'mysterious': 'large sharp serif typography',
-    'tense': 'large sharp condensed typography',
-    'sad': 'large delicate light serif typography',
-    'longing': 'large elegant thin serif typography',
-    'romantic': 'large flowing medium weight serif typography',
-    'warm': 'large soft medium weight typography',
-    'cute': 'large soft rounded bubbly typography',
-    'playful': 'large bouncy rounded typography',
-    'literary': 'large refined elegant serif typography',
-    'quiet': 'large minimal spaced serif typography',
-    'hopeful': 'large clean modern sans-serif typography',
-    'bold': 'massive heavy block typography'
-  };
+  console.log('coverBrief:', coverBrief);
 
-  const weight = Object.entries(typeWeight).find(([key]) =>
-    coverBrief.mood?.toLowerCase().includes(key)
-  )?.[1] || 'large bold typography';
-
-  const authorName = coverBrief.authorName || coverBrief.author || 'Unknown Author';
-
-  const styles = [
-    `Big type dominant, title '${coverBrief.titleLines.join(' ')}' in ${weight} filling entire cover, painterly illustration bleeding through letters, ${coverBrief.imagePrompt}, the book title '${coverBrief.titleLines.join(' ')}' dominates 75% of the cover in very large bold typography, the author name '${authorName}' takes up 25% of the cover in medium weight text at the bottom, clear size hierarchy between title and author name, no vertical text, no rotated text, all text horizontal only, no decorative words, no extra labels`,
-    `Centered minimal, title '${coverBrief.titleLines.join(' ')}' centered in ${weight}, lots of negative space, single abstract object, ${coverBrief.imagePrompt}, the book title '${coverBrief.titleLines.join(' ')}' dominates 75% of the cover in very large bold typography, the author name '${authorName}' takes up 25% of the cover in medium weight text at the bottom, clear size hierarchy between title and author name, no vertical text, no rotated text, all text horizontal only, no decorative words, no extra labels`,
-    `Split composition, top half painterly illustration, bottom half solid color block with title '${coverBrief.titleLines.join(' ')}' in ${weight}, ${coverBrief.imagePrompt}, the book title '${coverBrief.titleLines.join(' ')}' dominates 75% of the cover in very large bold typography, the author name '${authorName}' takes up 25% of the cover in medium weight text at the bottom, clear size hierarchy between title and author name, no vertical text, no rotated text, all text horizontal only, no decorative words, no extra labels`,
-    `Full bleed bold, solid deep color background, title '${coverBrief.titleLines.join(' ')}' in ${weight}, minimal graphic accent, ${coverBrief.imagePrompt}, the book title '${coverBrief.titleLines.join(' ')}' dominates 75% of the cover in very large bold typography, the author name '${authorName}' takes up 25% of the cover in medium weight text at the bottom, clear size hierarchy between title and author name, no vertical text, no rotated text, all text horizontal only, no decorative words, no extra labels`
-  ];
+  const prompt1 = coverBrief.cover1;
+  const prompt2 = coverBrief.cover2;
+  const prompt3 = coverBrief.cover3;
+  const prompt4 = coverBrief.cover4;
 
   const results = await Promise.all(
-    styles.map(prompt =>
+    [prompt1, prompt2, prompt3, prompt4].map(prompt =>
       fetch(`${window.PDF_SERVER_URL}/generate-cover`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
