@@ -1,0 +1,4337 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>어나더북 | 세상에 하나뿐인 나만의 소설</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:wght@900&family=DM+Serif+Display&family=Cormorant+Garamond:wght@700&family=Anton&family=Spectral:wght@800&family=Barlow+Condensed:wght@800,900&family=Dancing+Script:wght@700&family=DM+Sans:wght@700,900&family=Libre+Baskerville:wght@700&family=Noto+Sans+KR:wght@300;400;700;900&family=Noto+Serif+KR:wght@400;700&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+
+:root {
+  --burg: #7B1C31;
+  --burg-dk: #4A0F1C;
+  --burg-md: #5C1525;
+  --burg-lt: #9B2845;
+  --gold: #C9A84C;
+  --gold-lt: #DFC06E;
+  --gold-dk: #A8883C;
+  --cream: #FBF5E6;
+  --cream-dk: #F0E4C8;
+  --cream-dp: #E3D0AD;
+  --txt: #1E0E08;
+  --txt-md: #4A2E1E;
+  --txt-lt: #7A5A4A;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  font-family:'Noto Serif KR','Malgun Gothic',serif;
+  background:var(--cream);
+  color:var(--txt);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+.page{display:none;min-height:100vh;}
+.page.active{display:block;}
+
+/* ── BUTTONS ── */
+.btn-gold{
+  background:linear-gradient(135deg,var(--gold),var(--gold-lt));
+  color:var(--burg-dk);
+  border:none;
+  padding:16px 44px;
+  font-size:17px;font-weight:700;
+  font-family:'Noto Sans KR',sans-serif;
+  border-radius:50px;cursor:pointer;
+  transition:all .3s;
+  box-shadow:0 4px 24px rgba(201,168,76,.45);
+  letter-spacing:.5px;
+}
+.btn-gold:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(201,168,76,.55);}
+
+.btn-outline{
+  background:transparent;
+  color:var(--gold);
+  border:2px solid var(--gold);
+  padding:14px 36px;
+  font-size:15px;font-weight:600;
+  font-family:'Noto Sans KR',sans-serif;
+  border-radius:50px;cursor:pointer;
+  transition:all .3s;
+}
+.btn-outline:hover{background:var(--gold);color:var(--burg-dk);}
+
+/* ── NAV ── */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  padding:18px 40px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(74,15,28,.96);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(201,168,76,.2);
+}
+.nav-logo{
+  display:flex;align-items:center;gap:10px;
+  color:var(--gold);
+  font-size:20px;font-weight:700;
+  font-family:'Noto Serif KR',serif;letter-spacing:1px;
+}
+.nav-logo .book-icon{font-size:22px;}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;
+  background:linear-gradient(155deg,var(--burg-dk) 0%,var(--burg) 55%,var(--burg-lt) 100%);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  position:relative;overflow:hidden;
+  padding:120px 20px 80px;
+}
+
+/* Decorative circles */
+.hero::before{
+  content:'';
+  position:absolute;width:600px;height:600px;
+  border-radius:50%;
+  border:1px solid rgba(201,168,76,.08);
+  top:-100px;right:-100px;pointer-events:none;
+}
+.hero::after{
+  content:'';
+  position:absolute;width:400px;height:400px;
+  border-radius:50%;
+  border:1px solid rgba(201,168,76,.06);
+  bottom:-80px;left:-80px;pointer-events:none;
+}
+
+.hero-badge{
+  background:rgba(201,168,76,.12);
+  border:1px solid rgba(201,168,76,.35);
+  color:var(--gold-lt);
+  padding:8px 22px;border-radius:50px;
+  font-size:13px;
+  font-family:'Noto Sans KR',sans-serif;
+  margin-bottom:28px;display:inline-block;
+  letter-spacing:1.5px;
+}
+
+.hero-title{
+  font-size:clamp(38px,7vw,78px);
+  font-weight:900;color:var(--cream);
+  line-height:1.15;margin-bottom:10px;
+  font-family:'Noto Serif KR',serif;
+}
+.hero-title .gold-line{color:var(--gold);display:block;}
+
+.hero-tagline{
+  font-size:clamp(16px,2.5vw,22px);
+  color:rgba(251,245,230,.75);
+  margin-bottom:18px;
+  font-family:'Noto Serif KR',serif;
+  font-weight:300;font-style:italic;
+}
+
+.hero-desc{
+  font-size:15px;color:rgba(251,245,230,.55);
+  max-width:480px;margin:0 auto 48px;
+  font-family:'Noto Sans KR',sans-serif;line-height:1.9;
+}
+
+.hero-btns{
+  display:flex;gap:14px;flex-wrap:wrap;
+  justify-content:center;margin-bottom:80px;
+}
+
+/* Sample books */
+.books-row{
+  display:flex;gap:14px;justify-content:center;flex-wrap:wrap;
+}
+.book{
+  width:110px;height:155px;
+  border-radius:3px 10px 10px 3px;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:12px 10px;text-align:center;
+  position:relative;cursor:pointer;
+  transition:transform .35s;
+  box-shadow:-5px 5px 20px rgba(0,0,0,.5),
+             inset -3px 0 6px rgba(0,0,0,.3);
+}
+.book::before{
+  content:'';
+  position:absolute;left:0;top:0;bottom:0;width:10px;
+  background:rgba(0,0,0,.25);border-radius:3px 0 0 3px;
+}
+.book:hover{transform:translateY(-10px) rotate(3deg);}
+.book-em{font-size:26px;margin-bottom:8px;}
+.book-ttl{font-size:11px;font-weight:700;color:rgba(255,255,255,.92);
+  font-family:'Noto Sans KR',sans-serif;line-height:1.35;}
+
+/* ── FEATURES ── */
+.features{background:var(--cream-dk);padding:90px 20px;}
+.features-inner{max-width:960px;margin:0 auto;text-align:center;}
+.sec-title{font-size:30px;font-weight:700;color:var(--burg);
+  font-family:'Noto Serif KR',serif;margin-bottom:10px;}
+.sec-sub{color:var(--txt-lt);font-size:14px;
+  font-family:'Noto Sans KR',sans-serif;margin-bottom:50px;}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;}
+.feat-card{
+  background:white;border-radius:16px;padding:32px 22px;
+  border:1px solid var(--cream-dp);
+  transition:all .3s;text-align:left;
+}
+.feat-card:hover{transform:translateY(-5px);
+  box-shadow:0 14px 44px rgba(123,28,49,.1);border-color:var(--gold);}
+.feat-icon{font-size:34px;margin-bottom:14px;}
+.feat-name{font-size:17px;font-weight:700;color:var(--burg);
+  font-family:'Noto Sans KR',sans-serif;margin-bottom:8px;}
+.feat-desc{color:var(--txt-lt);font-size:13px;
+  font-family:'Noto Sans KR',sans-serif;line-height:1.75;}
+
+/* ── CTA BAND ── */
+.cta-band{background:var(--burg);padding:80px 20px;text-align:center;}
+.cta-band h2{font-size:30px;color:var(--cream);
+  font-family:'Noto Serif KR',serif;margin-bottom:14px;}
+.cta-band p{color:rgba(251,245,230,.65);font-family:'Noto Sans KR',sans-serif;
+  font-size:14px;margin-bottom:36px;}
+
+/* ── FOOTER ── */
+.footer{background:var(--burg-dk);color:rgba(251,245,230,.4);
+  text-align:center;padding:28px;font-size:12px;
+  font-family:'Noto Sans KR',sans-serif;}
+
+/* ── API KEY MODAL ── */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:999;
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.overlay.open{display:flex;}
+.modal-box{
+  background:white;border-radius:22px;padding:44px 36px;
+  max-width:480px;width:100%;text-align:center;
+  box-shadow:0 24px 80px rgba(0,0,0,.35);
+}
+.modal-icon{font-size:48px;margin-bottom:16px;}
+.modal-title{font-size:21px;font-weight:700;color:var(--burg);
+  font-family:'Noto Serif KR',serif;margin-bottom:10px;}
+.modal-desc{color:var(--txt-lt);font-size:13px;
+  font-family:'Noto Sans KR',sans-serif;line-height:1.8;margin-bottom:24px;}
+.modal-desc a{color:var(--burg);font-weight:600;}
+.inp{
+  width:100%;padding:14px 18px;font-size:15px;
+  font-family:'Noto Sans KR',sans-serif;
+  border:2px solid var(--cream-dp);border-radius:12px;
+  background:var(--cream);color:var(--txt);outline:none;
+  transition:border-color .2s;margin-bottom:14px;
+}
+.inp:focus{border-color:var(--burg);}
+.inp::placeholder{color:#B5A090;}
+.err{
+  background:#fee2e2;border:1px solid #fca5a5;color:#b91c1c;
+  padding:10px 14px;border-radius:8px;font-size:13px;
+  font-family:'Noto Sans KR',sans-serif;margin-bottom:12px;
+  display:none;
+}
+
+/* ── QUESTIONS PAGE ── */
+.q-header{
+  background:var(--burg-dk);padding:18px 36px;
+  display:flex;align-items:center;gap:24px;
+  position:sticky;top:0;z-index:100;
+}
+.q-logo{color:var(--gold);font-family:'Noto Serif KR',serif;
+  font-size:17px;font-weight:700;white-space:nowrap;}
+.prog-wrap{flex:1;max-width:420px;margin:0 auto;}
+.prog-txt{color:rgba(251,245,230,.6);font-size:12px;
+  font-family:'Noto Sans KR',sans-serif;margin-bottom:5px;text-align:center;}
+.prog-bar{height:4px;background:rgba(255,255,255,.12);border-radius:2px;overflow:hidden;}
+.prog-fill{
+  height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-lt));
+  border-radius:2px;transition:width .5s ease;
+}
+.q-spacer{width:120px;}
+
+.q-body{
+  max-width:760px;margin:0 auto;
+  padding:56px 24px 40px;
+  animation:fadeUp .4s ease;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+
+.q-num{font-size:11px;color:var(--gold);font-family:'Noto Sans KR',sans-serif;
+  font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:10px;}
+.q-title{font-size:26px;font-weight:700;color:var(--burg);
+  font-family:'Noto Serif KR',serif;line-height:1.3;margin-bottom:8px;}
+.q-sub{color:var(--txt-lt);font-size:14px;
+  font-family:'Noto Sans KR',sans-serif;margin-bottom:34px;}
+
+/* Card grid */
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(145px,1fr));
+  gap:11px;margin-bottom:36px;
+}
+.cards-grid.small{grid-template-columns:repeat(3,1fr);}
+.cards-grid.two-col{grid-template-columns:repeat(2,1fr);}
+.opt-card{
+  background:white;border:2px solid var(--cream-dp);
+  border-radius:13px;padding:16px 12px;
+  cursor:pointer;transition:all .22s;text-align:center;
+  font-family:'Noto Sans KR',sans-serif;
+}
+.opt-card:hover{border-color:var(--gold);background:rgba(201,168,76,.04);}
+.opt-card.sel{border-color:var(--burg);background:rgba(123,28,49,.07);
+  box-shadow:0 0 0 1px var(--burg);}
+.opt-em{font-size:26px;margin-bottom:7px;display:block;}
+.opt-lbl{font-size:12.5px;font-weight:500;color:var(--txt);line-height:1.3;}
+
+/* Tags */
+.tags-wrap{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:34px;}
+.tag{
+  background:white;border:2px solid var(--cream-dp);
+  border-radius:50px;padding:9px 16px;cursor:pointer;
+  transition:all .22s;font-family:'Noto Sans KR',sans-serif;
+  font-size:13px;font-weight:500;color:var(--txt-md);
+  display:flex;align-items:center;gap:6px;
+}
+.tag:hover{border-color:var(--gold);}
+.tag.sel{border-color:var(--burg);background:var(--burg);color:white;}
+
+/* Text inputs */
+.txt-inp{
+  width:100%;padding:14px 18px;font-size:16px;
+  font-family:'Noto Sans KR',sans-serif;
+  border:2px solid var(--cream-dp);border-radius:12px;
+  background:white;color:var(--txt);outline:none;
+  transition:border-color .2s;margin-bottom:36px;
+}
+.txt-inp:focus{border-color:var(--burg);}
+.txt-inp::placeholder{color:#B5A090;}
+.txt-area{
+  width:100%;padding:16px 18px;font-size:14.5px;
+  font-family:'Noto Sans KR',sans-serif;
+  border:2px solid var(--cream-dp);border-radius:12px;
+  background:white;color:var(--txt);outline:none;
+  transition:border-color .2s;min-height:130px;
+  resize:vertical;margin-bottom:36px;line-height:1.8;
+}
+.txt-area:focus{border-color:var(--burg);}
+.detail-field-label{font-size:13px;font-weight:700;color:var(--gold);margin:0 0 8px;letter-spacing:.3px;}
+.custom-box{margin-bottom:22px;display:none;}
+
+/* Nav */
+.q-nav{display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
+.btn-back{
+  background:none;border:none;color:var(--txt-lt);font-size:14px;
+  font-family:'Noto Sans KR',sans-serif;cursor:pointer;
+  display:flex;align-items:center;gap:6px;padding:10px 0;
+  transition:color .2s;
+}
+.btn-back:hover{color:var(--txt);}
+.btn-next{
+  background:linear-gradient(135deg,var(--burg),var(--burg-lt));
+  color:white;border:none;
+  padding:14px 36px;font-size:15px;font-weight:600;
+  font-family:'Noto Sans KR',sans-serif;
+  border-radius:50px;cursor:pointer;
+  transition:all .3s;
+  box-shadow:0 4px 18px rgba(123,28,49,.3);
+  display:flex;align-items:center;gap:8px;
+}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(123,28,49,.4);}
+
+/* ── LANGUAGE SELECTION ── */
+.lang-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:36px;}
+.lang-card{
+  background:white;border:2px solid var(--cream-dp);
+  border-radius:16px;padding:32px 20px;
+  cursor:pointer;transition:all .22s;text-align:center;
+  font-family:'Noto Sans KR',sans-serif;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+}
+.lang-card:hover{border-color:var(--gold);background:rgba(201,168,76,.04);}
+.lang-card.sel{border-color:var(--burg);background:rgba(123,28,49,.07);
+  box-shadow:0 0 0 1px var(--burg);}
+.lang-flag{font-size:52px;}
+.lang-name{font-size:16px;font-weight:700;color:var(--burg);}
+.lang-desc{font-size:13px;color:var(--txt-lt);line-height:1.4;}
+
+/* ── AGE GRID (Step 1) ── */
+.age-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:36px;}
+.age-card{
+  background:white;border:2px solid var(--cream-dp);border-radius:12px;
+  padding:16px 10px;cursor:pointer;text-align:center;
+  font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:600;color:var(--txt-md);
+  transition:all .2s;
+}
+.age-card:hover{border-color:var(--gold);background:rgba(201,168,76,.04);}
+.age-card.sel{border-color:var(--burg);background:rgba(123,28,49,.07);color:var(--burg);box-shadow:0 0 0 1px var(--burg);}
+
+/* ── GENDER CARDS (Step 2) ── */
+.field-label{font-size:13px;font-weight:700;color:var(--txt-md);margin:0 0 10px;letter-spacing:.3px;}
+.card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px;}
+.card-option{background:white;border:2px solid var(--cream-dp);border-radius:12px;padding:14px 10px;cursor:pointer;text-align:center;font-size:15px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--txt-md);transition:all .22s;}
+.card-option:hover{border-color:var(--gold);background:rgba(201,168,76,.04);}
+.card-option.sel{border-color:var(--burg);background:rgba(123,28,49,.07);color:var(--burg);box-shadow:0 0 0 1px var(--burg);}
+.btn-next:disabled{opacity:.45;cursor:not-allowed;transform:none !important;box-shadow:none !important;}
+
+/* ── HINT GRID (Steps 2 & 5) ── */
+.hint-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+.hint-item{background:var(--cream-dk);border-radius:12px;padding:14px 12px;text-align:center;}
+.hint-icon{font-size:22px;margin-bottom:5px;}
+.hint-cat{font-family:'Noto Sans KR',sans-serif;font-size:12.5px;font-weight:700;color:var(--txt-md);margin-bottom:4px;}
+.hint-ex{font-family:'Noto Sans KR',sans-serif;font-size:11.5px;color:var(--txt-lt);line-height:1.5;}
+
+/* ── TIP BOX ── */
+.tip-box{
+  background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);border-radius:10px;
+  padding:12px 16px;font-size:13px;font-family:'Noto Sans KR',sans-serif;
+  color:var(--txt-md);line-height:1.7;margin-bottom:24px;
+}
+
+/* ── SKIP & SUBMIT BUTTONS ── */
+.btn-skip{
+  background:none;border:2px solid var(--cream-dp);color:var(--txt-lt);
+  padding:11px 20px;font-size:13px;font-family:'Noto Sans KR',sans-serif;
+  border-radius:50px;cursor:pointer;transition:all .22s;white-space:nowrap;
+}
+.btn-skip:hover{border-color:var(--gold);color:var(--txt-md);}
+.btn-submit{
+  background:linear-gradient(135deg,var(--gold),var(--gold-lt));color:var(--burg-dk);border:none;
+  padding:14px 36px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;
+  border-radius:50px;cursor:pointer;transition:all .3s;
+  box-shadow:0 4px 20px rgba(201,168,76,.4);letter-spacing:.3px;
+}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(201,168,76,.5);}
+.step-nav-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;}
+
+@media(max-width:640px){
+  .age-grid{grid-template-columns:repeat(2,1fr);}
+  .hint-grid{grid-template-columns:repeat(2,1fr);}
+  .step-nav-right{flex-direction:column;align-items:stretch;}
+  .btn-skip,.btn-submit{text-align:center;}
+}
+
+/* ── LOADING ── */
+.loading-page{
+  background:linear-gradient(145deg,var(--burg-dk) 0%,var(--burg) 60%,var(--burg-lt) 100%);
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;padding:60px 28px;
+  position:relative;overflow:hidden;
+}
+.loading-page::before{
+  content:'';position:absolute;width:700px;height:700px;
+  border-radius:50%;border:1px solid rgba(201,168,76,.07);
+  top:-220px;right:-200px;pointer-events:none;
+}
+.loading-page::after{
+  content:'';position:absolute;width:500px;height:500px;
+  border-radius:50%;border:1px solid rgba(201,168,76,.05);
+  bottom:-160px;left:-160px;pointer-events:none;
+}
+
+/* Writing animation */
+.load-icon-wrap{margin-bottom:30px;position:relative;}
+.load-icon{font-size:70px;display:block;animation:pen-write 2.4s ease-in-out infinite;}
+@keyframes pen-write{
+  0%,100%{transform:rotate(-6deg) translateY(0);}
+  25%{transform:rotate(7deg) translateY(-8px);}
+  50%{transform:rotate(-3deg) translateY(4px);}
+  75%{transform:rotate(5deg) translateY(-4px);}
+}
+.load-lines-wrap{display:flex;flex-direction:column;gap:8px;align-items:center;margin-top:16px;}
+.load-line{height:3px;background:rgba(201,168,76,.4);border-radius:2px;animation:grow-line 1.8s ease-in-out infinite;}
+.load-line:nth-child(1){width:110px;animation-delay:0s;}
+.load-line:nth-child(2){width:80px;animation-delay:.35s;}
+.load-line:nth-child(3){width:95px;animation-delay:.7s;}
+@keyframes grow-line{0%,100%{opacity:.25;transform:scaleX(.6);}50%{opacity:1;transform:scaleX(1);}}
+
+.load-title{font-size:28px;font-weight:700;color:var(--cream);
+  font-family:'Noto Serif KR',serif;margin-bottom:8px;}
+.load-sub{color:rgba(251,245,230,.45);font-size:14px;
+  font-family:'Noto Sans KR',sans-serif;margin-bottom:24px;}
+.load-msg{
+  font-size:16px;color:var(--gold-lt);font-style:italic;
+  font-family:'Noto Sans KR',sans-serif;
+  margin-bottom:36px;min-height:50px;
+  transition:opacity .45s;max-width:400px;line-height:1.75;
+}
+
+/* Progress bar */
+.load-prog-wrap{width:100%;max-width:380px;margin-bottom:44px;}
+.load-prog-bar{
+  height:6px;background:rgba(255,255,255,.1);border-radius:3px;
+  overflow:hidden;margin-bottom:8px;
+}
+.load-prog-fill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--gold-dk),var(--gold),var(--gold-lt));
+  border-radius:3px;transition:width .9s ease;
+}
+.load-prog-txt{
+  color:rgba(251,245,230,.38);font-size:12px;
+  font-family:'Noto Sans KR',sans-serif;text-align:right;
+}
+
+/* Steps */
+.load-steps{display:flex;flex-direction:column;gap:10px;max-width:300px;width:100%;
+  max-height:300px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(201,168,76,.3) transparent;}
+.load-steps::-webkit-scrollbar{width:4px;}
+.load-steps::-webkit-scrollbar-track{background:transparent;}
+.load-steps::-webkit-scrollbar-thumb{background:rgba(201,168,76,.3);border-radius:2px;}
+.load-step{
+  display:flex;align-items:center;gap:12px;
+  color:rgba(251,245,230,.28);
+  font-family:'Noto Sans KR',sans-serif;font-size:14px;
+  padding:10px 16px;border-radius:10px;
+  border:1px solid transparent;
+  transition:all .4s;
+}
+.load-step.active{
+  color:rgba(251,245,230,.65);
+  border-color:rgba(255,255,255,.08);
+  background:rgba(255,255,255,.04);
+}
+.load-step.done{
+  color:rgba(251,245,230,.9);
+  background:rgba(201,168,76,.12);
+  border-color:rgba(201,168,76,.25);
+}
+.step-ico{font-size:16px;width:22px;text-align:center;flex-shrink:0;}
+
+/* ── STORY PAGE ── */
+.story-hdr{
+  background:linear-gradient(160deg,var(--burg-dk) 0%,var(--burg-md) 100%);
+  padding:70px 24px 60px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.story-hdr::before{
+  content:'"';font-size:400px;color:rgba(201,168,76,.05);
+  position:absolute;top:-80px;left:50%;transform:translateX(-50%);
+  font-family:'Noto Serif KR',serif;line-height:1;pointer-events:none;
+}
+.story-badge2{
+  background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.35);
+  color:var(--gold-lt);padding:6px 18px;border-radius:50px;
+  font-size:12px;font-family:'Noto Sans KR',sans-serif;
+  display:inline-block;margin-bottom:18px;letter-spacing:1.5px;
+}
+.story-main-title{
+  font-size:clamp(26px,5vw,52px);font-weight:900;
+  color:var(--cream);font-family:'Noto Serif KR',serif;
+  margin-bottom:14px;line-height:1.2;position:relative;z-index:1;
+}
+.story-author-line{color:var(--gold);font-size:16px;
+  font-family:'Noto Serif KR',serif;font-weight:300;position:relative;z-index:1;}
+
+/* TOC */
+.toc-sec{max-width:760px;margin:0 auto;padding:56px 24px 36px;}
+.toc-title{font-size:20px;font-weight:700;color:var(--burg);
+  font-family:'Noto Serif KR',serif;
+  margin-bottom:20px;padding-bottom:12px;
+  border-bottom:2px solid var(--cream-dp);}
+.toc-list{list-style:none;}
+.toc-row{
+  display:flex;align-items:center;padding:11px 0;
+  border-bottom:1px solid var(--cream-dk);gap:14px;
+}
+.toc-num{color:var(--gold);font-weight:700;
+  font-family:'Noto Sans KR',sans-serif;font-size:13px;min-width:22px;}
+.toc-ch-title{font-family:'Noto Serif KR',serif;color:var(--txt);font-size:14.5px;flex:1;}
+.toc-status{font-size:13px;white-space:nowrap;}
+.toc-status.toc-free{color:var(--gold-dk);font-weight:700;}
+.toc-status.toc-lock{color:var(--txt-lt);}
+.toc-cta-msg{
+  margin-top:28px;padding:20px 24px;
+  background:var(--burg);
+  border-radius:14px;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:15px;font-weight:700;color:white;
+  text-align:center;line-height:1.65;
+}
+
+/* Pricing section */
+.price-sec{background:var(--cream-dk);padding:64px 24px 72px;}
+
+/* Chapter */
+.ch-sec{max-width:760px;margin:0 auto;padding:20px 24px 56px;}
+.ch-label{font-size:11px;color:var(--gold);font-family:'Noto Sans KR',sans-serif;
+  font-weight:700;letter-spacing:2.5px;margin-bottom:8px;}
+.ch-title{font-size:26px;font-weight:700;color:var(--burg);
+  font-family:'Noto Serif KR',serif;}
+.ch-hdr{margin-bottom:28px;padding-bottom:18px;border-bottom:1.5px solid var(--cream-dp);}
+.ch-content{font-family:'Noto Serif KR',serif;font-size:17px;line-height:2.1;color:var(--txt);}
+.ch-content p{margin-bottom:26px;}
+em{font-style:italic;color:inherit;}
+
+/* Divider */
+.ornament{max-width:760px;margin:0 auto;padding:0 24px 40px;
+  display:flex;align-items:center;gap:16px;}
+.orn-line{flex:1;height:1px;background:var(--cream-dp);}
+.orn-ic{font-size:20px;color:var(--gold);}
+
+/* Free download */
+.dl-sec{max-width:760px;margin:0 auto;padding:0 24px 60px;text-align:center;}
+.dl-hint{color:var(--txt-lt);font-size:13px;font-family:'Noto Sans KR',sans-serif;margin-bottom:16px;}
+.btn-dl{
+  background:white;border:2px solid var(--burg);color:var(--burg);
+  padding:13px 30px;font-size:14px;font-weight:600;
+  font-family:'Noto Sans KR',sans-serif;
+  border-radius:50px;cursor:pointer;transition:all .3s;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn-dl:hover{background:var(--burg);color:white;}
+
+/* Lock section */
+.lock-sec{background:var(--cream-dk);padding:60px 24px;}
+
+.lock-preview{max-width:760px;margin:0 auto 56px;position:relative;}
+.lock-blur{
+  filter:blur(7px);pointer-events:none;user-select:none;
+  padding:36px;background:white;border-radius:16px;
+  border:1px solid var(--cream-dp);
+}
+.lock-overlay{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+}
+.lock-badge{
+  background:var(--burg);color:white;
+  padding:10px 26px;border-radius:50px;
+  font-size:14px;font-weight:700;
+  font-family:'Noto Sans KR',sans-serif;
+  display:flex;align-items:center;gap:8px;
+  box-shadow:0 4px 20px rgba(123,28,49,.4);
+}
+.lock-hint{color:var(--txt-md);font-family:'Noto Sans KR',sans-serif;
+  font-size:14px;text-align:center;line-height:1.7;}
+
+/* Pricing */
+.price-wrap{max-width:920px;margin:0 auto;text-align:center;}
+.price-title{font-size:28px;font-weight:700;color:var(--burg);
+  font-family:'Noto Serif KR',serif;margin-bottom:8px;}
+.price-sub{color:var(--txt-lt);font-size:14px;
+  font-family:'Noto Sans KR',sans-serif;margin-bottom:40px;}
+.price-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:20px;margin-bottom:28px;}
+.price-card{
+  background:white;border-radius:20px;padding:36px 24px;
+  border:2px solid var(--cream-dp);text-align:center;
+  position:relative;transition:all .3s;
+}
+.price-card:hover{transform:translateY(-5px);
+  box-shadow:0 18px 52px rgba(123,28,49,.12);}
+.price-card.pop{border-color:var(--burg);transform:scale(1.04);}
+.price-card.pop:hover{transform:scale(1.04) translateY(-5px);}
+.pop-badge{
+  position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,var(--gold),var(--gold-lt));
+  color:var(--burg-dk);padding:6px 18px;border-radius:50px;
+  font-size:12px;font-weight:700;
+  font-family:'Noto Sans KR',sans-serif;white-space:nowrap;
+  box-shadow:0 2px 12px rgba(201,168,76,.4);
+}
+.price-type{font-size:11px;color:var(--gold-dk);
+  font-family:'Noto Sans KR',sans-serif;font-weight:700;
+  letter-spacing:1.5px;margin-bottom:10px;}
+.price-name{font-size:19px;font-weight:700;color:var(--burg);
+  font-family:'Noto Serif KR',serif;margin-bottom:10px;}
+.price-desc{color:var(--txt-lt);font-size:13px;
+  font-family:'Noto Sans KR',sans-serif;line-height:1.65;margin-bottom:22px;}
+.price-amt{font-size:36px;font-weight:900;color:var(--txt);
+  font-family:'Noto Sans KR',sans-serif;margin-bottom:22px;}
+.price-amt small{font-size:16px;font-weight:400;color:var(--txt-lt);}
+.btn-price{
+  width:100%;padding:13px 22px;border-radius:50px;
+  font-size:14px;font-weight:700;
+  font-family:'Noto Sans KR',sans-serif;cursor:pointer;
+  transition:all .3s;
+}
+.btn-p1{background:linear-gradient(135deg,var(--burg),var(--burg-lt));
+  color:white;border:none;box-shadow:0 4px 18px rgba(123,28,49,.3);}
+.btn-p1:hover{box-shadow:0 8px 28px rgba(123,28,49,.4);transform:translateY(-1px);}
+.btn-p2{background:transparent;color:var(--burg);border:2px solid var(--burg);}
+.btn-p2:hover{background:var(--burg);color:white;}
+.price-note{color:var(--txt-lt);font-size:13px;
+  font-family:'Noto Sans KR',sans-serif;margin-top:18px;}
+
+/* New story */
+.new-story-sec{text-align:center;padding:60px 24px;background:var(--cream);}
+.new-story-hint{color:var(--txt-lt);font-size:14px;
+  font-family:'Noto Sans KR',sans-serif;margin-bottom:20px;}
+
+/* ── STORY CHAPTER NAV ── */
+.story-ch-nav{
+  background:var(--burg-dk);padding:12px 24px;
+  position:sticky;top:0;z-index:100;
+  overflow-x:auto;white-space:nowrap;
+  border-bottom:1px solid rgba(201,168,76,.2);
+}
+.story-ch-nav-inner{display:inline-flex;gap:8px;}
+.ch-nav-btn{
+  background:rgba(255,255,255,.07);border:1px solid rgba(201,168,76,.25);
+  color:rgba(251,245,230,.7);padding:6px 14px;border-radius:20px;
+  font-size:12px;font-weight:600;font-family:'Noto Sans KR',sans-serif;
+  cursor:pointer;transition:all .2s;white-space:nowrap;
+  text-decoration:none;display:inline-block;
+}
+.ch-nav-btn:hover{background:rgba(201,168,76,.2);color:var(--gold-lt);}
+
+/* ── PDF BUTTON ── */
+.btn-pdf{
+  background:linear-gradient(135deg,var(--burg),var(--burg-lt));color:white;border:none;
+  padding:14px 36px;font-size:15px;font-weight:700;
+  font-family:'Noto Sans KR',sans-serif;border-radius:50px;cursor:pointer;
+  transition:all .3s;box-shadow:0 4px 18px rgba(123,28,49,.3);
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn-pdf:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(123,28,49,.4);}
+
+/* Toast */
+#toast{
+  position:fixed;bottom:32px;left:50%;transform:translateX(-50%);
+  background:var(--burg);color:white;
+  padding:14px 28px;border-radius:50px;
+  font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:600;
+  z-index:9999;display:none;
+  box-shadow:0 8px 28px rgba(0,0,0,.3);
+  white-space:nowrap;
+}
+
+/* Responsive */
+@media(max-width:640px){
+  .nav{padding:14px 18px;}
+  .q-header{padding:14px 18px;}
+  .cards-grid{grid-template-columns:repeat(2,1fr);}
+  .cards-grid.small{grid-template-columns:repeat(3,1fr);}
+  .price-cards{grid-template-columns:1fr;}
+  .price-card.pop{transform:none;}
+  .price-card.pop:hover{transform:translateY(-5px);}
+  .q-spacer{display:none;}
+  .books-row{gap:8px;}
+  .book{width:90px;height:130px;}
+}
+
+/* ══════════════════════════════════════════
+   LANDING PAGE — 어나더북 REDESIGN
+══════════════════════════════════════════ */
+:root {
+  --lp-bg: #FDFAF5;
+  --lp-text: #2C2C2C;
+  --lp-green: #3D5A47;
+  --lp-green-dk: #2A3E32;
+  --lp-green-lt: rgba(61,90,71,0.1);
+  --lp-gold: #C4A882;
+  --lp-gold-lt: rgba(196,168,130,0.18);
+  --lp-text-lt: #7A7A6E;
+  --lp-border: rgba(196,168,130,0.25);
+}
+
+/* ── LP HERO ── */
+.lp-hero {
+  min-height: 100vh;
+  background-color: var(--lp-bg);
+  background-image:
+    radial-gradient(ellipse at 15% 15%, rgba(196,168,130,0.12) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 85%, rgba(61,90,71,0.07) 0%, transparent 55%),
+    repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(196,168,130,0.025) 40px, rgba(196,168,130,0.025) 41px);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.lp-nav {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: 30px 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+}
+.lp-brand {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--lp-green);
+  letter-spacing: 2px;
+}
+.lp-nav-cta {
+  background: transparent;
+  color: var(--lp-green);
+  border: 1.5px solid var(--lp-green);
+  padding: 10px 26px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Noto Sans KR', sans-serif;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.lp-nav-cta:hover { background: var(--lp-green); color: white; }
+
+.lp-hero-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 140px 24px 100px;
+}
+
+/* Floating decorative elements */
+.lp-deco {
+  position: absolute;
+  pointer-events: none;
+  color: var(--lp-gold);
+  opacity: 0.22;
+  animation: lp-float 6s ease-in-out infinite;
+}
+.lp-deco-1 { top: 15%; right: 8%; font-size: 44px; animation-delay: 0s; }
+.lp-deco-2 { bottom: 22%; left: 6%; font-size: 36px; animation-delay: 2s; }
+.lp-deco-3 { top: 60%; right: 5%; font-size: 28px; animation-delay: 4s; opacity: 0.15; }
+.lp-deco-4 { top: 20%; left: 7%; font-size: 22px; animation-delay: 1s; opacity: 0.15; }
+@keyframes lp-float {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-12px) rotate(5deg); }
+}
+
+.lp-hero-eyebrow {
+  display: inline-block;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--lp-green);
+  background: var(--lp-green-lt);
+  border: 1px solid rgba(61,90,71,0.2);
+  padding: 7px 20px;
+  border-radius: 50px;
+  margin-bottom: 32px;
+  text-transform: uppercase;
+}
+
+.lp-hero-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: clamp(38px, 6.5vw, 76px);
+  font-weight: 900;
+  color: var(--lp-text);
+  line-height: 1.15;
+  margin-bottom: 36px;
+  letter-spacing: -1px;
+}
+
+.lp-hero-desc {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: clamp(15px, 2vw, 17px);
+  color: var(--lp-text-lt);
+  line-height: 2.1;
+  margin-bottom: 48px;
+  max-width: 520px;
+}
+.lp-hero-desc p { margin: 0; }
+
+.lp-btn-primary {
+  background: var(--lp-green);
+  color: white;
+  border: none;
+  padding: 20px 56px;
+  font-size: 17px;
+  font-weight: 600;
+  font-family: 'Noto Sans KR', sans-serif;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 8px 36px rgba(61,90,71,0.32);
+  letter-spacing: 0.3px;
+}
+.lp-btn-primary:hover {
+  background: var(--lp-green-dk);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px rgba(61,90,71,0.42);
+}
+.lp-btn-primary-lg {
+  padding: 22px 72px;
+  font-size: 18px;
+}
+
+.lp-hero-scroll-hint {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--lp-text-lt);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  opacity: 0.6;
+  animation: lp-bounce 2.2s ease-in-out infinite;
+}
+.lp-hero-scroll-hint::after {
+  content: '↓';
+  font-size: 16px;
+}
+@keyframes lp-bounce {
+  0%,100% { transform: translateX(-50%) translateY(0); }
+  50%      { transform: translateX(-50%) translateY(6px); }
+}
+
+/* ── HOW IT WORKS ── */
+.lp-how-sec {
+  background: white;
+  padding: 110px 24px;
+}
+.lp-how-inner {
+  max-width: 980px;
+  margin: 0 auto;
+  text-align: center;
+}
+.lp-sec-label {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3.5px;
+  color: var(--lp-green);
+  margin-bottom: 14px;
+  text-transform: uppercase;
+}
+.lp-sec-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: clamp(24px, 4vw, 40px);
+  font-weight: 700;
+  color: var(--lp-text);
+  margin-bottom: 16px;
+  line-height: 1.3;
+}
+.lp-sec-sub {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  color: var(--lp-text-lt);
+  margin-bottom: 70px;
+  line-height: 1.7;
+}
+.lp-steps-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+.lp-step-card {
+  background: var(--lp-bg);
+  border-radius: 22px;
+  padding: 44px 28px 36px;
+  text-align: center;
+  border: 1px solid var(--lp-border);
+  transition: all 0.3s;
+  position: relative;
+}
+.lp-step-card::before {
+  content: attr(data-step);
+  position: absolute;
+  top: 20px; right: 22px;
+  font-family: 'Noto Serif KR', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--lp-gold);
+  opacity: 0.8;
+}
+.lp-step-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 24px 64px rgba(61,90,71,0.1);
+  border-color: var(--lp-gold);
+}
+.lp-step-icon {
+  font-size: 42px;
+  margin-bottom: 20px;
+  display: block;
+}
+.lp-step-card h3 {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--lp-text);
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+.lp-step-card p {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  color: var(--lp-text-lt);
+  line-height: 1.85;
+}
+
+/* ── STORY PREVIEW ── */
+.lp-preview-sec {
+  background: var(--lp-bg);
+  padding: 110px 24px;
+}
+.lp-preview-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+}
+.lp-book-wrap {
+  margin-top: 52px;
+  position: relative;
+}
+.lp-book-page {
+  background: white;
+  border-radius: 4px 18px 18px 4px;
+  padding: 60px 64px;
+  text-align: left;
+  position: relative;
+  box-shadow:
+    -10px 2px 28px rgba(0,0,0,0.06),
+    0 24px 72px rgba(0,0,0,0.08),
+    inset -6px 0 12px rgba(0,0,0,0.025);
+  border-left: 6px solid var(--lp-gold);
+}
+.lp-book-page::before {
+  content: '\201C';
+  font-family: 'Noto Serif KR', serif;
+  font-size: 140px;
+  color: var(--lp-gold);
+  opacity: 0.1;
+  position: absolute;
+  top: -20px;
+  left: 28px;
+  line-height: 1;
+  pointer-events: none;
+}
+.lp-book-chap {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--lp-green);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.lp-book-title-line {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--lp-text);
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--lp-border);
+}
+.lp-book-text {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 16.5px;
+  line-height: 2.3;
+  color: var(--lp-text);
+}
+.lp-book-text p { margin-bottom: 22px; }
+.lp-book-text p:last-child { margin-bottom: 0; }
+.lp-book-page-num {
+  text-align: center;
+  font-family: 'Noto Serif KR', serif;
+  font-size: 13px;
+  color: rgba(196,168,130,0.8);
+  margin-top: 28px;
+  letter-spacing: 3px;
+}
+.lp-preview-note {
+  margin-top: 28px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  color: var(--lp-text-lt);
+  font-style: italic;
+}
+
+/* ── PRICING ── */
+.lp-pricing-sec {
+  background: white;
+  padding: 110px 24px;
+}
+.lp-pricing-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  text-align: center;
+}
+.lp-price-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin: 64px 0 24px;
+  align-items: start;
+}
+.lp-price-card {
+  background: var(--lp-bg);
+  border-radius: 22px;
+  padding: 42px 28px;
+  border: 2px solid var(--lp-border);
+  text-align: center;
+  position: relative;
+  transition: all 0.3s;
+}
+.lp-price-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.07);
+}
+.lp-price-card.lp-featured {
+  border-color: var(--lp-green);
+  background: white;
+  box-shadow: 0 12px 48px rgba(61,90,71,0.14);
+  transform: scale(1.05);
+  padding-top: 52px;
+}
+.lp-price-card.lp-featured:hover {
+  transform: scale(1.05) translateY(-6px);
+}
+.lp-price-badge {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--lp-green);
+  color: white;
+  padding: 5px 18px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Noto Sans KR', sans-serif;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(61,90,71,0.35);
+}
+.lp-price-icon { font-size: 40px; margin-bottom: 14px; display: block; }
+.lp-price-name {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--lp-text);
+  margin-bottom: 8px;
+}
+.lp-price-desc {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  color: var(--lp-text-lt);
+  margin-bottom: 22px;
+  line-height: 1.75;
+  min-height: 40px;
+}
+.lp-price-amt {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--lp-green);
+  margin-bottom: 26px;
+  letter-spacing: -1px;
+}
+.lp-btn-price {
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Noto Sans KR', sans-serif;
+  cursor: pointer;
+  transition: all 0.28s;
+  border: 2px solid var(--lp-green);
+}
+.lp-btn-price-outline {
+  background: transparent;
+  color: var(--lp-green);
+}
+.lp-btn-price-outline:hover { background: var(--lp-green); color: white; }
+.lp-btn-price-solid {
+  background: var(--lp-green);
+  color: white;
+}
+.lp-btn-price-solid:hover { background: var(--lp-green-dk); }
+.lp-pricing-note {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  color: var(--lp-text-lt);
+  margin-top: 8px;
+}
+
+/* ── FINAL CTA ── */
+.lp-final-sec {
+  background: var(--lp-bg);
+  padding: 130px 24px;
+  text-align: center;
+  background-image:
+    radial-gradient(ellipse at 50% 100%, rgba(61,90,71,0.07) 0%, transparent 65%);
+  position: relative;
+  overflow: hidden;
+}
+.lp-final-sec::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  border: 1px solid rgba(196,168,130,0.12);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.lp-final-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: clamp(26px, 4vw, 48px);
+  font-weight: 700;
+  color: var(--lp-text);
+  margin-bottom: 44px;
+  line-height: 1.4;
+  position: relative;
+}
+.lp-final-footer-txt {
+  margin-top: 40px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13.5px;
+  color: var(--lp-text-lt);
+  letter-spacing: 0.3px;
+}
+
+/* ── LP FOOTER ── */
+.lp-footer {
+  background: white;
+  border-top: 1px solid var(--lp-border);
+  padding: 28px 24px;
+  text-align: center;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 12px;
+  color: var(--lp-text-lt);
+}
+
+/* ── LP RESPONSIVE ── */
+@media (max-width: 768px) {
+  .lp-nav { padding: 22px 24px; }
+  .lp-brand { font-size: 20px; }
+  .lp-hero-inner { padding: 120px 20px 80px; }
+  .lp-deco-1, .lp-deco-2, .lp-deco-3, .lp-deco-4 { display: none; }
+  .lp-steps-row { grid-template-columns: 1fr; gap: 16px; }
+  .lp-book-page { padding: 36px 28px; }
+  .lp-book-page::before { font-size: 80px; }
+  .lp-price-grid { grid-template-columns: 1fr; gap: 16px; }
+  .lp-price-card.lp-featured { transform: none; }
+  .lp-price-card.lp-featured:hover { transform: translateY(-6px); }
+}
+@media (max-width: 480px) {
+  .lp-nav-cta { display: none; }
+  .lp-btn-primary, .lp-btn-primary-lg { padding: 17px 40px; font-size: 16px; }
+}
+
+/* ── PDF PROGRESS OVERLAY ── */
+#pdf-progress-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.72);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+.pdf-prog-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 44px 52px;
+  text-align: center;
+  max-width: 380px;
+  width: 90%;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+  font-family: 'Noto Serif KR', serif;
+}
+.pdf-prog-icon { font-size: 44px; margin-bottom: 18px; }
+.pdf-prog-title { font-size: 19px; font-weight: 700; color: #2C2C2C; margin-bottom: 6px; }
+.pdf-prog-track {
+  background: #f0ede8;
+  border-radius: 6px;
+  height: 8px;
+  margin: 18px 0 10px;
+  overflow: hidden;
+}
+#pdf-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #3D5A47, #C4A882);
+  border-radius: 6px;
+  width: 0%;
+  transition: width 0.4s ease;
+}
+#pdf-progress-msg { font-size: 13px; color: #888; min-height: 20px; }
+
+/* ── PDF SUCCESS TOAST ── */
+#pdf-success-msg {
+  display: none;
+  position: fixed;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #3D5A47;
+  color: #fff;
+  padding: 20px 32px;
+  border-radius: 14px;
+  font-family: 'Noto Serif KR', serif;
+  font-size: 15px;
+  line-height: 1.7;
+  text-align: center;
+  z-index: 10000;
+  box-shadow: 0 8px 32px rgba(61,90,71,0.4);
+  white-space: nowrap;
+}
+
+/* ── COVER SELECT PAGE ── */
+.cover-sel-card {
+  background: white;
+  border: 2.5px solid var(--cream-dp);
+  border-radius: 16px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all .22s;
+  width: 300px;
+  position: relative;
+}
+.cover-sel-card:hover { border-color: var(--gold); }
+.cover-sel-card.sel {
+  border-color: var(--lp-green);
+  box-shadow: 0 0 0 1px var(--lp-green);
+}
+.cover-card-badge {
+  position: absolute;
+  top: -11px;
+  right: 16px;
+  background: linear-gradient(135deg, #C9A84C, #DFC06E);
+  color: #4A0F1C;
+  padding: 4px 14px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'Noto Sans KR', sans-serif;
+  box-shadow: 0 2px 8px rgba(201,168,76,.35);
+}
+.cover-card-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--lp-text);
+  text-align: center;
+  margin-bottom: 16px;
+}
+.cover-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(61,90,71,.15);
+  border-top-color: #3D5A47;
+  border-radius: 50%;
+  animation: cover-spin .8s linear infinite;
+  margin: 0 auto;
+}
+@keyframes cover-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 680px) {
+  .cover-sel-card { width: 100%; }
+  #cover-cards-row { flex-direction: column !important; align-items: center; }
+}
+
+/* ── COVER LOADING PAGE ── */
+.cover-loading-page{
+  background:linear-gradient(145deg,var(--burg-dk) 0%,var(--burg) 60%,var(--burg-lt) 100%);
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;padding:60px 28px;
+  position:relative;overflow:hidden;
+}
+.cover-loading-page::before{
+  content:'';position:absolute;width:600px;height:600px;
+  border-radius:50%;border:1px solid rgba(201,168,76,.07);
+  top:-200px;right:-180px;pointer-events:none;
+}
+.cover-loading-page::after{
+  content:'';position:absolute;width:400px;height:400px;
+  border-radius:50%;border:1px solid rgba(201,168,76,.05);
+  bottom:-140px;left:-140px;pointer-events:none;
+}
+.cover-load-pulse{
+  font-family:'Noto Serif KR',serif;font-size:20px;font-weight:700;
+  color:var(--gold);letter-spacing:3px;margin-bottom:40px;
+  animation:cover-pulse 2.4s ease-in-out infinite;
+}
+@keyframes cover-pulse{
+  0%,100%{opacity:.65;transform:scale(1);}
+  50%{opacity:1;transform:scale(1.05);}
+}
+.cover-load-icon{font-size:64px;display:block;margin-bottom:24px;
+  animation:cover-float 3s ease-in-out infinite;}
+@keyframes cover-float{
+  0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}
+}
+.cover-load-msg{
+  font-size:17px;color:var(--gold-lt);
+  font-family:'Noto Sans KR',sans-serif;font-style:italic;
+  min-height:30px;transition:opacity .45s;
+  max-width:400px;line-height:1.75;margin-bottom:32px;
+}
+.cover-load-dots{display:flex;gap:12px;justify-content:center;}
+.cover-load-dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.15);transition:all .4s;}
+.cover-load-dot.active{background:var(--gold);transform:scale(1.35);}
+.cover-load-dot.done{background:var(--gold-dk);}
+.cover-sel-card.sel{border-width:3px;}
+
+/* ── DEV MODE COVER MODAL ── */
+#dev-cover-modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;
+  display:none;align-items:center;justify-content:center;flex-direction:column;
+}
+.dev-modal-card{
+  background:#111;border:1px solid #333;border-radius:14px;
+  padding:24px 24px 20px;max-width:420px;width:90%;text-align:center;
+}
+.dev-modal-label{
+  color:#D4AF37;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;
+  margin-bottom:14px;font-family:monospace;
+}
+#dev-cover-canvas{width:100%;border-radius:8px;display:block;}
+.dev-modal-hint{color:#666;font-size:12px;margin-top:12px;letter-spacing:.5px;}
+.dev-modal-close{
+  margin-top:16px;padding:8px 24px;background:#222;color:#ccc;
+  border:1px solid #444;border-radius:6px;cursor:pointer;font-size:13px;
+  transition:background .2s;
+}
+.dev-modal-close:hover{background:#333;}
+</style>
+</head>
+<body>
+
+<!-- ══════════ HOME PAGE — 어나더북 ══════════ -->
+<div id="page-home" class="page active">
+
+  <!-- ── SECTION 1: HERO ── -->
+  <section class="lp-hero">
+    <nav class="lp-nav">
+      <div class="lp-brand">어나더북</div>
+      <button class="lp-nav-cta" onclick="startStory()">시작하기</button>
+    </nav>
+
+    <!-- Floating decorative elements -->
+    <div class="lp-deco lp-deco-1">📖</div>
+    <div class="lp-deco lp-deco-2">🌿</div>
+    <div class="lp-deco lp-deco-3">✦</div>
+    <div class="lp-deco lp-deco-4">❧</div>
+
+    <div class="lp-hero-inner">
+      <span class="lp-hero-eyebrow">AI 맞춤 소설 · 세상에 하나뿐인 책</span>
+      <h1 class="lp-hero-title">세상에 하나뿐인<br>나만의 소설</h1>
+      <div class="lp-hero-desc">
+        <p>누군가에게 특별한 선물을 하고 싶다면 🎁</p>
+        <p>또는 나 자신에게 특별한 경험을 주고 싶다면 💝</p>
+        <p>→ 세상에 하나뿐인 나만의 소설을 만들어보세요</p>
+      </div>
+      <button class="lp-btn-primary" onclick="startStory()">나만의 이야기 시작하기 →</button>
+    </div>
+
+    <div class="lp-hero-scroll-hint">SCROLL</div>
+  </section>
+
+  <!-- ── SECTION 2: HOW IT WORKS ── -->
+  <section class="lp-how-sec">
+    <div class="lp-how-inner">
+      <div class="lp-sec-label">HOW IT WORKS</div>
+      <h2 class="lp-sec-title">단 세 단계로 완성되는<br>나만의 이야기</h2>
+      <div class="lp-steps-row">
+        <div class="lp-step-card" data-step="01">
+          <span class="lp-step-icon">📝</span>
+          <h3>내 이야기를 알려주세요</h3>
+          <p>주인공의 이름, 관심사, 소중한 사람들을 알려주세요</p>
+        </div>
+        <div class="lp-step-card" data-step="02">
+          <span class="lp-step-icon">✨</span>
+          <h3>나만을 위한 소설이 완성돼요</h3>
+          <p>AI 작가가 당신만의 특별한 이야기를 써드려요</p>
+        </div>
+        <div class="lp-step-card" data-step="03">
+          <span class="lp-step-icon">📖</span>
+          <h3>세상에 하나뿐인 책</h3>
+          <p>디지털 또는 실물 책으로 간직하세요</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 3: STORY PREVIEW ── -->
+  <section class="lp-preview-sec">
+    <div class="lp-preview-inner">
+      <div class="lp-sec-label">스토리 미리보기</div>
+      <h2 class="lp-sec-title">이런 이야기가 만들어져요</h2>
+      <div class="lp-book-wrap">
+        <div class="lp-book-page">
+          <div class="lp-book-chap" id="lp-chap-label">챕터 1</div>
+          <div class="lp-book-title-line">봄날의 첫 페이지</div>
+          <div class="lp-book-text">
+            <p>지수는 오랫동안 잊고 있었던 그 냄새를 맡았다. 오래된 책장에서 나는 종이와 먼지, 그리고 어딘가 달콤한 잉크 냄새. 그 냄새는 마치 오래전 어린 시절의 어느 오후처럼, 말 없이도 많은 것을 이야기해 주었다.</p>
+            <p>창밖으로 봄비가 조용히 내리고 있었다. 지수는 창가에 기대어 빗소리에 귀를 기울이며 생각했다. 지금까지의 삶이 다른 누군가의 이야기처럼 느껴지는 날이 있다. 오늘이 바로 그런 날이었다.</p>
+            <p>그러나 이제부터는 달랐다. 이 도시 어딘가에 그녀만을 위한 이야기가 조용히 기다리고 있다는 것을, 지수는 왠지 모르게 알 수 있었다.</p>
+          </div>
+        </div>
+        <div class="lp-book-page-num">— 1 —</div>
+      </div>
+      <p class="lp-preview-note">✍️ 위 내용은 예시입니다. 당신의 이름과 이야기로 새롭게 완성됩니다.</p>
+    </div>
+  </section>
+
+  <!-- ── SECTION 4: PRICING ── -->
+  <section class="lp-pricing-sec">
+    <div class="lp-pricing-inner">
+      <div class="lp-sec-label">PRICING</div>
+      <h2 class="lp-sec-title">나만의 책을 완성하세요</h2>
+      <p class="lp-sec-sub">이야기는 무료로 미리보기 · 원하는 형태로 소장하세요</p>
+
+      <div class="lp-price-grid">
+        <div class="lp-price-card">
+          <span class="lp-price-icon">📱</span>
+          <div class="lp-price-name">디지털 PDF</div>
+          <div class="lp-price-desc">전체 10챕터 즉시 다운로드</div>
+          <div class="lp-price-amt">₩9,900</div>
+          <button class="lp-btn-price lp-btn-price-outline" onclick="showCoverSelect()">PDF 다운로드</button>
+        </div>
+
+        <div class="lp-price-card lp-featured">
+          <div class="lp-price-badge">⭐ 가장 인기</div>
+          <span class="lp-price-icon">📚</span>
+          <div class="lp-price-name">실물 책</div>
+          <div class="lp-price-desc">나만의 책이 집으로 배송돼요</div>
+          <div class="lp-price-amt">₩39,900</div>
+          <button class="lp-btn-price lp-btn-price-solid" onclick="showToast()">나만의 책 주문하기</button>
+        </div>
+
+        <div class="lp-price-card">
+          <span class="lp-price-icon">🎁</span>
+          <div class="lp-price-name">프리미엄 박스</div>
+          <div class="lp-price-desc">실물 책 + 디지털 PDF + 특별 패키지</div>
+          <div class="lp-price-amt">₩89,900</div>
+          <button class="lp-btn-price lp-btn-price-outline" onclick="showToast()">프리미엄으로 받기</button>
+        </div>
+      </div>
+
+      <p class="lp-pricing-note">* 결제 시스템은 곧 오픈됩니다! 기대해주세요 😊</p>
+    </div>
+  </section>
+
+  <!-- ── SECTION 5: FINAL CTA ── -->
+  <section class="lp-final-sec">
+    <h2 class="lp-final-title">지금 바로 나만의 이야기를<br>시작해보세요</h2>
+    <button class="lp-btn-primary lp-btn-primary-lg" onclick="startStory()">시작하기 →</button>
+    <p class="lp-final-footer-txt">어나더북 AI 작가가 당신만을 위해 씁니다 ✍️</p>
+  </section>
+
+  <footer class="lp-footer">
+    <p>© 2026 어나더북. 모든 이야기는 AI에 의해 생성됩니다.</p>
+  </footer>
+</div>
+
+<!-- ══════════ API KEY MODAL ══════════ -->
+<div id="modal-api" class="overlay">
+  <div class="modal-box">
+    <div class="modal-icon">🔑</div>
+    <h3 class="modal-title">API 키 입력</h3>
+    <p class="modal-desc">
+      이야기를 생성하려면 Anthropic API 키가 필요합니다.<br>
+      <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>에서 무료로 발급받으세요.<br><br>
+      API 키는 이 기기에만 저장되며 외부로 전송되지 않습니다.
+    </p>
+    <input type="password" id="api-inp" class="inp" placeholder="sk-ant-api03-..."
+      onkeydown="if(event.key==='Enter')submitKey()">
+    <div id="api-err" class="err"></div>
+    <button class="btn-gold" onclick="submitKey()" style="width:100%;justify-content:center;display:flex;">
+      이야기 만들기 시작 →
+    </button>
+  </div>
+</div>
+
+<!-- ══════════ QUESTIONS PAGE ══════════ -->
+<div id="page-questions" class="page">
+  <header class="q-header">
+    <div class="q-logo">📖 어나더북</div>
+    <div class="prog-wrap">
+      <div class="prog-txt" id="prog-txt">1 / 5</div>
+      <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+    <div class="q-spacer"></div>
+  </header>
+  <div id="q-body" class="q-body"></div>
+</div>
+
+<!-- ══════════ LOADING PAGE ══════════ -->
+<div id="page-loading" class="page">
+  <div class="loading-page">
+    <div class="load-icon-wrap">
+      <span class="load-icon">✍️</span>
+      <div class="load-lines-wrap">
+        <div class="load-line"></div>
+        <div class="load-line"></div>
+        <div class="load-line"></div>
+      </div>
+    </div>
+    <h2 class="load-title">이야기를 쓰고 있어요</h2>
+    <p class="load-sub">AI가 당신만을 위한 소설을 정성껏 집필 중입니다</p>
+    <div class="load-msg" id="load-msg">"이야기를 쓰고 있어요... 정말 재밌을 거예요!"</div>
+    <div class="load-prog-wrap">
+      <div class="load-prog-bar"><div class="load-prog-fill" id="load-prog-fill"></div></div>
+      <div class="load-prog-txt" id="load-prog-txt">준비 중...</div>
+    </div>
+    <div class="load-steps">
+      <div class="load-step active" id="ls1"><span class="step-ico">⏳</span><span>이야기 구조 설계 중...</span></div>
+      <div class="load-step" id="ls2"><span class="step-ico">⏳</span><span>챕터 제목 완성 중...</span></div>
+      <div class="load-step" id="ls3"><span class="step-ico">⏳</span><span>챕터 1 집필 중...</span></div>
+      <div class="load-step" id="ls4"><span class="step-ico">⏳</span><span>완성!</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ STORY PAGE ══════════ -->
+<div id="page-story" class="page">
+
+  <!-- Story Header -->
+  <div class="story-hdr" id="story-hdr">
+    <div class="story-badge2">📖 나만의 AI 스토리북</div>
+    <h1 class="story-main-title" id="s-title">이야기 제목</h1>
+  </div>
+
+  <!-- Section A: Chapter 1 (filled by JS) -->
+  <div class="ch-sec" id="ch1-section" style="max-width:760px;margin:0 auto;padding:40px 24px 40px;"></div>
+
+  <!-- Ornament divider -->
+  <div class="ornament">
+    <div class="orn-line"></div><div class="orn-ic">❧</div><div class="orn-line"></div>
+  </div>
+
+  <!-- Section B: Table of Contents -->
+  <div class="toc-sec" id="toc-sec">
+    <h2 class="toc-title">📋 전체 목차</h2>
+    <ul class="toc-list" id="toc-list"></ul>
+  </div>
+
+  <!-- Section C: Purchase -->
+  <div class="price-sec" id="price-sec">
+    <div class="price-wrap">
+      <h2 class="price-title">완전한 이야기를 받아보세요</h2>
+      <p class="price-sub">나머지 9개 챕터를 지금 바로 받아보세요</p>
+      <div class="price-cards">
+
+        <div class="price-card">
+          <div class="price-type">디지털 다운로드</div>
+          <div class="price-name">디지털 PDF</div>
+          <div class="price-desc">전체 10챕터 즉시 다운로드</div>
+          <div class="price-amt">₩9,900</div>
+          <button class="btn-price btn-p2" onclick="showCoverSelect('digital')">PDF로 받기</button>
+        </div>
+
+        <div class="price-card pop">
+          <div class="pop-badge">⭐ 가장 인기</div>
+          <div class="price-type">실물 책 주문</div>
+          <div class="price-name">실물 책</div>
+          <div class="price-desc">나만의 책이 집으로 배송돼요<br>PDF도 함께 제공</div>
+          <div class="price-amt">₩39,900</div>
+          <button class="btn-price btn-p1" onclick="showCoverSelect('physical')">책으로 받기</button>
+        </div>
+
+        <div class="price-card">
+          <div class="price-type">선물 박스</div>
+          <div class="price-name">선물 박스</div>
+          <div class="price-desc">실물 책 + PDF + 특별 패키징</div>
+          <div class="price-amt">₩59,900</div>
+          <button class="btn-price btn-p2" onclick="showCoverSelect('gift')">선물로 받기</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="new-story-sec">
+    <p class="new-story-hint">다른 이야기를 만들고 싶으신가요?</p>
+    <button class="btn-gold" onclick="goHome()">🔄 새 이야기 만들기</button>
+  </div>
+
+  <footer class="footer"><p>© 2026 어나더북. 모든 이야기는 AI에 의해 생성됩니다.</p></footer>
+</div>
+
+<!-- Toast -->
+<div id="toast">결제 시스템 준비 중입니다! 곧 오픈됩니다 😊</div>
+
+<!-- PDF Progress Overlay -->
+<div id="pdf-progress-overlay">
+  <div class="pdf-prog-card">
+    <div class="pdf-prog-icon">📖</div>
+    <div class="pdf-prog-title">PDF 생성 중</div>
+    <div class="pdf-prog-track">
+      <div id="pdf-progress-bar"></div>
+    </div>
+    <div id="pdf-progress-msg">준비 중...</div>
+  </div>
+</div>
+
+<!-- PDF Success Toast -->
+<div id="pdf-success-msg">PDF가 준비됐어요!<br>선물용으로 출력하거나 디지털로 전송하세요 📖</div>
+
+<!-- ══════════ COVER LOADING PAGE ══════════ -->
+<div id="page-cover-loading" class="page">
+  <div class="cover-loading-page">
+    <div class="cover-load-pulse">어나더북</div>
+    <span class="cover-load-icon" id="cover-load-icon">🎨</span>
+    <div class="cover-load-msg" id="cover-load-msg">🎨 AI가 표지 디자인을 구상하고 있어요...</div>
+    <div class="cover-load-dots">
+      <div class="cover-load-dot active" id="cld1"></div>
+      <div class="cover-load-dot" id="cld2"></div>
+      <div class="cover-load-dot" id="cld3"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ COVER SELECT PAGE ══════════ -->
+<div id="page-cover-select" class="page">
+  <header class="q-header">
+    <div class="q-logo">📖 어나더북</div>
+    <div class="q-spacer"></div>
+    <div class="q-spacer"></div>
+  </header>
+
+  <div style="max-width:840px;margin:0 auto;padding:48px 24px 72px;">
+    <h2 style="text-align:center;font-family:'Noto Serif KR',serif;font-size:26px;font-weight:700;color:#2C2C2C;margin-bottom:8px;">📖 표지 미리보기</h2>
+    <p style="text-align:center;color:var(--txt-lt);font-family:'Noto Sans KR',sans-serif;font-size:14px;margin-bottom:44px;">AI가 디자인한 표지예요</p>
+
+    <div style="display:flex;justify-content:center;margin-bottom:32px;">
+      <img id="cover-preview-img"
+        style="width:240px;height:360px;border-radius:3px 8px 8px 3px;box-shadow:-4px 4px 20px rgba(0,0,0,.32);display:none;object-fit:cover;" />
+      <canvas id="cover-canvas" width="800" height="1200"
+        style="width:240px;height:360px;border-radius:3px 8px 8px 3px;box-shadow:-4px 4px 20px rgba(0,0,0,.32);display:block;"></canvas>
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="text-align:center;max-width:480px;margin:0 auto;">
+      <button onclick="regenerateCover()"
+        style="background:transparent;border:2px solid #3D5A47;color:#3D5A47;width:100%;padding:14px 32px;font-size:14px;font-weight:600;font-family:'Noto Sans KR',sans-serif;border-radius:50px;cursor:pointer;transition:all .3s;margin-bottom:14px;">
+        🔄 표지 다시 생성하기
+      </button>
+      <button id="confirm-cover-btn" onclick="confirmCoverAndMakePDF()"
+        style="background:#3D5A47;color:white;border:none;width:100%;padding:18px 32px;font-size:16px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border-radius:50px;cursor:pointer;transition:all .3s;box-shadow:0 4px 20px rgba(61,90,71,.3);">
+        이 표지로 계속하기 →
+      </button>
+      <p style="margin-top:18px;">
+        <button onclick="goBackFromCoverSelect()"
+          style="background:none;border:none;color:var(--txt-lt);cursor:pointer;font-size:13px;font-family:'Noto Sans KR',sans-serif;">
+          ← 이야기로 돌아가기
+        </button>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+window.IDEOGRAM_API_KEY = '';
+
+// ──────────── DEV MODE ────────────
+// Set to true to bypass chapter lock and show all 10 chapters without payment.
+// Set to false before shipping to production.
+const DEV_MODE = true;
+
+// Set to true to generate ONLY Chapter 1 (3 parts) for quality testing.
+// Set to false to generate all 10 chapters normally.
+const TEST_CH1_ONLY = false;
+
+const PDF_SERVER_URL = 'https://anotherbook-server-production.up.railway.app';
+window.PDF_SERVER_URL = PDF_SERVER_URL;
+
+// ──────────── STATE ────────────
+let curStep = 1;
+let ans = {};
+let selectedLang = 'ko'; // "ko" or "en"
+let story = null;
+let apiKey = sessionStorage.getItem('ms_api') || '';
+let loadTimer = null;
+let coverDesign = null;
+let selectedProduct = 'digital'; // 'digital', 'physical', 'gift'
+let selectedCoverImage = null;
+let storedCoverBrief = null;
+
+// ──────────── QUESTIONNAIRE DATA ────────────
+const TOPICS = [
+  {e:'💰',l:'복권 당첨'},
+  {e:'🏋️',l:'다이어트 성공'},
+  {e:'🚀',l:'성공적인 사업 시작'},
+  {e:'🌍',l:'세계 여행'},
+  {e:'💼',l:'꿈의 직장 취업'},
+  {e:'🏠',l:'꿈의 집 구매'},
+  {e:'💪',l:'큰 도전 극복하기'},
+  {e:'👨‍👩‍👧',l:'완벽한 가족 찾기'},
+  {e:'🎓',l:'학교로 돌아가기'},
+  {e:'❤️',l:'진정한 사랑 찾기'},
+  {e:'🧬',l:'숨겨진 과거 발견'},
+  {e:'🏆',l:'대회에서 우승'},
+  {e:'🌟',l:'나만의 재능으로 빛나기'},
+  {e:'💫',l:'운명적인 사랑'},
+  {e:'✏️',l:'직접 주제 입력하기',custom:true}
+];
+const GENRES = [
+  {e:'😊',l:'따뜻하고 감동적인'},
+  {e:'😄',l:'유쾌하고 재미있는'},
+  {e:'💪',l:'영감을 주는'},
+  {e:'😢',l:'감성적이고 깊은'},
+  {e:'💕',l:'로맨틱한'},
+  {e:'🎭',l:'드라마틱한'},
+  {e:'🔪',l:'스릴러 / 서스펜스'},
+  {e:'👻',l:'공포 / 호러'},
+  {e:'🚀',l:'SF / 판타지'},
+  {e:'🕵️',l:'미스터리 / 추리'},
+  {e:'🌿',l:'힐링 / 잔잔한'},
+  {e:'👨‍👩‍👧',l:'가족 / 세대 이야기'}
+];
+const AGE_GROUPS = ['20대','30대','40대','50대 이상'];
+const GENDERS = ['여성','남성','기타'];
+
+// ──────────── PAGE NAV ────────────
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function goHome(){ showPage('page-home'); }
+
+function startStory(){
+  if(!apiKey){
+    document.getElementById('modal-api').classList.add('open');
+    return;
+  }
+  curStep=1; ans={}; selectedLang='en';
+  renderStep();
+  showPage('page-questions');
+}
+
+function submitKey(){
+  const v = document.getElementById('api-inp').value.trim();
+  const err = document.getElementById('api-err');
+  if(!v){ err.textContent='API 키를 입력해주세요.'; err.style.display='block'; return; }
+  if(!v.startsWith('sk-ant-')){
+    err.textContent='API 키는 "sk-ant-"로 시작해야 합니다.';
+    err.style.display='block'; return;
+  }
+  apiKey = v;
+  sessionStorage.setItem('ms_api', apiKey);
+  document.getElementById('modal-api').classList.remove('open');
+  err.style.display='none';
+  curStep=1; ans={}; selectedLang='en';
+  renderStep();
+  showPage('page-questions');
+}
+
+// ──────────── STEP RENDERER ────────────
+function renderStep(){
+  const pct = ((curStep-1)/7*100).toFixed(0);
+  document.getElementById('prog-fill').style.width = pct+'%';
+  document.getElementById('prog-txt').textContent = `${curStep} / 7`;
+  const body = document.getElementById('q-body');
+  body.style.animation='none'; void body.offsetHeight; body.style.animation='fadeUp .4s ease';
+  [null,renderLangStep,renderStep1,renderStep2,renderGenreStep,renderStep3,renderStep5,renderAuthorStep][curStep](body);
+}
+
+function renderLangStep(body){
+  ans.language = 'en';
+  selectedLang = 'en';
+  body.innerHTML = `
+    <div class="q-num">STEP 1 / 7</div>
+    <h2 class="q-title">영어 학습 소설을 만들어볼까요?</h2>
+    <p class="q-sub" style="margin-bottom:30px;">내가 주인공인 영어 소설로 공부하세요</p>
+    <div class="lang-grid" style="grid-template-columns:1fr;max-width:320px;margin:0 auto 36px;">
+      <div class="lang-card sel" onclick="pickLang('en')">
+        <span class="lang-flag">📚</span>
+        <span class="lang-name">영어 학습 소설 📚</span>
+        <span class="lang-desc">내가 주인공인 영어 소설로 공부하세요</span>
+      </div>
+    </div>
+    <div class="q-nav">
+      <button class="btn-back" onclick="goHome()">← 홈으로</button>
+      <button class="btn-next" onclick="nextStep()">다음 →</button>
+    </div>`;
+}
+
+function pickLang(lang){
+  ans.language = lang;
+  selectedLang = lang;
+  document.querySelectorAll('.lang-card').forEach((c,i)=>c.classList.toggle('sel',(i===0&&lang==='ko')||(i===1&&lang==='en')));
+}
+
+function renderStep1(body){
+  body.innerHTML = `
+    <div class="q-num">STEP 2 / 7</div>
+    <h2 class="q-title">주인공을 소개해주세요</h2>
+    <p class="q-sub">이야기의 주인공이 될 분의 이름과 나이대를 알려주세요</p>
+    <input class="txt-inp" id="inp-name" placeholder="이름을 입력해주세요... (예: 지수, 민준, 소연)" value="${ans.name||''}" onkeydown="if(event.key==='Enter')nextStep()">
+    ${ans.language === 'en' ? `<div class="tip-box" style="margin-bottom:16px;line-height:1.7;">💡 <strong>영어 소설을 선택하셨나요?</strong><br>한국 이름 입력 시 AI가 자동으로 영어식으로 표기해요.<br><span style="color:var(--txt-md)">예: 지수 → Jisoo, 민준 → Minjun, 서연 → Seoyeon</span><br><br>원하는 영어 표기가 따로 있다면 영어로 직접 입력하는 것을 추천해요!<br><span style="color:var(--txt-md)">예: "Ji-su", "Jay", "Sophia"</span></div>` : ''}
+    <div class="field-label">성별을 선택해주세요</div>
+    <div class="card-grid" id="gender-grid">
+      <button class="card-option${ans.gender==='여성'?' sel':''}" data-value="여성" onclick="pickGender('여성')">👩 여성</button>
+      <button class="card-option${ans.gender==='남성'?' sel':''}" data-value="남성" onclick="pickGender('남성')">👨 남성</button>
+      <button class="card-option${ans.gender==='기타'?' sel':''}" data-value="기타" onclick="pickGender('기타')">🧑 기타</button>
+    </div>
+    <div class="field-label">나이대를 선택해주세요</div>
+    <div class="age-grid" id="age-grid">
+      ${AGE_GROUPS.map(a=>`<div class="age-card${ans.ageGroup===a?' sel':''}" onclick="pickAge('${a}')">${a}</div>`).join('')}
+    </div>
+    <div id="step2-err" style="display:none;text-align:center;color:var(--txt-lt);font-size:13px;margin:-10px 0 14px;font-family:'Noto Sans KR',sans-serif;">성별과 나이대를 모두 선택해주세요 😊</div>
+    <div class="q-nav">
+      <button class="btn-back" onclick="prevStep()">← 이전</button>
+      <button class="btn-next" id="step2-next" onclick="nextStep()" ${ans.gender && ans.ageGroup ? '' : 'disabled'}>다음 →</button>
+    </div>`;
+  setTimeout(()=>document.getElementById('inp-name')?.focus(),80);
+}
+
+function renderStep2(body){
+  body.innerHTML = `
+    <div class="q-num">STEP 3 / 7</div>
+    <h2 class="q-title">주인공에 대해 더 알려주세요</h2>
+    <p class="q-sub">알고 있는 것만 적어주세요. 비워도 괜찮아요. 구체적일수록 더 특별한 이야기가 만들어져요.</p>
+    <p class="detail-field-label">👥 소중한 사람</p>
+    <textarea class="txt-area" id="inp-d1" style="min-height:72px;margin-bottom:18px;" placeholder="예: 10년 지기 친구 민지, 항상 웃게 만들어주는 존재 / 엄마, 말은 없지만 힘들 때 밥을 해줌">${ans.detailPeople||''}</textarea>
+    <p class="detail-field-label">🎯 취미나 관심사</p>
+    <textarea class="txt-area" id="inp-d2" style="min-height:72px;margin-bottom:18px;" placeholder="예: 새벽 산책, 필사, 식물 키우기, 오래된 책방 구경, 요리">${ans.detailHobbies||''}</textarea>
+    <p class="detail-field-label">📍 좋아하는 장소</p>
+    <textarea class="txt-area" id="inp-d3" style="min-height:72px;margin-bottom:18px;" placeholder="예: 집 근처 작은 카페, 한강 벤치, 강릉 바닷가, 동네 헌책방">${ans.detailPlaces||''}</textarea>
+    <p class="detail-field-label">🐾 반려동물</p>
+    <textarea class="txt-area" id="inp-d4" style="min-height:72px;margin-bottom:18px;" placeholder="예: 하얀 고양이 눈송이 14살, 골든리트리버 버터, 없음">${ans.detailPet||''}</textarea>
+    <p class="detail-field-label">🧠 성격 / MBTI</p>
+    <textarea class="txt-area" id="inp-d5" style="min-height:72px;margin-bottom:18px;" placeholder="예: INFJ, 조용하지만 한번 웃으면 온 방이 밝아짐, 걱정이 많지만 남 앞에서는 티 안 냄">${ans.detailPersonality||''}</textarea>
+    <p class="detail-field-label">💭 기타 꼭 넣고 싶은 것</p>
+    <textarea class="txt-area" id="inp-d6" style="min-height:72px;margin-bottom:18px;" placeholder="예: 꼭 나오는 대사, 실제 있었던 일, 특별한 물건, 좋아하는 음식">${ans.detailOther||''}</textarea>
+    <div class="q-nav">
+      <button class="btn-back" onclick="prevStep()">← 이전</button>
+      <div class="step-nav-right">
+        <button class="btn-skip" onclick="skipStep2()">건너뛰기 → AI가 알아서 채울게요 🤖</button>
+        <button class="btn-next" onclick="nextStep()">다음 →</button>
+      </div>
+    </div>`;
+}
+
+function renderGenreStep(body){
+  const cards = GENRES.map(g=>`
+    <div class="opt-card${ans.genres?.includes(g.l)?' sel':''}" onclick="pickGenre('${g.l}')" data-val="${g.l}">
+      <span class="opt-em">${g.e}</span>
+      <span class="opt-lbl">${g.l}</span>
+    </div>`).join('');
+  body.innerHTML = `
+    <div class="q-num">STEP 4 / 7</div>
+    <h2 class="q-title">어떤 분위기의 이야기를 원하세요?</h2>
+    <p class="q-sub">주인공의 이야기가 담길 장르와 감성을 선택해주세요</p>
+    <p class="q-sub" style="font-size:13px;margin-bottom:20px;">💡 최대 2개까지 선택할 수 있어요</p>
+    <div class="cards-grid two-col" id="genre-cards">${cards}</div>
+    <div class="q-nav">
+      <button class="btn-back" onclick="prevStep()">← 이전</button>
+      <button class="btn-next" onclick="nextStep()">다음 →</button>
+    </div>`;
+}
+
+function renderStep3(body){
+  const cards = TOPICS.map((t,i)=>`
+    <div class="opt-card${ans.topicIdx===i?' sel':''}" onclick="pickTopic(${i})">
+      <span class="opt-em">${t.e}</span>
+      <span class="opt-lbl">${t.l}</span>
+    </div>`).join('');
+  body.innerHTML = `
+    <div class="q-num">STEP 5 / 7</div>
+    <h2 class="q-title">어떤 이야기를 원하시나요?</h2>
+    <p class="q-sub">주인공이 경험하게 될 이야기의 주제를 선택해주세요</p>
+    <div class="cards-grid">${cards}</div>
+    <div class="custom-box" id="custom-box" style="${ans.topicIdx===14?'display:block':''}">
+      <input class="txt-inp" id="custom-inp" style="margin-bottom:0" placeholder="직접 입력해주세요..." value="${ans.topicCustom||''}">
+    </div>
+    <div class="q-nav">
+      <button class="btn-back" onclick="prevStep()">← 이전</button>
+      <button class="btn-next" onclick="nextStep()">다음 →</button>
+    </div>`;
+}
+
+
+function renderStep5(body){
+  body.innerHTML = `
+    <div class="q-num">STEP 6 / 7</div>
+    <h2 class="q-title">특별히 넣고 싶은 장면이 있나요? ✨</h2>
+    <p class="q-sub">기억에 남기고 싶은 장면을 자유롭게 적어주세요. 비워도 괜찮아요.</p>
+    <p class="detail-field-label">📍 장소</p>
+    <textarea class="txt-area" id="inp-s1" style="min-height:72px;margin-bottom:18px;" placeholder="예: 파리 에펠탑 앞, 제주 성산일출봉, 강릉 바닷가, 우리가 처음 만난 카페">${ans.scenePlaces||''}</textarea>
+    <p class="detail-field-label">👥 사람</p>
+    <textarea class="txt-area" id="inp-s2" style="min-height:72px;margin-bottom:18px;" placeholder="예: 첫사랑과의 재회, 오랜 친구와의 만남, 돌아가신 할머니와의 추억">${ans.scenePeople||''}</textarea>
+    <p class="detail-field-label">✨ 특별한 순간</p>
+    <textarea class="txt-area" id="inp-s3" style="min-height:72px;margin-bottom:18px;" placeholder="예: 깜짝 프로포즈, 뜻밖의 선물, 생일 파티, 졸업식날">${ans.sceneMoments||''}</textarea>
+    <p class="detail-field-label">💬 꼭 나왔으면 하는 대사</p>
+    <textarea class="txt-area" id="inp-s4" style="min-height:72px;margin-bottom:18px;" placeholder="예: &quot;괜찮아, 네 편이야&quot;, &quot;늦었지만 미안해&quot;, &quot;사랑해&quot;">${ans.sceneDialogue||''}</textarea>
+    <div class="q-nav">
+      <button class="btn-back" onclick="prevStep()">← 이전</button>
+      <div class="step-nav-right">
+        <button class="btn-skip" onclick="skipToAuthor()">⏭️ 건너뛰기</button>
+        <button class="btn-next" onclick="nextStep()">다음 →</button>
+      </div>
+    </div>`;
+}
+
+function renderAuthorStep(body){
+  const defaultName = selectedLang === 'ko' ? '어나더북' : 'AnotherBook';
+  const tipText = selectedLang === 'ko'
+    ? `💡 본인 이름, 선물받는 분 이름, 또는 그냥 두시면 '어나더북'으로 설정돼요`
+    : `💡 본인 이름 또는 선물받는 분 이름을 입력하세요. 비워두면 'AnotherBook'으로 설정돼요. 한국어 이름은 자동으로 영문으로 변환돼요.`;
+  body.innerHTML = `
+    <div class="q-num">STEP 7 / 7</div>
+    <h2 class="q-title">저자명을 입력해주세요</h2>
+    <p class="q-sub">책 표지와 내지에 들어갈 이름이에요</p>
+    <input class="txt-inp" id="inp-author" placeholder="${defaultName}" value="${ans.author||''}"
+      onkeydown="if(event.key==='Enter')submitWithAuthor()">
+    <div class="tip-box">${tipText}</div>
+    <div class="q-nav">
+      <button class="btn-back" onclick="prevStep()">← 이전</button>
+      <div class="step-nav-right">
+        <button class="btn-skip" onclick="skipAuthorAndGenerate()">건너뛰기 🤖</button>
+        <button class="btn-submit" onclick="submitWithAuthor()">✨ 이야기 만들기</button>
+      </div>
+    </div>`;
+  setTimeout(()=>document.getElementById('inp-author')?.focus(),80);
+}
+
+// ──────────── STEP PICKERS ────────────
+function pickGender(g){
+  ans.gender=g;
+  document.querySelectorAll('#gender-grid .card-option').forEach(c=>c.classList.toggle('sel',c.dataset.value===g));
+  updateStep2Next();
+}
+function pickAge(a){
+  ans.ageGroup=a;
+  document.querySelectorAll('#age-grid .age-card').forEach(c=>c.classList.toggle('sel',c.textContent.trim()===a));
+  updateStep2Next();
+}
+function updateStep2Next(){
+  const btn=document.getElementById('step2-next');
+  const err=document.getElementById('step2-err');
+  const ready=!!(ans.gender && ans.ageGroup);
+  const hasOne=!!(ans.gender || ans.ageGroup);
+  if(btn) btn.disabled=!ready;
+  if(err) err.style.display=(!ready && hasOne)?'block':'none';
+}
+function pickTopic(i){
+  ans.topicIdx=i;
+  document.querySelectorAll('#q-body .opt-card').forEach((c,idx)=>c.classList.toggle('sel',idx===i));
+  const box=document.getElementById('custom-box');
+  if(box) box.style.display=TOPICS[i].custom?'block':'none';
+  if(TOPICS[i].custom) setTimeout(()=>document.getElementById('custom-inp')?.focus(),60);
+}
+function pickGenre(l){
+  if(!ans.genres) ans.genres=[];
+  const idx=ans.genres.indexOf(l);
+  if(idx>-1){ ans.genres.splice(idx,1); }
+  else { if(ans.genres.length>=2) return; ans.genres.push(l); }
+  document.querySelectorAll('#genre-cards .opt-card').forEach(c=>c.classList.toggle('sel',ans.genres.includes(c.dataset.val)));
+}
+
+// ──────────── STEP NAVIGATION ────────────
+function nextStep(){
+  if(curStep===1){
+    if(!ans.language){alert('언어를 선택해주세요.');return;}
+  }
+  if(curStep===2){
+    const name=(document.getElementById('inp-name')?.value||'').trim();
+    if(!name){alert('이름을 입력해주세요.');return;}
+    if(!ans.gender || !ans.ageGroup){
+      const err=document.getElementById('step2-err');
+      if(err){err.style.display='block';err.scrollIntoView({behavior:'smooth',block:'center'});}
+      return;
+    }
+    ans.name=name;
+  }
+  if(curStep===3){
+    const d1=(document.getElementById('inp-d1')?.value||'').trim();
+    const d2=(document.getElementById('inp-d2')?.value||'').trim();
+    const d3=(document.getElementById('inp-d3')?.value||'').trim();
+    const d4=(document.getElementById('inp-d4')?.value||'').trim();
+    const d5=(document.getElementById('inp-d5')?.value||'').trim();
+    const d6=(document.getElementById('inp-d6')?.value||'').trim();
+    ans.detailPeople=d1; ans.detailHobbies=d2; ans.detailPlaces=d3;
+    ans.detailPet=d4; ans.detailPersonality=d5; ans.detailOther=d6;
+    const parts=[
+      d1&&`소중한 사람: ${d1}`,
+      d2&&`취미/관심사: ${d2}`,
+      d3&&`좋아하는 장소: ${d3}`,
+      d4&&`반려동물: ${d4}`,
+      d5&&`성격/MBTI: ${d5}`,
+      d6&&`기타: ${d6}`
+    ].filter(Boolean);
+    ans.personalDetails=parts.join('\n')||'';
+  }
+  if(curStep===4){
+    if(!ans.genres||ans.genres.length===0){alert('장르를 최소 1개 선택해주세요.');return;}
+  }
+  if(curStep===5){
+    if(ans.topicIdx===undefined){alert('이야기 주제를 선택해주세요.');return;}
+    if(TOPICS[ans.topicIdx].custom){
+      const cv=(document.getElementById('custom-inp')?.value||'').trim();
+      if(!cv){alert('주제를 직접 입력해주세요.');return;}
+      ans.topicCustom=cv; ans.topic=cv;
+    } else {
+      ans.topic=TOPICS[ans.topicIdx].l;
+    }
+  }
+  if(curStep===6){
+    const s1=(document.getElementById('inp-s1')?.value||'').trim();
+    const s2=(document.getElementById('inp-s2')?.value||'').trim();
+    const s3=(document.getElementById('inp-s3')?.value||'').trim();
+    const s4=(document.getElementById('inp-s4')?.value||'').trim();
+    ans.scenePlaces=s1; ans.scenePeople=s2; ans.sceneMoments=s3; ans.sceneDialogue=s4;
+    const parts=[
+      s1&&`장소: ${s1}`,
+      s2&&`사람: ${s2}`,
+      s3&&`특별한 순간: ${s3}`,
+      s4&&`대사: ${s4}`
+    ].filter(Boolean);
+    ans.specialScenes=parts.join('\n')||'';
+  }
+  if(curStep<7){curStep++;renderStep();}
+}
+function prevStep(){
+  if(curStep>1){curStep--;renderStep();}
+  else goHome();
+}
+function skipStep2(){
+  ans.detailPeople=''; ans.detailHobbies=''; ans.detailPlaces='';
+  ans.detailPet=''; ans.detailPersonality=''; ans.detailOther='';
+  ans.personalDetails=''; curStep=5; renderStep();
+}
+function skipToAuthor(){
+  ans.scenePlaces=''; ans.scenePeople=''; ans.sceneMoments=''; ans.sceneDialogue='';
+  ans.specialScenes=''; curStep=7; renderStep();
+}
+function skipAuthorAndGenerate(){
+  ans.author = selectedLang === 'ko' ? '어나더북' : 'AnotherBook';
+  generateStory();
+}
+function submitWithAuthor(){
+  const raw = (document.getElementById('inp-author')?.value||'').trim();
+  ans.author = raw || (selectedLang === 'ko' ? '어나더북' : 'AnotherBook');
+  generateStory();
+}
+
+async function resolveAuthorDisplay(){
+  const raw = ans.author?.trim() || (selectedLang === 'ko' ? '어나더북' : 'AnotherBook');
+  if(selectedLang !== 'ko'){
+    const hasKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(raw);
+    if(hasKorean){
+      try{
+        const romanized = await apiCall(
+          `Romanize this Korean name into natural English order (given name first, family name last, no hyphens unless conventional): "${raw}"\nRespond with ONLY the romanized name, nothing else.`,
+          30
+        );
+        ans.authorDisplay = romanized.trim() || 'AnotherBook';
+      } catch(e){
+        ans.authorDisplay = 'AnotherBook';
+      }
+    } else {
+      ans.authorDisplay = raw || 'AnotherBook';
+    }
+  } else {
+    ans.authorDisplay = raw || '어나더북';
+  }
+}
+
+// ──────────── LOADING ────────────
+const MSGS = [
+  '"이야기를 쓰고 있어요... 정말 재밌을 거예요!"',
+  '"당신만의 특별한 요소를 추가하고 있어요..."',
+  '"관심사를 이야기에 녹여내고 있어요..."',
+  '"캐릭터에 생명을 불어넣고 있어요..."',
+  '"흥미로운 반전을 준비하고 있어요..."',
+  '"거의 다 됐어요... 최고의 부분이 오고 있어요!"',
+  '"마지막 마무리를 하고 있어요..."'
+];
+
+function startLoading(){
+  let mi=0;
+  const el=document.getElementById('load-msg');
+  loadTimer=setInterval(()=>{
+    el.style.opacity='0';
+    setTimeout(()=>{ mi=(mi+1)%MSGS.length; el.textContent=MSGS[mi]; el.style.opacity='1'; },400);
+  },3200);
+}
+
+function stopLoading(){ clearInterval(loadTimer); }
+
+// ──────────── GENERATE HELPERS ────────────
+async function apiCall(promptText, maxTok, systemPrompt){
+  const body = {
+    model:'claude-opus-4-7',
+    max_tokens: maxTok,
+    messages:[{role:'user', content: promptText}]
+  };
+  if(systemPrompt) body.system = systemPrompt;
+  const res = await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body: JSON.stringify(body)
+  });
+  if(!res.ok){
+    const e = await res.json().catch(()=>({error:{message:'알 수 없는 오류'}}));
+    throw new Error(e.error?.message||`HTTP ${res.status}`);
+  }
+  const data = await res.json();
+  return data.content[0].text.trim();
+}
+
+function extractJSON(raw){
+  try {
+    const start=raw.indexOf('{'), end=raw.lastIndexOf('}');
+    return JSON.parse(raw.substring(start,end+1));
+  } catch(e){
+    const m=raw.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if(m) return JSON.parse(m[1].trim());
+    throw new Error('이야기 파싱 오류');
+  }
+}
+
+function markLoadStep(id){
+  const s=document.getElementById(id);
+  if(s){ s.classList.remove('active'); s.classList.add('done'); s.querySelector('.step-ico').textContent='✅';
+    s.scrollIntoView({block:'nearest',behavior:'smooth'}); }
+  const order=['ls1','ls2','ls3','ls4'];
+  const idx=order.indexOf(id);
+  if(idx>=0){
+    const next=document.getElementById(order[idx+1]);
+    if(next) next.classList.add('active');
+    setProgress(idx===3 ? 100 : Math.round((idx+1)/4*100));
+  }
+}
+
+function setProgress(pct, txt){
+  const fill=document.getElementById('load-prog-fill');
+  const label=document.getElementById('load-prog-txt');
+  if(fill) fill.style.width=Math.min(100,pct)+'%';
+  if(label && txt) label.textContent=txt;
+  else if(label) label.textContent=Math.round(Math.min(100,pct))+'% 완료';
+}
+
+function setLoadMsg(msg){
+  const el=document.getElementById('load-msg');
+  if(!el) return;
+  el.style.opacity='0';
+  setTimeout(()=>{ el.textContent=msg; el.style.opacity='1'; },400);
+}
+
+// ──────────── GENERATE ────────────
+async function generateStory(){
+  await resolveAuthorDisplay();
+  showPage('page-loading');
+  ['ls1','ls2','ls3','ls4'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(el){ el.classList.remove('done','active'); el.querySelector('.step-ico').textContent='⏳'; }
+    if(i===0 && el) el.classList.add('active');
+  });
+  setProgress(0,'준비 중...');
+  startLoading();
+
+  const isEnglish = selectedLang === 'en';
+  const languageInstruction = selectedLang === 'ko'
+    ? `IMPORTANT: Write the ENTIRE story in Korean (한국어) as the primary language. All narrative and descriptions must be in Korean.\nHowever, you MAY use English words or sentences naturally when:\n- A character is speaking English in the scene\n- A character is learning English and practices it\n- English words appear naturally in Korean daily life (e.g. 카페, 오케이, Fighting!)\n- Signs, menus, or text in the story are in English\nThis mirrors how real Korean literary fiction is written — Korean-first but naturally incorporating English where it fits the story organically.`
+    : `IMPORTANT: Write the ENTIRE story in English only. All narrative and dialogue must be in English. Keep Korean proper nouns romanized (e.g. Gangneung, Seo-yeon, doenjang jjigae) but do not write any Korean characters anywhere in the story.`;
+  const writerRole = isEnglish
+    ? `You are a bestselling English novelist.\nStyle: Literary commercial fiction, warm and emotional tone.\nVocabulary: Natural adult English, accessible but sophisticated.\nProtagonist: ${ans.name}\n\nFormatting: You may use *italic* sparingly for emphasis (internal thoughts, a single stressed word). Never use **bold** — bold markdown is unprofessional in literary fiction body text and must not appear anywhere in the story.\n\nYou may naturally include Korean words and phrases where they feel authentic to the story.\nROMANIZED Korean words are ALWAYS fine: names (eomma, appa, unnie, oppa, sunbae), food (japchae, kimbap, tteokbokki, samgyeopsal), places (Hongdae, Sinchon, Yeouido), expressions (daebak, aigoo, fighting).\nHANGUL SCRIPT is also fine to use naturally: pet names (뭉치), affectionate calls (지수야, 엄마), money amounts (30억 원), signs/menus, brief Korean dialogue when a character speaks Korean.\nUse both romanized and Hangul naturally as a skilled literary author would.\n\nThis is an English language book. Write everything in English only. No Korean characters anywhere in the story text. Character names should be romanized (e.g. Mongchi not 몽치). Cultural terms should be translated or explained in English.`
+    : '당신은 한국어 베스트셀러 소설 작가입니다.\n형식: *이탤릭체*는 강조에 드물게 사용할 수 있습니다(예: 내면의 생각, 강조할 단어). **굵은 글씨**는 절대 사용하지 마세요 — 문학 소설 본문에 볼드체는 적합하지 않습니다.';
+  const qualityStdFn = isEnglish
+    ? (part) => part === 1
+        ? `Write Part 1 of this chapter. Minimum 1,500 words.\nWrite with rich detail, full scene development, complete dialogue exchanges, and deep interiority.\nDo not summarize. Do not rush.\nTake your time with each scene.\nExpand every moment fully.\nShow don't tell throughout.\nInclude at least 2 fully developed scenes.`
+        : part === 2
+          ? `Write Part 2 continuing directly from Part 1. Minimum 1,500 words.\nContinue with the same rich detail and pacing.\nInclude character reflection and internal monologue.\nDo not wrap up or conclude - more story follows.`
+          : `Write Part 3 as the final section of this chapter. Minimum 1,500 words.\nBring this chapter to a satisfying but open ending that creates anticipation for the next chapter.\nInclude a memorable closing image or line.`
+    : (part) => part === 1
+        ? `이 챕터의 1부를 써주세요.\n최소 1,500 한국어 단어.\n풍부한 묘사, 완전한 장면 전개, 대화와 내면 독백을 포함하세요.\n요약하지 마세요. 서두르지 마세요.\n각 장면을 완전히 펼쳐주세요.`
+        : part === 2
+          ? `1부에서 바로 이어서 2부를 써주세요.\n최소 1,500 한국어 단어.\n같은 풍부한 디테일과 페이싱으로 계속하세요.`
+          : `이 챕터의 마지막 섹션을 써주세요.\n최소 1,500 한국어 단어.\n다음 챕터에 대한 기대감을 주는 기억에 남는 마무리로 끝내주세요.`;
+
+  const storyInfo = buildStoryInfo();
+  const rules = buildRules();
+  const lotteryRule = buildLotteryRule();
+
+  try {
+    // ── Step 1: Design story structure ──
+    setLoadMsg('⏳ 이야기 구조 설계 중...');
+    const outlinePrompt = isEnglish
+      ? `${languageInstruction}
+
+${writerRole} Based on the information below, create the title and 10 chapter titles for a 10-chapter novel.
+
+${storyInfo}
+
+${languageInstruction}
+
+Output ONLY pure JSON, no other text:
+{"title":"novel title","subtitle":"subtitle","chapters":[{"number":1,"title":"chapter title"},{"number":2,"title":"chapter title"},{"number":3,"title":"chapter title"},{"number":4,"title":"chapter title"},{"number":5,"title":"chapter title"},{"number":6,"title":"chapter title"},{"number":7,"title":"chapter title"},{"number":8,"title":"chapter title"},{"number":9,"title":"chapter title"},{"number":10,"title":"chapter title"}]}`
+      : `${languageInstruction}
+
+당신은 한국어 베스트셀러 소설 작가입니다. 아래 정보를 바탕으로 10챕터 소설의 제목과 각 챕터 제목을 만들어주세요.
+
+${storyInfo}
+
+${languageInstruction}
+
+반드시 순수 JSON만 출력, 다른 텍스트 없이:
+{"title":"소설 제목","subtitle":"부제목","chapters":[{"number":1,"title":"챕터 제목"},{"number":2,"title":"챕터 제목"},{"number":3,"title":"챕터 제목"},{"number":4,"title":"챕터 제목"},{"number":5,"title":"챕터 제목"},{"number":6,"title":"챕터 제목"},{"number":7,"title":"챕터 제목"},{"number":8,"title":"챕터 제목"},{"number":9,"title":"챕터 제목"},{"number":10,"title":"챕터 제목"}]}`;
+
+    const outlineRaw = await apiCall(outlinePrompt, 800);
+    const outline = extractJSON(outlineRaw);
+    markLoadStep('ls1');
+
+    // ── Step 2: Chapter titles complete ──
+    setLoadMsg('챕터 제목이 완성됐어요...');
+    await new Promise(r=>setTimeout(r,300));
+    markLoadStep('ls2');
+
+    // ── Step 3: Write Chapter 1 (Part 1 + Part 2) ──
+    setLoadMsg('✍️ 챕터 1을 집필하고 있어요...');
+    const ch1Title = outline.chapters[0].title;
+    const ch1Part1Prompt = isEnglish
+      ? `${languageInstruction}
+
+${writerRole}
+
+Write Part 1 of 3 for Chapter 1 of the novel below.
+
+**Novel info:**
+Title: ${outline.title}
+${storyInfo}
+
+**Full chapter outline:**
+${outline.chapters.map(c=>`Chapter ${c.number}: ${c.title}`).join('\n')}
+
+**Now writing — Chapter 1: ${ch1Title} (Part 1 of 3)**
+${qualityStdFn(1)}
+
+${rules}
+${lotteryRule}
+${languageInstruction}
+**Response format — output only the chapter body. No chapter number, title, or JSON. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**
+
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`
+      : `${languageInstruction}
+
+당신은 한국어 베스트셀러 소설 작가입니다. 아래 소설의 챕터 1 파트 1을 집필해주세요.
+
+**소설 정보:**
+제목: ${outline.title}
+${storyInfo}
+
+**전체 챕터 구성:**
+${outline.chapters.map(c=>`챕터 ${c.number}: ${c.title}`).join('\n')}
+
+**현재 집필 — 챕터 1: ${ch1Title} (파트 1/3)**
+${qualityStdFn(1)}
+
+${rules}
+${lotteryRule}
+${languageInstruction}
+**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**
+
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`;
+
+    const ch1Part1Raw = await apiCall(ch1Part1Prompt, 3500);
+    const ch1Part1Content = ch1Part1Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
+
+    setLoadMsg('📖 풍부한 장면을 펼치고 있어요...');
+    const ch1Part2Prompt = isEnglish
+      ? `${languageInstruction}
+
+${writerRole}
+
+Write Part 2 of 3 for Chapter 1, continuing directly from Part 1.
+
+**Novel info:**
+Title: ${outline.title}
+${storyInfo}
+
+**Part 1 content:**
+${ch1Part1Content}
+
+**Now writing — Chapter 1: ${ch1Title} (Part 2 of 3)**
+${qualityStdFn(2)}
+
+${rules}
+${lotteryRule}
+${languageInstruction}
+**Response format — output only the continuation. No chapter number, title, or JSON. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**
+
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`
+      : `${languageInstruction}
+
+당신은 한국어 베스트셀러 소설 작가입니다. 파트 1에 이어 챕터 1의 파트 2를 집필해주세요.
+
+**소설 정보:**
+제목: ${outline.title}
+${storyInfo}
+
+**파트 1 내용:**
+${ch1Part1Content}
+
+**현재 집필 — 챕터 1: ${ch1Title} (파트 2/3)**
+${qualityStdFn(2)}
+
+${rules}
+${lotteryRule}
+${languageInstruction}
+**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**
+
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`;
+
+    const ch1Part2Raw = await apiCall(ch1Part2Prompt, 3500);
+    const ch1Part2Content = ch1Part2Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
+
+    setLoadMsg('🎨 마무리 중...');
+    const ch1Part3Prompt = isEnglish
+      ? `${languageInstruction}
+
+${writerRole}
+
+Write Part 3 of 3 for Chapter 1, the final section of this chapter.
+
+**Novel info:**
+Title: ${outline.title}
+${storyInfo}
+
+**Part 2 content (continue from here):**
+${ch1Part2Content}
+
+**Now writing — Chapter 1: ${ch1Title} (Part 3 of 3)**
+${qualityStdFn(3)}
+
+${rules}
+${lotteryRule}
+${languageInstruction}
+**Response format — output only the story continuation. No chapter number, no title. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines.**
+
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.
+
+After writing the story chapter, you MUST output a cover brief on a new line in this exact format with no variations:
+
+Generate 4 completely different Ideogram image prompts for this book cover. Each one must have a genuinely different visual style, layout, color palette, and typography direction.
+
+Rules for all 4:
+- Include the exact title '${outline.title}' and author name '${ans.authorDisplay}'
+- Match the mood and genre of the story
+- Each must look like it belongs to a different design school
+
+<coverBrief>
+{
+  "cover1": "full ideogram prompt here...",
+  "cover2": "full ideogram prompt here...",
+  "cover3": "full ideogram prompt here...",
+  "cover4": "full ideogram prompt here...",
+  "fontStyle": "[BARLOW for dramatic/intense | PLAYFAIR for romantic/warm | LIBRE for literary/quiet | CORMORANT for elegant/sad | NOTO_SANS_KR for Korean dramatic | NOTO_SERIF_KR for Korean literary]",
+  "textColor": "[#FFFFFF for dark backgrounds | #0D0D0D for light backgrounds]",
+  "accentColor": "[a bold contrasting hex color]",
+  "titleLines": ["[TITLE LINE 1]", "[TITLE LINE 2 if needed]"],
+  "titleAlign": "[left or center]",
+  "authorName": "[the full name of the book's author exactly as entered by the user]",
+  "mood": "[one word]",
+  "language": "[en or ko]"
+}
+</coverBrief>
+
+This block is mandatory. Do not skip it.`
+      : `${languageInstruction}
+
+당신은 한국어 베스트셀러 소설 작가입니다. 챕터 1의 마지막 파트 3을 집필해주세요.
+
+**소설 정보:**
+제목: ${outline.title}
+${storyInfo}
+
+**파트 2 내용 (여기서 이어서):**
+${ch1Part2Content}
+
+**현재 집필 — 챕터 1: ${ch1Title} (파트 3/3)**
+${qualityStdFn(3)}
+
+${rules}
+${lotteryRule}
+${languageInstruction}
+**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목 없이. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분.**
+
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.
+
+스토리 챕터를 쓴 후, 반드시 새 줄에 아래 형식 그대로 커버 브리프를 출력하세요. 형식을 바꾸지 마세요:
+
+이 책의 표지를 위해 완전히 다른 Ideogram 이미지 프롬프트 4개를 생성하세요. 각각은 시각적 스타일, 레이아웃, 색상 팔레트, 타이포그래피 방향이 진정으로 달라야 합니다.
+
+모든 4개의 규칙:
+- 정확한 제목 '${outline.title}'과 저자 이름 '${ans.authorDisplay}'을 포함하세요
+- 이야기의 분위기와 장르에 맞추세요
+- 각각은 다른 디자인 학파에 속하는 것처럼 보여야 합니다
+
+<coverBrief>
+{
+  "cover1": "full ideogram prompt here...",
+  "cover2": "full ideogram prompt here...",
+  "cover3": "full ideogram prompt here...",
+  "cover4": "full ideogram prompt here...",
+  "fontStyle": "[BARLOW: 극적/강렬 | PLAYFAIR: 로맨틱/따뜻 | LIBRE: 문학적/차분 | CORMORANT: 우아/슬픔 | NOTO_SANS_KR: 한국어 극적 | NOTO_SERIF_KR: 한국어 문학적]",
+  "textColor": "[어두운 배경은 #FFFFFF | 밝은 배경은 #0D0D0D]",
+  "accentColor": "[강한 대비의 hex 색상]",
+  "titleLines": ["[제목 1줄]", "[필요시 2줄]"],
+  "titleAlign": "[left 또는 center]",
+  "authorName": "[the full name of the book's author exactly as entered by the user]",
+  "mood": "[한 단어 분위기]",
+  "language": "[en 또는 ko]"
+}
+</coverBrief>
+
+이 블록은 필수입니다. 절대 생략하지 마세요.`;
+
+    const ch1Part3Raw = await apiCall(ch1Part3Prompt, 3500);
+    let ch1Part3Content = ch1Part3Raw
+      .replace(/<coverBrief>[\s\S]*?<\/coverBrief>/g, '')
+      .replace(/^```[\s\S]*?\n|```$/gm,'')
+      .trim();
+    ch1Part3Content = ch1Part3Content.replace(/<coverBrief>[\s\S]*?<\/coverBrief>/g, '').trim();
+    const ch1Content = ch1Part1Content + '\n\n' + ch1Part2Content + '\n\n' + ch1Part3Content;
+    console.log('Raw Claude response for cover:', ch1Part3Raw);
+    storedCoverBrief = parseCoverBrief(ch1Part3Raw) || null;
+    console.log('Parsed coverBrief:', storedCoverBrief);
+    markLoadStep('ls3');
+
+    // ── Step 4: Done ──
+    await new Promise(r=>setTimeout(r,300));
+    markLoadStep('ls4');
+    setProgress(100, '✅ 완성!');
+
+    story = {
+      title: outline.title,
+      subtitle: outline.subtitle,
+      allChapterTitles: outline.chapters,
+      chapters: [{number:1, title:ch1Title, content:ch1Content}]
+    };
+    stopLoading();
+
+    const coverBrief = storedCoverBrief;
+    const bookTitle = outline.title;
+    const authorName = ans.authorDisplay;
+
+    if (coverBrief) {
+      coverBrief.authorName = authorName;
+      showStatus('🎨 표지를 생성하고 있어요...');
+      const imageUrls = await generateBookCover(coverBrief);
+      if (imageUrls && imageUrls.length > 0) {
+        showStatus('표지를 선택해주세요...');
+        const selectedCover = await showCoverSelection(imageUrls, coverBrief, bookTitle, authorName);
+        proceedToPDF(selectedCover, coverBrief, bookTitle, authorName);
+      } else {
+        proceedToPDF(null, coverBrief, bookTitle, authorName);
+      }
+    } else {
+      displayStory(story);
+    }
+
+  } catch(err){
+    stopLoading();
+    alert(`오류가 발생했습니다:\n${err.message}\n\nAPI 키를 확인하고 다시 시도해주세요.`);
+    showPage('page-questions');
+  }
+}
+
+// ──────────── SHARED PROMPT BUILDERS ────────────
+function buildStoryInfo(){
+  const pronouns = ans.gender === '여성' ? 'she/her (그녀/그녀의)'
+                 : ans.gender === '남성' ? 'he/him (그/그의)'
+                 : 'they/them (성별 중립)';
+  return `이야기 주제: ${ans.topic}
+주인공 이름: ${ans.name}
+주인공 성별: ${ans.gender||'없음'} — 인칭대명사: ${pronouns}
+주인공 나이대: ${ans.ageGroup||'없음'}
+주인공 관련 정보: ${ans.personalDetails||'없음'}
+이야기 장르/분위기: ${ans.genres?.join(' / ')||'없음'}
+특별 요청 장면: ${ans.specialScenes||'없음'}`;
+}
+
+function buildRules(){
+  const pronouns = ans.gender === '여성' ? 'she/her (그녀/그녀의)'
+                 : ans.gender === '남성' ? 'he/him (그/그의)'
+                 : 'they/them (성별 중립)';
+  return `**개인화 규칙:**
+1. 주인공의 이름(${ans.name})은 모든 챕터에 자연스럽게 등장해야 함
+2. 주인공의 인칭대명사 ${pronouns}를 전체 이야기에 일관되게 사용할 것
+3. 주인공 나이대(${ans.ageGroup||'없음'})에 어울리는 생활 방식, 고민, 감성으로 묘사할 것
+4. 주인공 관련 정보(${ans.personalDetails||'없음'})에 언급된 취미, 장소, 소중한 사람 등을 최소 5개 챕터에 자연스럽게 녹여줄 것
+5. 특별 요청 장면(${ans.specialScenes||'없음'})이 있다면 2-3단락 분량의 온전한 장면으로 묘사
+6. 선택한 장르/분위기(${ans.genres?.join(' / ')||'없음'})를 전체 이야기에 일관되게 유지
+7. 이야기는 반드시 긍정적이고 희망적인 결말로 끝낼 것
+
+**콘텐츠 규칙:**
+1. 전 연령 대상 콘텐츠 — 성적이거나 성인용 내용 금지
+2. 잔인한 폭력 묘사나 자해 내용 금지
+3. 실존하는 연예인이나 공인의 실명 사용 금지
+4. 유해하거나 차별적인 내용 금지
+5. 한국의 문화적 가치를 존중할 것
+
+**이야기 완성도 규칙:**
+1. 각 챕터는 이전 챕터의 사건을 자연스럽게 이어받아야 함
+2. 초반에 등장한 조연 인물은 후반부에 다시 등장해야 함
+3. 초반 챕터의 작은 복선이 후반 챕터에서 결실을 맺어야 함
+4. 주인공은 10챕터에 걸쳐 뚜렷한 감정적 성장을 보여야 함
+5. 10챕터의 마지막 단락은 기억에 남고 감동적으로 마무리되어야 함`;
+}
+
+function buildLotteryRule(){
+  return ans.topic === '복권 당첨' ? `
+**복권 당첨 스토리 전용 규칙:**
+- 당첨 복권을 발견하는 장면은 반드시 두 단계의 감정적 비트로 나누어 써야 함:
+  1. 첫 번째 비트: 1등임을 인식하는 순간 — 믿기지 않는 충격과 혼란
+  2. 두 번째 비트: 핸드폰으로 당첨금을 검색해 **로또 1등 당첨금 약 30억 원**이라는 숫자를 직접 확인하는 순간 — 이 두 번째 충격이 첫 번째보다 훨씬 더 강렬하고 감정적이어야 함
+- 30억 원이라는 금액은 이 장면에서 반드시 명시적으로 언급되어야 함
+` : '';
+}
+
+// ──────────── DISPLAY STORY ────────────
+function displayStory(d){
+  const isEn = selectedLang === 'en';
+  const ch1 = d.chapters[0];
+
+  document.getElementById('s-title').textContent = d.title;
+  const lpChapLabel = document.getElementById('lp-chap-label');
+  if (lpChapLabel) lpChapLabel.textContent = ch1.title ? `챕터 1 · ${ch1.title}` : '챕터 1';
+
+  // Section A: Chapter 1
+  const ch1Section = document.getElementById('ch1-section');
+  ch1Section.innerHTML = `
+    <div style="background:#f9f5f0;border:1px solid #e8e0d5;border-radius:8px;padding:12px 16px;margin-bottom:20px;text-align:center;font-size:14px;color:#666;">
+      📖 1장 미리보기 · 다 읽으신 후 아래에서 원하시는 옵션을 선택해주세요 ↓
+    </div>
+    <div class="ch-hdr">
+      <div class="ch-label">챕터 1 · 무료 미리보기</div>
+      <h2 class="ch-title">${ch1.title}</h2>
+    </div>
+    <div class="ch-content">${fmtContent(ch1.content)}</div>`;
+
+  // Section B: TOC (all 10 chapters)
+  const tocEl = document.getElementById('toc-list');
+  tocEl.innerHTML = '';
+  d.allChapterTitles.forEach((ch, i)=>{
+    const li = document.createElement('li');
+    li.className = 'toc-row';
+    const isFirst = i === 0;
+    li.innerHTML = `
+      <span class="toc-num">${ch.number}</span>
+      <span class="toc-ch-title">${ch.title}</span>
+      <span class="toc-status ${isFirst ? 'toc-free' : 'toc-lock'}">${isFirst ? '✅ 읽음' : '🔒'}</span>`;
+    tocEl.appendChild(li);
+  });
+
+  showPage('page-story');
+  window.scrollTo(0,0);
+}
+
+function showStatus(msg){
+  setLoadMsg(msg);
+}
+
+function proceedToPDF(selectedCover, coverBrief, bookTitle, authorName){
+  if(selectedCover) selectedCoverImage = selectedCover;
+  displayStory(story);
+}
+
+function renderMarkdown(text) {
+  // Convert *text* to <em>text</em> for italics
+  return text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+}
+
+function fmtContent(txt){
+  return txt.split(/\n\n+|\n/).filter(p=>p.trim())
+    .map(p=>`<p>${renderMarkdown(p.trim())}</p>`).join('');
+}
+
+// ──────────── PDF DOWNLOAD (legacy – kept for safety, unused) ────────────
+async function downloadPDF() {
+  if (!story) return;
+
+  const isEn   = selectedLang === 'en';
+  const today = new Date().toISOString().slice(0, 10);
+  const fileName = `anotherbook-${today}.pdf`;
+
+  const overlay = document.getElementById('pdf-progress-overlay');
+  const barEl   = document.getElementById('pdf-progress-bar');
+  const msgEl   = document.getElementById('pdf-progress-msg');
+  overlay.style.display = 'flex';
+
+  const setProgress = (pct, txt) => {
+    barEl.style.width = pct + '%';
+    msgEl.textContent = txt;
+  };
+
+  try {
+    setProgress(5, 'PDF 라이브러리 불러오는 중...');
+
+    if (!window.html2pdf) {
+      await new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        s.onload = res;
+        s.onerror = () => rej(new Error('html2pdf.js CDN 로드 실패'));
+        document.head.appendChild(s);
+      });
+    }
+
+    setProgress(15, '폰트 준비 중...');
+
+    if (!document.getElementById('bc-fonts-link')) {
+      const link = document.createElement('link');
+      link.id   = 'bc-fonts-link';
+      link.rel  = 'stylesheet';
+      link.href = 'https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap';
+      await new Promise(r => { link.onload = r; link.onerror = r; document.head.appendChild(link); });
+    }
+
+    setProgress(22, '책 구조 만드는 중...');
+
+    // Estimate chapter starting page numbers for TOC
+    const chapPageNums = [];
+    let pg = 7;
+    for (const ch of story.chapters) {
+      chapPageNums.push(pg);
+      const words = ch.content.split(/\s+/).filter(w => w.length > 0).length;
+      pg += 1 + Math.max(1, Math.ceil(words / (isEn ? 350 : 270)));
+    }
+
+    const container = document.createElement('div');
+    container.style.cssText = 'position:fixed;top:-99999px;left:-99999px;width:148mm;';
+    container.innerHTML = buildBookHTML(isEn, name, today, chapPageNums);
+    document.body.appendChild(container);
+
+    setProgress(32, '폰트 로딩 기다리는 중...');
+    await document.fonts.ready;
+    await new Promise(r => setTimeout(r, 2000));
+
+    setProgress(42, 'PDF 렌더링 중... (잠시만요!)');
+
+    let pv = 42;
+    const tick = setInterval(() => {
+      pv = Math.min(88, pv + 1.2);
+      barEl.style.width = pv + '%';
+    }, 700);
+
+    const opt = {
+      margin: 0,
+      filename: fileName,
+      image: { type: 'jpeg', quality: 0.95 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        letterRendering: true,
+        logging: false,
+        backgroundColor: '#FDFAF5',
+      },
+      jsPDF: {
+        unit: 'mm',
+        format: 'a5',
+        orientation: 'portrait',
+        compress: true,
+      },
+      pagebreak: {
+        mode: ['css', 'legacy'],
+        before: ['.bc-page-break'],
+        avoid:  ['.bc-ch-header'],
+      }
+    };
+
+    await html2pdf()
+      .set(opt)
+      .from(container.querySelector('.book-content'))
+      .save();
+
+    clearInterval(tick);
+    document.body.removeChild(container);
+    setProgress(100, '저장 완료!');
+
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      const suc = document.getElementById('pdf-success-msg');
+      suc.style.display = 'block';
+      setTimeout(() => { suc.style.display = 'none'; }, 5000);
+    }, 500);
+
+  } catch (err) {
+    overlay.style.display = 'none';
+    console.error('PDF 생성 오류:', err);
+    alert('PDF 생성 중 오류가 발생했습니다.\n' + (err.message || String(err)));
+  }
+}
+
+function buildBookHTML(isEn, name, today, chapPageNums) {
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const title = esc(story.title);
+
+  const tocEntries = story.chapters.map((ch, i) => `
+    <div class="bc-toc-entry">
+      <span class="bc-toc-num">${ch.number}</span>
+      <span class="bc-toc-title">${esc(ch.title)}</span>
+      <span class="bc-toc-dots"></span>
+      <span class="bc-toc-pg">${chapPageNums[i]}</span>
+    </div>`).join('');
+
+  const chaptersHTML = story.chapters.map((ch, i) => {
+    const paras = ch.content.split(/\n\n+|\n/).filter(p => p.trim());
+    const bodyHTML = paras.map((p, idx) =>
+      `<p class="${idx === 0 ? 'bc-first-para' : 'bc-body-para'}">${p.trim()}</p>`
+    ).join('');
+    return `
+      <div class="bc-chapter bc-page-break">
+        <div class="bc-ch-header">
+          <div class="bc-ch-num">${ch.number}</div>
+          <div class="bc-ch-title">${esc(ch.title)}</div>
+          <div class="bc-ch-line"></div>
+        </div>
+        <div class="bc-ch-body">${bodyHTML}</div>
+        <div class="bc-ch-pgnum">${chapPageNums[i]}</div>
+      </div>`;
+  }).join('');
+
+  return `<div class="book-content">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap');
+.book-content{font-family:'Noto Serif KR',serif;font-size:11pt;line-height:1.8;color:#2C2C2C;width:148mm;background:#FDFAF5;}
+.book-content *{box-sizing:border-box;margin:0;padding:0;}
+.book-content .bc-page{width:148mm;height:210mm;position:relative;overflow:hidden;background:#FDFAF5;}
+.book-content .bc-page-break{page-break-before:always;}
+
+.book-content .bc-cover{background:#3D5A47;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:25mm 18mm;}
+.book-content .bc-cover-inner{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;}
+.book-content .bc-gold-line{width:52mm;height:1px;background:#C4A882;margin:7mm auto;}
+.book-content .bc-cover-title{font-size:28pt;font-weight:900;color:#FDFAF5;line-height:1.3;margin:4mm 0;}
+.book-content .bc-cover-sub{font-size:14pt;color:#FDFAF5;font-weight:400;margin:3mm 0;}
+.book-content .bc-cover-pub{position:absolute;bottom:20mm;left:0;right:0;text-align:center;font-size:12pt;color:#FDFAF5;letter-spacing:0.3mm;}
+
+.book-content .bc-copyright{padding:20mm 15mm 20mm 22mm;}
+.book-content .bc-copyright-body{position:absolute;bottom:20mm;left:22mm;right:15mm;font-size:9pt;line-height:1.9;color:#555;}
+.book-content .bc-copyright-body p{margin-bottom:0;}
+.book-content .bc-copyright-ttl{font-size:10pt;font-weight:700;color:#2C2C2C;margin-bottom:6mm;display:block;}
+
+.book-content .bc-dedication{padding:20mm 15mm 20mm 22mm;display:flex;align-items:center;justify-content:center;}
+.book-content .bc-ded-text{font-family:'Source Serif 4','Noto Serif KR',serif;font-size:13pt;font-style:italic;text-align:center;line-height:2.2;color:#2C2C2C;}
+
+.book-content .bc-toc{padding:20mm 15mm 20mm 22mm;}
+.book-content .bc-toc-head{font-size:18pt;font-weight:700;text-align:center;color:#2C2C2C;margin-bottom:11mm;}
+.book-content .bc-toc-entry{display:flex;align-items:flex-end;padding:1.6mm 0;font-size:10pt;color:#2C2C2C;}
+.book-content .bc-toc-num{flex-shrink:0;width:6mm;font-size:9pt;color:#888;}
+.book-content .bc-toc-title{flex-shrink:0;max-width:72mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.book-content .bc-toc-dots{flex:1;border-bottom:1px dotted #aaa;height:0;margin:0 2mm 2mm 2mm;min-width:4mm;}
+.book-content .bc-toc-pg{flex-shrink:0;font-size:9pt;color:#888;width:8mm;text-align:right;}
+
+.book-content .bc-chapter{padding:0 15mm 20mm 22mm;background:#FDFAF5;}
+.book-content .bc-ch-header{padding-top:60pt;text-align:center;margin-bottom:13mm;}
+.book-content .bc-ch-num{font-size:13pt;font-weight:700;color:#2C2C2C;margin-bottom:2.5mm;}
+.book-content .bc-ch-title{font-size:13pt;font-weight:700;color:#2C2C2C;line-height:1.4;margin-bottom:5mm;}
+.book-content .bc-ch-line{width:36mm;height:1px;background:#C4A882;margin:0 auto;}
+.book-content .bc-ch-body{font-size:11pt;line-height:1.8;color:#2C2C2C;text-align:justify;}
+.book-content .bc-first-para{text-indent:0;margin-bottom:4mm;}
+.book-content .bc-body-para{text-indent:10mm;margin-bottom:4mm;}
+.book-content .bc-ch-pgnum{text-align:center;font-size:10pt;color:#888;padding:7mm 0 0;}
+
+.book-content .bc-authors{padding:20mm 15mm 20mm 22mm;min-height:210mm;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.book-content .bc-authors-title{font-size:16pt;font-weight:700;text-align:center;color:#2C2C2C;margin-bottom:11mm;}
+.book-content .bc-authors-body{font-size:11pt;line-height:2.1;color:#2C2C2C;text-align:center;}
+.book-content .bc-authors-body p{margin-bottom:3mm;}
+.book-content .bc-authors-date{margin-top:8mm;color:#888;font-size:10pt;}
+.book-content .bc-authors-sig{font-style:italic;color:#666;}
+</style>
+
+<!-- PAGE 1: COVER -->
+<div class="bc-page bc-cover">
+  <div class="bc-cover-inner">
+    <div class="bc-gold-line"></div>
+    <h1 class="bc-cover-title">${title}</h1>
+    <p class="bc-cover-sub">나만의 이야기</p>
+    <div class="bc-gold-line"></div>
+  </div>
+  <div class="bc-cover-pub">어나더북 | AnotherBook</div>
+</div>
+
+<!-- PAGE 2: COPYRIGHT -->
+<div class="bc-page bc-copyright bc-page-break">
+  <div class="bc-copyright-body">
+    <span class="bc-copyright-ttl">${title}</span>
+    <p>발행일: ${today}</p>
+    <p>저&nbsp;&nbsp;&nbsp;자: 어나더북 AI 작가</p>
+    <p>펴낸곳: 어나더북 (AnotherBook)</p>
+    <p>&nbsp;</p>
+    <p>이 책은 어나더북(AnotherBook)이 제작한</p>
+    <p>세상에 하나뿐인 맞춤형 소설입니다.</p>
+    <p>&nbsp;</p>
+    <p>© 2026 AnotherBook. All rights reserved.</p>
+  </div>
+</div>
+
+<!-- PAGE 3: DEDICATION -->
+<div class="bc-page bc-dedication bc-page-break">
+  <p class="bc-ded-text">이 이야기를 읽을 당신에게.<br>당신의 이야기이니까요.</p>
+</div>
+
+<!-- PAGE 4: BLANK -->
+<div class="bc-page bc-page-break"></div>
+
+<!-- PAGE 5: TABLE OF CONTENTS -->
+<div class="bc-page bc-toc bc-page-break">
+  <h2 class="bc-toc-head">차례</h2>
+  <div>${tocEntries}</div>
+</div>
+
+<!-- PAGE 6: BLANK (chapter 1 starts on right/odd page 7) -->
+<div class="bc-page bc-page-break"></div>
+
+<!-- CHAPTERS (pages 7+) -->
+${chaptersHTML}
+
+<!-- AUTHORS NOTE -->
+<div class="bc-authors bc-page-break">
+  <h2 class="bc-authors-title">작가의 말</h2>
+  <div class="bc-authors-body">
+    <p>${esc(name)}님,</p>
+    <p>이 이야기는 처음부터 끝까지<br>당신을 위해 썼습니다.</p>
+    <p class="bc-authors-date">${today}</p>
+    <p class="bc-authors-sig">어나더북 AI 작가</p>
+  </div>
+</div>
+
+</div>`;
+}
+
+// ──────────── COMPOSE COVER ────────────
+async function composeCover(imageUrl, coverBrief, title, author) {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 600;
+    canvas.height = 900;
+    const ctx = canvas.getContext('2d');
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function() {
+      if (coverBrief.language === 'ko') {
+        try {
+          ctx.drawImage(img, 0, 0, 600, 900);
+          drawCoverText(canvas, coverBrief, title, author);
+          resolve(canvas.toDataURL('image/jpeg', 0.95));
+        } catch (e) {
+          // Canvas tainted by CORS — use fresh canvas with solid background
+          const fb = document.createElement('canvas');
+          fb.width = 600; fb.height = 900;
+          const fbCtx = fb.getContext('2d');
+          fbCtx.fillStyle = coverBrief.coverColor || '#1A0A2E';
+          fbCtx.fillRect(0, 0, 600, 900);
+          drawCoverText(fb, coverBrief, title, author);
+          resolve(fb.toDataURL('image/jpeg', 0.95));
+        }
+      } else {
+        ctx.drawImage(img, 0, 0, 600, 900);
+        resolve(canvas.toDataURL('image/jpeg', 0.95));
+      }
+    };
+    img.onerror = function() {
+      if (coverBrief.language === 'ko') {
+        ctx.fillStyle = coverBrief.coverColor || '#1A0A2E';
+        ctx.fillRect(0, 0, 600, 900);
+        drawCoverText(canvas, coverBrief, title, author);
+      }
+      resolve(canvas.toDataURL('image/jpeg', 0.95));
+    };
+    const proxiedUrl = `${window.PDF_SERVER_URL}/proxy-image?url=${encodeURIComponent(imageUrl)}`;
+    img.src = proxiedUrl;
+  });
+}
+
+// ──────────── COVER SELECTION MODAL ────────────
+async function showCoverSelection(imageUrls, coverBrief, title, author) {
+  const composedCovers = await Promise.all(
+    imageUrls.map(url => composeCover(url, coverBrief, title, author))
+  );
+
+  const modal = document.createElement('div');
+  modal.id = 'cover-selection-modal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.92);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+    overflow-y: auto;
+  `;
+
+  modal.innerHTML = `
+    <h2 style="color: #F5F0E8; font-family: 'Noto Sans KR', sans-serif;
+               font-weight: 300; letter-spacing: 4px; font-size: 13px;
+               text-transform: uppercase; margin-bottom: 14px;">
+      표지를 선택해주세요
+    </h2>
+    <div id="cover-grid" style="
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      max-width: 600px;
+      width: 100%;
+      margin-bottom: 14px;
+    ">
+      ${composedCovers.map((dataUrl, i) => `
+        <div class="cover-option" data-index="${i}" data-ideogram-url="${imageUrls[i]}" style="
+          cursor: pointer;
+          border: 3px solid transparent;
+          border-radius: 4px;
+          overflow: hidden;
+          transition: border-color 0.2s;
+        ">
+          <img src="${dataUrl}" style="
+            width: 100%;
+            max-height: 280px;
+            object-fit: cover;
+            border-radius: 4px;
+            display: block;
+          " />
+        </div>
+      `).join('')}
+    </div>
+    <button id="use-cover-btn" style="
+      padding: 12px 40px;
+      background: #FFD600;
+      color: #0D0D0D;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      cursor: pointer;
+      opacity: 0.4;
+      pointer-events: none;
+    ">이 표지로 계속하기 →</button>
+  `;
+
+  document.body.appendChild(modal);
+
+  let selectedIndex = null;
+  let selectedImageUrl = null;
+
+  modal.querySelectorAll('.cover-option').forEach(option => {
+    option.addEventListener('click', function() {
+      modal.querySelectorAll('.cover-option').forEach(o => {
+        o.style.borderColor = 'transparent';
+      });
+      this.style.borderColor = '#FFD600';
+      selectedIndex = parseInt(this.dataset.index);
+      selectedImageUrl = this.dataset.ideogramUrl || imageUrls[selectedIndex];
+      console.log('Selected cover index:', selectedIndex, '| Ideogram URL:', selectedImageUrl);
+      const btn = document.getElementById('use-cover-btn');
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
+    });
+  });
+
+  return new Promise((resolve) => {
+    document.getElementById('use-cover-btn').addEventListener('click', function() {
+      modal.remove();
+      resolve(selectedImageUrl);
+    });
+  });
+}
+
+// ──────────── COVER SELECT ────────────
+function showCoverSelect(type){
+  selectedProduct = type || 'digital';
+  if(!story){ startStory(); return; }
+  coverDesign = null;
+  showPage('page-cover-loading');
+  generateFullCover();
+}
+
+function goBackFromCoverSelect(){ showPage('page-story'); }
+
+// ──────────── COVER LOADING HELPERS ────────────
+function setCoverLoadMsg(msg){
+  const el = document.getElementById('cover-load-msg');
+  if(!el) return;
+  el.style.opacity = '0';
+  setTimeout(()=>{ el.textContent = msg; el.style.opacity = '1'; }, 400);
+}
+
+function setCoverLoadDot(step){
+  for(let i=1; i<=3; i++){
+    const dot = document.getElementById('cld'+i);
+    if(!dot) continue;
+    dot.classList.remove('active','done');
+    if(i < step) dot.classList.add('done');
+    else if(i === step) dot.classList.add('active');
+  }
+}
+
+// ──────────── STEP 1: CLAUDE COVER DESIGN ────────────
+async function getCoverDesign(){
+  const bookTitle = story?.title || '';
+  const systemPrompt = `You are a bold graphic designer for a premium literary fiction publisher. Based on this story, output ONLY a JSON object with no explanation. STRICT COLOR RULES: NEVER use teal, blue-gray, navy, gray, or muted safe colors. For sad/longing mood use #1C0A00 or #2D0A0A. For romantic/warm use #8B1A1A or #7B2D8B. For hopeful/growth use #1B3A2D or #2D4A1E. For mysterious/tense use #0D0D1A or #1A0A2E. For joyful/bright use #8B3A00 or #CC5500. For modern/bold use #1A1A1A or #F5F0E8. textColor always #F5F0E8 or #FFFFFF. accentColor always bold and contrasting. STRICT FONT RULES: For sad/longing choose SPECTRAL or CORMORANT. For romantic/warm choose PLAYFAIR or DANCING. For mysterious/tense choose SPECTRAL or ANTON. For hopeful/uplifting choose DM_SERIF or JAKARTA. For dramatic/intense choose BARLOW or ANTON. For literary/quiet choose CORMORANT or DM_SERIF. For modern/contemporary choose DM_SANS or JAKARTA. For bold/political choose BARLOW or BEBAS. For quiet/minimal/literary (Sally Rooney style) choose LIBRE or CORMORANT. For dark/dramatic/deep sea choose ABRIL or SPECTRAL. STRICT LAYOUT RULES: Use layoutStyle STACKED_LARGE for full-width dramatic covers (Amanda Gorman style) — titleAlign left, fontSize 130px. Use layoutStyle CENTERED_MINIMAL for quiet literary covers (Sally Rooney style) — titleAlign center, fontSize 72px, letterSpacing 8px. Use layoutStyle STACKED_MID for balanced default covers — titleAlign left, fontSize 110px. STRICT TITLE RULES: never put a single short word like I, A, or THE alone on one line. Maximum 3 lines. Group words so lines are roughly equal length. Return JSON: { coverColor, textColor, accentColor, titleLines, fontStyle, layoutStyle, mood }`;
+  const userPrompt = `Title: ${bookTitle}
+Theme: ${ans.topic}
+Genre/Mood: ${ans.genres?.join(' / ')||''}
+Language: ${selectedLang === 'ko' ? 'Korean' : 'English'}`;
+  const raw = await apiCall(userPrompt, 400, systemPrompt);
+  return extractJSON(raw);
+}
+
+// ──────────── STEP 3: RENDER COVER ON CANVAS (typography) ────────────
+async function renderCover(canvas, design, bookTitle, authorName){
+  const W = 800, H = 1200;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  const isKo = selectedLang === 'ko';
+  const titleFont = isKo ? '"Noto Sans KR",sans-serif' : '"Bebas Neue",sans-serif';
+  const bodyFont  = '"Montserrat",sans-serif';
+
+  const fontMap = {
+    'BEBAS':     { family: "'Bebas Neue'",        weight: '400', size: 120 },
+    'PLAYFAIR':  { family: "'Playfair Display'",   weight: '900', size: 100 },
+    'ANTON':     { family: "'Anton'",              weight: '400', size: 115 },
+    'CORMORANT': { family: "'Cormorant Garamond'", weight: '700', size: 105 },
+    'SPECTRAL':  { family: "'Spectral'",           weight: '800', size: 100 },
+    'DM_SERIF':  { family: "'DM Serif Display'",   weight: '400', size: 105 },
+    'BARLOW':    { family: "'Barlow Condensed'",   weight: '900', size: 130 },
+    'DANCING':   { family: "'Dancing Script'",     weight: '700', size: 95  },
+    'DM_SANS':   { family: "'DM Sans'",            weight: '900', size: 115 },
+    'JAKARTA':   { family: "'Plus Jakarta Sans'",  weight: '800', size: 110 },
+    'ABRIL':     { family: "'Abril Fatface'",      weight: '400', size: 105 },
+    'LIBRE':     { family: "'Libre Baskerville'",  weight: '700', size: 72  }
+  };
+  const chosen = fontMap[design.fontStyle] || fontMap['BARLOW'];
+
+  const layoutMap = {
+    'STACKED_LARGE':    { fontSize: 130, titleAlign: 'left',   letterSpacing: '0px' },
+    'CENTERED_MINIMAL': { fontSize: 72,  titleAlign: 'center', letterSpacing: '8px' },
+    'STACKED_MID':      { fontSize: 110, titleAlign: 'left',   letterSpacing: '0px' }
+  };
+  const layout   = layoutMap[design.layoutStyle] || layoutMap['STACKED_MID'];
+  const fontSize = isKo ? 120 : layout.fontSize;
+
+  try {
+    await Promise.all([
+      isKo
+        ? document.fonts.load(`900 130px ${titleFont}`)
+        : document.fonts.load(`${chosen.weight} ${fontSize}px ${chosen.family}`),
+      document.fonts.load(`400 16px ${bodyFont}`)
+    ]);
+  } catch(e){ /* non-fatal */ }
+
+  // 1. Solid color background — full bleed
+  ctx.fillStyle = design.coverColor || '#1B2A4A';
+  ctx.fillRect(0, 0, W, H);
+
+  // 2. Visual style element
+  const visualStyle = design.visualStyle || null;
+
+  if (visualStyle === 'COLOR_BLOCK') {
+    ctx.beginPath();
+    ctx.arc(W * 0.85, H * 0.75, W * 0.7, 0, Math.PI * 2);
+    ctx.fillStyle = design.accentColor;
+    ctx.globalAlpha = 0.15;
+    ctx.fill();
+    ctx.globalAlpha = 1.0;
+    ctx.beginPath();
+    ctx.arc(W, H * 0.3, W * 0.55, 0, Math.PI * 2);
+    ctx.fillStyle = design.accentColor;
+    ctx.globalAlpha = 0.25;
+    ctx.fill();
+    ctx.globalAlpha = 1.0;
+    ctx.beginPath();
+    ctx.arc(W * 0.75, H * 0.6, W * 0.12, 0, Math.PI * 2);
+    ctx.fillStyle = design.accentColor;
+    ctx.globalAlpha = 1.0;
+    ctx.fill();
+  }
+
+  if (visualStyle === 'ORGANIC_SHAPE') {
+    ctx.beginPath();
+    ctx.moveTo(W * 0.0, H * 0.55);
+    ctx.bezierCurveTo(W * 0.2, H * 0.35, W * 0.8, H * 0.45, W * 1.0, H * 0.5);
+    ctx.bezierCurveTo(W * 1.0, H * 0.8, W * 0.7, H * 1.05, W * 0.0, H * 1.0);
+    ctx.closePath();
+    ctx.fillStyle = design.accentColor;
+    ctx.globalAlpha = 0.12;
+    ctx.fill();
+    ctx.globalAlpha = 1.0;
+    ctx.beginPath();
+    ctx.moveTo(W * 0.3, H * 0.65);
+    ctx.bezierCurveTo(W * 0.5, H * 0.5, W * 0.9, H * 0.6, W * 1.0, H * 0.75);
+    ctx.bezierCurveTo(W * 0.9, H * 0.95, W * 0.4, H * 1.0, W * 0.3, H * 0.65);
+    ctx.closePath();
+    ctx.fillStyle = design.accentColor;
+    ctx.globalAlpha = 0.18;
+    ctx.fill();
+    ctx.globalAlpha = 1.0;
+    ctx.strokeStyle = design.textColor;
+    ctx.globalAlpha = 0.04;
+    ctx.lineWidth = 1;
+    for (let y = 0; y < H; y += 6) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(W, y);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1.0;
+  }
+
+  if (visualStyle === 'RISOGRAPH') {
+    ctx.fillStyle = design.accentColor;
+    ctx.globalAlpha = 1.0;
+    ctx.fillRect(W * 0.08, H * 0.08, W * 0.88, H * 0.88);
+    ctx.fillStyle = design.coverColor;
+    ctx.globalAlpha = 1.0;
+    ctx.fillRect(0, 0, W * 0.88, H * 0.88);
+    ctx.strokeStyle = design.accentColor;
+    ctx.globalAlpha = 0.08;
+    ctx.lineWidth = 8;
+    for (let i = -H; i < W + H; i += 40) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i + H, H);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1.0;
+  }
+
+  // 3. Title — group words for 5+ word titles
+  function groupTitleLines(raw) {
+    const words = raw.filter(w => w.trim().length > 0);
+    if (words.length < 5) return words;
+    // split into ~3 balanced groups, avoid orphaned short words
+    const target = Math.ceil(words.length / 3);
+    const groups = [];
+    for (let i = 0; i < words.length; i += target) {
+      groups.push(words.slice(i, i + target).join(' '));
+    }
+    return groups;
+  }
+
+  const rawLines = (design.titleLines && design.titleLines.length > 0)
+    ? design.titleLines
+    : bookTitle.split(' ');
+  const lines = groupTitleLines(rawLines);
+
+  const leftMargin = W * 0.08;
+  const lineH      = (design.fontStyle === 'DANCING') ? 110 : (layout.titleAlign === 'center' ? 85 : 125);
+  const titleX     = (isKo || layout.titleAlign !== 'center') ? leftMargin : W / 2;
+
+  const totalTitleHeight = lines.length * lineH;
+  const startY = (H * 0.65 - totalTitleHeight) / 2 + lineH;
+
+  ctx.fillStyle     = design.textColor || '#F5F0E8';
+  ctx.textAlign     = isKo ? 'left' : layout.titleAlign;
+  ctx.letterSpacing = layout.letterSpacing;
+
+  lines.forEach((line, i) => {
+    if (isKo) {
+      ctx.font = `800 ${fontSize}px ${titleFont}`;
+    } else {
+      let lineFontSize = fontSize;
+      ctx.font = design.fontStyle === 'DANCING'
+        ? `italic ${chosen.weight} ${lineFontSize}px ${chosen.family}, Arial Black, sans-serif`
+        : `${chosen.weight} ${lineFontSize}px ${chosen.family}, Arial Black, sans-serif`;
+      while (ctx.measureText(line).width > W * 0.85 && lineFontSize > 40) {
+        lineFontSize -= 3;
+        ctx.font = design.fontStyle === 'DANCING'
+          ? `italic ${chosen.weight} ${lineFontSize}px ${chosen.family}, Arial Black, sans-serif`
+          : `${chosen.weight} ${lineFontSize}px ${chosen.family}, Arial Black, sans-serif`;
+      }
+    }
+    ctx.fillText(line, titleX, startY + i * lineH);
+  });
+  ctx.letterSpacing = '0px';
+  ctx.textAlign     = 'left';
+
+  // 3. Thin divider line — accentColor at 70% opacity
+  const lastLineY = startY + (lines.length - 1) * lineH;
+  const dividerY  = lastLineY + 15;
+  ctx.globalAlpha = 0.7;
+  ctx.strokeStyle = design.accentColor || '#C4A882';
+  ctx.lineWidth   = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(leftMargin, dividerY);
+  ctx.lineTo(leftMargin + W * 0.35, dividerY);
+  ctx.stroke();
+  ctx.globalAlpha = 1.0;
+
+  // 4. Author name — below divider, Montserrat Light uppercase
+  ctx.font          = `400 16px ${bodyFont}`;
+  ctx.fillStyle     = design.textColor || '#F5F0E8';
+  ctx.globalAlpha   = 0.85;
+  ctx.letterSpacing = '5px';
+  ctx.fillText((authorName || '').toUpperCase(), leftMargin, dividerY + 28);
+  ctx.globalAlpha   = 1.0;
+  ctx.letterSpacing = '0px';
+
+  // 5. Logo — anchored to bottom right, leaving bottom 40% as clean negative space
+  ctx.font        = `300 11px ${bodyFont}`;
+  ctx.fillStyle   = design.textColor || '#F5F0E8';
+  ctx.globalAlpha = 0.35;
+  ctx.textAlign   = 'right';
+  ctx.fillText(isKo ? '어나더북' : 'anotherbook', W * 0.92, H * 0.96);
+  ctx.globalAlpha = 1.0;
+  ctx.textAlign   = 'left';
+}
+
+// ──────────── FULL COVER GENERATION FLOW ────────────
+async function generateFullCover(){
+  setCoverLoadMsg('🎨 AI가 표지 디자인을 구상하고 있어요...');
+  setCoverLoadDot(1);
+
+  const fallbackDesign = {
+    coverColor:'#1B2A4A', textColor:'#F5F0E8', accentColor:'#E8A020',
+    titleLines: story ? story.title.split(' ') : ['나의', '이야기'],
+  };
+
+  try {
+    // Step 1: Claude designs the cover
+    coverDesign = await getCoverDesign();
+  } catch(err){
+    console.warn('getCoverDesign 실패, 기본 디자인 사용:', err);
+    coverDesign = fallbackDesign;
+  }
+
+  setCoverLoadMsg('✨ 표지를 완성하고 있어요...');
+  setCoverLoadDot(2);
+  await new Promise(r=>setTimeout(r,300));
+
+  await document.fonts.ready;
+
+  const bookTitle = story?.title||'';
+  const authorName = ans.authorDisplay;
+
+  const canvas = document.getElementById('cover-canvas');
+  const previewImg = document.getElementById('cover-preview-img');
+
+  if (selectedCoverImage && !selectedCoverImage.startsWith('data:')) {
+    const proxiedUrl = `${window.PDF_SERVER_URL}/proxy-image?url=${encodeURIComponent(selectedCoverImage)}`;
+    console.log('Confirmation screen: showing Ideogram URL:', selectedCoverImage);
+
+    // Show the selected Ideogram image directly via <img> — no canvas re-render
+    if (previewImg) {
+      previewImg.src = proxiedUrl;
+      previewImg.style.display = 'block';
+    }
+    if (canvas) canvas.style.display = 'none';
+
+    // Also draw on the hidden canvas so jsPDF fallback can use it
+    await new Promise((res) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        res();
+      };
+      img.onerror = async () => { await renderCover(canvas, coverDesign, bookTitle, authorName); res(); };
+      img.src = proxiedUrl;
+    });
+  } else {
+    if (previewImg) previewImg.style.display = 'none';
+    if (canvas) canvas.style.display = 'block';
+    await renderCover(canvas, coverDesign, bookTitle, authorName);
+  }
+
+  showPage('page-cover-select');
+}
+
+function regenerateCover(){
+  coverDesign = null;
+  showPage('page-cover-loading');
+  generateFullCover();
+}
+
+// ──────────── PDF GENERATION (jsPDF text-based) ────────────
+async function confirmCoverAndMakePDF(){
+  if(!story) return;
+  const overlay = document.getElementById('pdf-progress-overlay');
+  const barEl   = document.getElementById('pdf-progress-bar');
+  const msgEl   = document.getElementById('pdf-progress-msg');
+  const titleEl = overlay.querySelector('.pdf-prog-title');
+  const iconEl  = overlay.querySelector('.pdf-prog-icon');
+  overlay.style.display='flex';
+  const sp=(pct,txt)=>{ barEl.style.width=pct+'%'; msgEl.textContent=txt; };
+
+  try {
+    // ── Phase 1: Generate chapters 2–10 if not already done ──
+    if(story.chapters.length < 10){
+      if(titleEl) titleEl.textContent='나머지 챕터를 생성하고 있어요...';
+      if(iconEl) iconEl.textContent='📖';
+      sp(0,'준비 중...');
+
+      const isEnglish = selectedLang === 'en';
+      const languageInstruction = selectedLang === 'ko'
+        ? `IMPORTANT: Write the ENTIRE story in Korean (한국어) as the primary language. All narrative and descriptions must be in Korean.\nHowever, you MAY use English words or sentences naturally when:\n- A character is speaking English in the scene\n- A character is learning English and practices it\n- English words appear naturally in Korean daily life (e.g. 카페, 오케이, Fighting!)\n- Signs, menus, or text in the story are in English\nThis mirrors how real Korean literary fiction is written — Korean-first but naturally incorporating English where it fits the story organically.`
+        : `IMPORTANT: Write the ENTIRE story in English only. All narrative and dialogue must be in English. Keep Korean proper nouns romanized (e.g. Gangneung, Seo-yeon, doenjang jjigae) but do not write any Korean characters anywhere in the story.`;
+      const writerRole = isEnglish
+        ? `You are a bestselling English novelist.\nStyle: Literary commercial fiction, warm and emotional tone.\nVocabulary: Natural adult English, accessible but sophisticated.\nProtagonist: ${ans.name}\n\nYou may naturally include Korean words and phrases where they feel authentic to the story.\nROMANIZED Korean words are ALWAYS fine: names (eomma, appa, unnie, oppa, sunbae), food (japchae, kimbap, tteokbokki, samgyeopsal), places (Hongdae, Sinchon, Yeouido), expressions (daebak, aigoo, fighting).\nHANGUL SCRIPT is also fine to use naturally: pet names (뭉치), affectionate calls (지수야, 엄마), money amounts (30억 원), signs/menus, brief Korean dialogue when a character speaks Korean.\nUse both romanized and Hangul naturally as a skilled literary author would.\n\nThis is an English language book. Write everything in English only. No Korean characters anywhere in the story text. Character names should be romanized (e.g. Mongchi not 몽치). Cultural terms should be translated or explained in English.`
+        : '당신은 한국어 베스트셀러 소설 작가입니다.';
+      const qualityStdFn = isEnglish
+        ? (part) => part === 1
+            ? `Write Part 1 of this chapter. Minimum 1,500 words.\nWrite with rich detail, full scene development, complete dialogue exchanges, and deep interiority.\nDo not summarize. Do not rush.\nTake your time with each scene.\nExpand every moment fully.\nShow don't tell throughout.\nInclude at least 2 fully developed scenes.`
+            : part === 2
+              ? `Write Part 2 continuing directly from Part 1. Minimum 1,500 words.\nContinue with the same rich detail and pacing.\nInclude character reflection and internal monologue.\nDo not wrap up or conclude - more story follows.`
+              : `Write Part 3 as the final section of this chapter. Minimum 1,500 words.\nBring this chapter to a satisfying but open ending that creates anticipation for the next chapter.\nInclude a memorable closing image or line.`
+        : (part) => part === 1
+            ? `이 챕터의 1부를 써주세요.\n최소 1,500 한국어 단어.\n풍부한 묘사, 완전한 장면 전개, 대화와 내면 독백을 포함하세요.\n요약하지 마세요. 서두르지 마세요.\n각 장면을 완전히 펼쳐주세요.`
+            : part === 2
+              ? `1부에서 바로 이어서 2부를 써주세요.\n최소 1,500 한국어 단어.\n같은 풍부한 디테일과 페이싱으로 계속하세요.`
+              : `이 챕터의 마지막 섹션을 써주세요.\n최소 1,500 한국어 단어.\n다음 챕터에 대한 기대감을 주는 기억에 남는 마무리로 끝내주세요.`;
+      const storyInfo = buildStoryInfo();
+      const rules = buildRules();
+      const lotteryRule = buildLotteryRule();
+      const outline = story.allChapterTitles;
+
+      const summaries = [
+        isEnglish
+          ? `Chapter 1 "${story.chapters[0].title}": ${story.chapters[0].content.substring(0,400).replace(/\n/g,' ')}...`
+          : `챕터 1 "${story.chapters[0].title}": ${story.chapters[0].content.substring(0,400).replace(/\n/g,' ')}...`
+      ];
+
+      for(let i=1; i<10; i++){
+        const chNum = i+1;
+        const chTitle = outline[i].title;
+        const isLast = chNum===10;
+        sp(Math.round(i/9*58), `챕터 ${chNum} 작성 중... (${chNum}/10)`);
+
+        const prevCtx = isEnglish
+          ? `\n**Previous chapters summary:**\n${summaries.join('\n')}\n`
+          : `\n**이전 챕터 요약:**\n${summaries.join('\n')}\n`;
+
+        const chPart1Prompt = isEnglish
+          ? `${languageInstruction}
+
+${writerRole}
+Write Part 1 of 3 for Chapter ${chNum} of the novel below.
+**Novel info:** Title: ${story.title}
+${storyInfo}
+**Full chapter outline:**
+${outline.map(c=>`Chapter ${c.number}: ${c.title}`).join('\n')}
+${prevCtx}
+**Now writing — Chapter ${chNum}: ${chTitle} (Part 1 of 3)**
+${qualityStdFn(1)}
+${rules}
+${lotteryRule}
+${languageInstruction}
+**Response format — output only the chapter body. No chapter number, title, or JSON. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**
+
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`
+          : `${languageInstruction}
+
+당신은 한국어 베스트셀러 소설 작가입니다. 아래 소설의 챕터 ${chNum} 파트 1을 집필해주세요.
+**소설 정보:** 제목: ${story.title}
+${storyInfo}
+**전체 챕터 구성:**
+${outline.map(c=>`챕터 ${c.number}: ${c.title}`).join('\n')}
+${prevCtx}
+**현재 집필 — 챕터 ${chNum}: ${chTitle} (파트 1/3)**
+${qualityStdFn(1)}
+${rules}
+${lotteryRule}
+${languageInstruction}
+**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**
+
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`;
+
+        const part1Raw = await apiCall(chPart1Prompt, 3500);
+        const part1Content = part1Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
+
+        const chPart2Prompt = isEnglish
+          ? `${languageInstruction}
+
+${writerRole}
+Write Part 2 of 2 for Chapter ${chNum}, continuing directly from Part 1.
+**Novel info:** Title: ${story.title}
+${storyInfo}
+**Part 1 content:**
+${part1Content}
+**Now writing — Chapter ${chNum}: ${chTitle} (Part 2 of 2)**
+Continue directly from Part 1. ${isLast ? 'Final chapter — bring the story to a moving, memorable conclusion.' : 'End naturally into the next chapter.'}
+**Length and quality:** ${qualityStdFn(chNum)}
+${rules}
+${lotteryRule}
+${languageInstruction}
+**Response format — output only the continuation. No chapter number, title, or JSON. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**
+
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`
+          : `${languageInstruction}
+
+당신은 한국어 베스트셀러 소설 작가입니다. 파트 1에 이어 챕터 ${chNum}의 파트 2를 집필해주세요.
+**소설 정보:** 제목: ${story.title}
+${storyInfo}
+**파트 1 내용:**
+${part1Content}
+**현재 집필 — 챕터 ${chNum}: ${chTitle} (파트 2/2)**
+파트 1에서 이어서 써주세요. ${isLast ? '이것은 마지막 챕터입니다. 전체 이야기를 긍정적이고 감동적으로 완결하세요. 마지막 단락은 독자의 가슴에 오래 남도록 특별히 공들여 써주세요.' : '다음 챕터로 자연스럽게 이어지는 여운을 남기세요.'}
+**분량 및 품질:** ${qualityStdFn(chNum)}
+${rules}
+${lotteryRule}
+${languageInstruction}
+**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**
+
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`;
+
+        const part2Raw = await apiCall(chPart2Prompt, 3500);
+        const part2Content = part2Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
+        const content = part1Content + '\n\n' + part2Content;
+        story.chapters.push({number:chNum, title:chTitle, content});
+        summaries.push(isEnglish
+          ? `Chapter ${chNum} "${chTitle}": ${content.substring(0,400).replace(/\n/g,' ')}...`
+          : `챕터 ${chNum} "${chTitle}": ${content.substring(0,400).replace(/\n/g,' ')}...`);
+      }
+    }
+
+    // ── Phase 2: Build PDF with jsPDF ──
+    if(titleEl) titleEl.textContent='PDF 생성 중';
+    if(iconEl) iconEl.textContent='📄';
+    await generatePDF(sp);
+
+  } catch(err){
+    overlay.style.display='none';
+    console.error('챕터 생성 오류:',err);
+    showToast('⚠️ 챕터 생성 중 문제가 발생했어요. 다시 시도해주세요.');
+  }
+}
+
+async function generatePDF(sp) {
+  try {
+    showLoading('PDF 생성 중...');
+
+    const response = await fetch(`${PDF_SERVER_URL}/generate-pdf`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        bookTitle: bookTitle,
+        authorName: authorName,
+        chapters: generatedChapters,
+        coverImageUrl: selectedCoverImage,
+        coverDesign: coverDesign,
+        language: selectedLanguage,
+        selectedProduct: selectedProduct
+      })
+    });
+
+    if (!response.ok) throw new Error('Server error');
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${bookTitle}.pdf`;
+    a.click();
+
+    hideLoading();
+    showToast('✅ PDF 다운로드 완료!');
+
+  } catch (error) {
+    console.error('Railway PDF failed, using fallback:', error);
+    generatePDFFallback();
+  }
+}
+
+async function setupKoreanPDFFont(doc) {
+  try {
+    const response = await fetch(
+      'https://cdn.jsdelivr.net/gh/threeHeaven/jspdf-korean/NanumGothic.ttf'
+    );
+    if (!response.ok) throw new Error('Font fetch failed');
+    const buffer = await response.arrayBuffer();
+    const uint8Array = new Uint8Array(buffer);
+    let binary = '';
+    const chunkSize = 8192;
+    for (let i = 0; i < uint8Array.length; i += chunkSize) {
+      const chunk = uint8Array.subarray(i, i + chunkSize);
+      binary += String.fromCharCode.apply(null, chunk);
+    }
+    const base64 = btoa(binary);
+    doc.addFileToVFS('NanumGothic.ttf', base64);
+    doc.addFont('NanumGothic.ttf', 'NanumGothic', 'normal');
+    doc.addFont('NanumGothic.ttf', 'NanumGothic', 'bold');
+    console.log('Korean font loaded successfully');
+    return 'NanumGothic';
+  } catch (error) {
+    console.log('Korean font load failed, using Times fallback:', error);
+    return null;
+  }
+}
+
+function cleanMarkdownForPDF(text) {
+  return text
+    .replace(/[\u{1F000}-\u{1FFFF}]/gu, '')
+    .replace(/[\u{2600}-\u{27FF}]/gu, '')
+    .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+    .replace(/\*\*\*(.*?)\*\*\*/g, '$1')
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/_(.*?)_/g, '$1')
+    .replace(/^#{1,6}\s+/gm, '')
+    .replace(/^---+$/gm, '\n* * *\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+async function generatePDFPrimary(sp) {
+  const overlay = document.getElementById('pdf-progress-overlay');
+
+  sp(62,'PDF 라이브러리 불러오는 중...');
+
+  if(!window.jspdf){
+    await new Promise((res,rej)=>{
+      const s=document.createElement('script');
+      s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+      s.onload=res; s.onerror=()=>rej(new Error('jsPDF CDN 로드 실패'));
+      document.head.appendChild(s);
+    });
+  }
+
+  sp(65,'표지 준비 중...');
+  await document.fonts.ready;
+
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF({orientation:'portrait', unit:'mm', format:[127,188], compress:true});
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  doc.setCharSpace(0);
+
+  // Load Korean font if needed
+  let bodyFont = 'helvetica';
+  if (selectedLang === 'ko') {
+    sp(66, '한국어 폰트 로딩 중...');
+    const koreanFont = await setupKoreanPDFFont(doc);
+    if (koreanFont) bodyFont = koreanFont;
+  }
+
+  // Cover page (use pre-rendered canvas)
+  const coverCanvas = document.getElementById('cover-canvas');
+  if(coverCanvas){
+    doc.addImage(coverCanvas.toDataURL('image/jpeg',0.95),'JPEG',0,0,127,188);
+  }
+
+  const PW=127, PH=188;
+  const mL=25, mR=25, mTop=15, mBot=18;
+  const textW = PW - mL - mR;
+  let globalPage = 1;
+
+  const drawPageHeader = () => {
+    // Running header removed
+  };
+
+  const drawPageNum = () => {
+    doc.setFont(bodyFont,'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(136,136,136);
+    doc.text(`— ${globalPage} —`, PW/2, PH - 5, {align:'center'});
+  };
+
+  // Pre-calculate chapter start pages for TOC
+  const AVG_CHARS_PER_LINE = 67;
+  const LINES_PER_BODY_PAGE = 21;
+  const FIRST_PAGE_LINES = 15;
+  const chapStartPages = [];
+  let estPage = 3;
+  for (const ch of story.chapters) {
+    chapStartPages.push(estPage);
+    const totalLines = Math.ceil(ch.content.length / AVG_CHARS_PER_LINE);
+    const totalPages = 1 + Math.max(0, Math.ceil((totalLines - FIRST_PAGE_LINES) / LINES_PER_BODY_PAGE));
+    estPage += totalPages;
+  }
+
+  // TOC page
+  doc.addPage();
+  globalPage++;
+  let tocY = mTop + 12;
+
+  doc.setFont(bodyFont,'bold');
+  doc.setFontSize(26);
+  doc.setTextColor(61,90,71);
+  doc.text((selectedLang === 'en') ? 'Contents' : '목  차', PW/2, tocY, {align:'center'});
+  tocY += 12;
+
+  doc.setDrawColor(196,168,130);
+  doc.setLineWidth(0.4);
+  doc.line((PW-50)/2, tocY, (PW+50)/2, tocY);
+  tocY += 10;
+
+  for (let i = 0; i < story.chapters.length; i++) {
+    const ch = story.chapters[i];
+    const pgNum = chapStartPages[i];
+    const entryY = tocY + i * 12;
+
+    // Chapter number
+    doc.setFont(bodyFont,'normal');
+    doc.setFontSize(12);
+    doc.setTextColor(196,168,130);
+    doc.text(`${ch.number}.`, mL + 5, entryY, {align:'right'});
+
+    // Chapter title
+    doc.setFont(bodyFont,'normal');
+    doc.setFontSize(13);
+    doc.setTextColor(44,44,44);
+    const maxChars = 28;
+    const titleShort = ch.title.length > maxChars ? ch.title.substring(0, maxChars-1)+'…' : ch.title;
+    const titleEndX = mL + 8 + doc.getTextWidth(titleShort) + 2;
+    doc.text(titleShort, mL + 8, entryY);
+
+    // Page number
+    doc.setFont(bodyFont,'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(136,136,136);
+    const pgNumStr = String(pgNum);
+    const pgNumW = doc.getTextWidth(pgNumStr);
+    const pgStartX = PW - mR - pgNumW - 2;
+    doc.text(pgNumStr, PW - mR, entryY, {align:'right'});
+
+    // Dashed connector
+    if (pgStartX > titleEndX + 4) {
+      try {
+        doc.setDrawColor(200,200,200);
+        doc.setLineWidth(0.1);
+        doc.setLineDashPattern([0.5, 2], 0);
+        doc.line(titleEndX, entryY - 1.2, pgStartX, entryY - 1.2);
+        doc.setLineDashPattern([], 0);
+      } catch(e3) { /* skip connector if method unavailable */ }
+    }
+  }
+
+  // Chapter pages
+  for(let ci=0; ci<story.chapters.length; ci++){
+    const ch = story.chapters[ci];
+    sp(65 + Math.round((ci+1)/story.chapters.length*30), `챕터 ${ch.number} PDF 작성 중...`);
+    doc.addPage();
+    globalPage++;
+    ch.pageNumber = doc.internal.getCurrentPageInfo().pageNumber;
+
+    drawPageHeader();
+    let y = mTop + 10;
+
+    // CHAPTER N label
+    doc.setFont(bodyFont,'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(196,168,130);
+    doc.text(`CHAPTER ${ch.number}`, PW/2, y, {align:'center', charSpace:0.8});
+    y += 8;
+
+    // Chapter title
+    doc.setFont(bodyFont,'bold');
+    doc.setFontSize(22);
+    doc.setTextColor(61,90,71);
+    const titleLines = doc.splitTextToSize(ch.title, textW);
+    doc.text(titleLines, PW/2, y, {align:'center'});
+    y += titleLines.length * 9 + 5;
+
+    // Divider
+    doc.setFont(bodyFont,'normal');
+    doc.setFontSize(12);
+    doc.setTextColor(196,168,130);
+    doc.text('── ✦ ──', PW/2, y, {align:'center'});
+    y += 12;
+
+    // Body text
+    doc.setFont(bodyFont,'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(44,44,44);
+
+    const paras = cleanMarkdownForPDF(ch.content).split(/\n\n+|\n/).filter(p=>p.trim());
+    let isFirstParagraph = true;
+
+    for (const para of paras) {
+      const cleanPara = para.trim();
+      doc.setFont(bodyFont,'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(44,44,44);
+
+      // Page break check before paragraph
+      if (y + 14 > PH - mBot) {
+        drawPageNum();
+        doc.addPage();
+        globalPage++;
+        drawPageHeader();
+        y = mTop + 8;
+        doc.setFont(bodyFont,'normal');
+        doc.setFontSize(11);
+        doc.setTextColor(44,44,44);
+      }
+
+      if (cleanPara.includes('*')) {
+        const newY = renderParagraphWithItalics(
+          doc, cleanPara,
+          isFirstParagraph ? mL : mL + 8,
+          y, textW, 11, bodyFont
+        );
+        y = newY + 3;
+      } else {
+        const lines = doc.splitTextToSize(cleanPara, textW);
+        if (!isFirstParagraph) {
+          // First-line indent
+          const firstLine = lines[0] || '';
+          if (y + 7 > PH - mBot) {
+            drawPageNum();
+            doc.addPage();
+            globalPage++;
+            drawPageHeader();
+            y = mTop + 8;
+            doc.setFont(bodyFont,'normal');
+            doc.setFontSize(11);
+            doc.setTextColor(44,44,44);
+          }
+          doc.text(firstLine, mL + 8, y);
+          y += 7;
+          for (const line of lines.slice(1)) {
+            if (y + 7 > PH - mBot) {
+              drawPageNum();
+              doc.addPage();
+              globalPage++;
+              drawPageHeader();
+              y = mTop + 8;
+              doc.setFont(bodyFont,'normal');
+              doc.setFontSize(11);
+              doc.setTextColor(44,44,44);
+            }
+            doc.text(line, mL, y);
+            y += 7;
+          }
+          y += 3;
+        } else {
+          // No indent for first paragraph of each chapter
+          for (const line of lines) {
+            if (y + 7 > PH - mBot) {
+              drawPageNum();
+              doc.addPage();
+              globalPage++;
+              drawPageHeader();
+              y = mTop + 8;
+              doc.setFont(bodyFont,'normal');
+              doc.setFontSize(11);
+              doc.setTextColor(44,44,44);
+            }
+            doc.text(line, mL, y);
+            y += 7;
+          }
+          y += 3;
+        }
+      }
+      isFirstParagraph = false;
+    }
+    drawPageNum();
+  }
+
+  sp(96,'저장 중...');
+  doc.save(`${story.title}.pdf`);
+  sp(100,'완료!');
+
+  setTimeout(()=>{
+    if(overlay) overlay.style.display='none';
+    const suc=document.getElementById('pdf-success-msg');
+    suc.textContent = '✅ PDF 다운로드 완료!';
+    suc.style.display='block';
+    setTimeout(()=>{ suc.style.display='none'; },5000);
+  },500);
+}
+
+function renderLineSegments(doc, segments, x, y, fontName, fontSize) {
+  let currentX = x;
+  for (const seg of segments) {
+    try {
+      doc.setFont(fontName, seg.style || 'normal');
+    } catch(e) {
+      doc.setFont('times', seg.style || 'normal');
+    }
+    doc.setFontSize(fontSize);
+    doc.text(seg.text, currentX, y);
+    currentX += seg.width;
+  }
+}
+
+function renderParagraphWithItalics(doc, text, x, y, maxWidth, fontSize, fontName) {
+  const parts = [];
+  const regex = /\*\*([^*]+)\*\*|\*([^*]+)\*/g;
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({ text: text.slice(lastIndex, match.index), style: 'normal' });
+    }
+    if (match[1]) {
+      parts.push({ text: match[1], style: 'bold' });
+    } else {
+      parts.push({ text: match[2], style: 'italic' });
+    }
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) {
+    parts.push({ text: text.slice(lastIndex), style: 'normal' });
+  }
+  if (parts.length === 0) {
+    parts.push({ text: text, style: 'normal' });
+  }
+
+  let currentLineWidth = 0;
+  let currentY = y;
+  let lineSegments = [];
+
+  for (const part of parts) {
+    const words = part.text.split(' ');
+    for (let i = 0; i < words.length; i++) {
+      const word = words[i];
+      const wordWithSpace = (i === words.length - 1) ? word : word + ' ';
+      try {
+        doc.setFont(fontName, part.style || 'normal');
+      } catch(e) {
+        doc.setFont('times', part.style || 'normal');
+      }
+      doc.setFontSize(fontSize);
+      const wordWidth = doc.getTextWidth(wordWithSpace);
+
+      if (currentLineWidth + wordWidth > maxWidth && currentLineWidth > 0) {
+        renderLineSegments(doc, lineSegments, x, currentY, fontName, fontSize);
+        currentY += fontSize * 0.45;
+        currentLineWidth = 0;
+        lineSegments = [];
+      }
+
+      const lastSeg = lineSegments[lineSegments.length - 1];
+      if (lastSeg && lastSeg.style === (part.style || 'normal')) {
+        lastSeg.text += wordWithSpace;
+        lastSeg.width += wordWidth;
+      } else {
+        lineSegments.push({ text: wordWithSpace, style: part.style || 'normal', width: wordWidth });
+      }
+      currentLineWidth += wordWidth;
+    }
+  }
+
+  if (lineSegments.length > 0) {
+    renderLineSegments(doc, lineSegments, x, currentY, fontName, fontSize);
+    currentY += fontSize * 0.45;
+  }
+
+  return currentY;
+}
+
+async function generatePDFFallback() {
+  const overlay = document.getElementById('pdf-progress-overlay');
+  try {
+    if(!window.jspdf){
+      await new Promise((res,rej)=>{
+        const s=document.createElement('script');
+        s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        s.onload=res; s.onerror=()=>rej(new Error('jsPDF CDN 로드 실패'));
+        document.head.appendChild(s);
+      });
+    }
+    const {jsPDF} = window.jspdf;
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: [139.7, 215.9] // 5.5 x 8.5 inches in mm (standard novel size)
+    });
+
+    const margin = 20; // 20mm margins
+    const pageWidth = doc.internal.pageSize.getWidth();   // 139.7mm
+    const pageHeight = doc.internal.pageSize.getHeight(); // 215.9mm
+    const textWidth = pageWidth - (margin * 2);           // 99.7mm usable
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10.5);
+    const lineHeight = 5.5;
+    const paragraphSpacing = 4;
+    doc.setCharSpace(0);
+
+    // Page 1: Full cover image (canvas has the selected Ideogram image drawn on it)
+    const coverCanvas = document.getElementById('cover-canvas');
+    if (coverCanvas) {
+      doc.addImage(coverCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0,
+        pageWidth, pageHeight);
+    } else {
+      // Fallback solid color cover if canvas isn't available
+      doc.setFillColor(61, 90, 71);
+      doc.rect(0, 0, pageWidth, pageHeight, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('times', 'bold');
+      doc.setFontSize(20);
+      doc.text(story.title || 'My Story', pageWidth / 2, pageHeight / 2, {align: 'center', maxWidth: 100});
+    }
+    const tocLineHeight = 10;
+    const chapters = story.chapters;
+
+    // Reserve TOC page — will be filled in after chapters are rendered
+    doc.addPage();
+    const tocPageNum = doc.internal.getCurrentPageInfo().pageNumber;
+
+    // Pass 1: render all chapter pages to capture accurate starting page numbers
+    for (let i = 0; i < chapters.length; i++) {
+      doc.addPage();
+      chapters[i].pageNumber = doc.internal.getCurrentPageInfo().pageNumber;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(13);
+      doc.setTextColor(44, 44, 44);
+      doc.text(chapters[i].title, pageWidth / 2, 20, {align: 'center'});
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10.5);
+
+      const lines = doc.splitTextToSize(cleanMarkdownForPDF(chapters[i].content || ''), textWidth);
+      let y = 35;
+      const bottomMargin = margin + 15;
+
+      lines.forEach(line => {
+        if (y + lineHeight > pageHeight - bottomMargin) {
+          doc.addPage();
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(10.5);
+          y = margin + 10;
+        }
+        doc.text(line, margin, y);
+        y += lineHeight;
+      });
+    }
+
+    // Pass 2: go back to the reserved TOC page and fill it in with accurate page numbers
+    doc.setPage(tocPageNum);
+    doc.setFillColor(255, 255, 255);
+    doc.rect(0, 0, pageWidth, pageHeight, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.text('Contents', margin, margin + 10);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10.5);
+    let tocY = margin + 30;
+
+    chapters.forEach((chapter) => {
+      doc.text(chapter.title, margin, tocY);
+      tocY += 10;
+    });
+
+    const totalPages = doc.internal.getNumberOfPages();
+    addPageNumbers(doc, totalPages, margin);
+    doc.save((story.title || 'my-story') + '.pdf');
+    if(overlay) overlay.style.display = 'none';
+    showToast('✅ PDF 다운로드 완료!');
+
+  } catch(fallbackError) {
+    console.error('Fallback also failed:', fallbackError);
+    if(overlay) overlay.style.display = 'none';
+    showToast('⚠️ PDF 생성 중 문제가 발생했어요. 다시 시도해주세요.');
+  }
+}
+
+function addPageNumbers(doc, totalPages, margin) {
+  for (let i = 2; i <= totalPages; i++) { // start from page 2, skip cover
+    doc.setPage(i);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(100);
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    doc.text(String(i - 1), pageWidth / 2, pageHeight - 10, { align: 'center' });
+    doc.setTextColor(0);
+  }
+}
+
+function htmlEsc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ──────────── TOAST ────────────
+function showToast(msg){
+  const t=document.getElementById('toast');
+  if(msg) t.textContent=msg;
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',3200);
+}
+
+// Close modal on overlay click
+document.getElementById('modal-api').addEventListener('click',function(e){
+  if(e.target===this) this.classList.remove('open');
+});
+
+// ──────────── KOREAN DETECTION ────────────
+function isKorean(text) {
+  return /[가-힯ᄀ-ᇿ㄰-㆏]/.test(text);
+}
+
+// ──────────── IDEOGRAM API ────────────
+async function generateBookCover(coverBrief) {
+  console.log('coverBrief:', coverBrief);
+
+  const prompt1 = coverBrief.cover1;
+  const prompt2 = coverBrief.cover2;
+  const prompt3 = coverBrief.cover3;
+  const prompt4 = coverBrief.cover4;
+
+  const results = await Promise.all(
+    [prompt1, prompt2, prompt3, prompt4].map(prompt =>
+      fetch(`${window.PDF_SERVER_URL}/generate-cover`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      }).then(r => r.json()).then(data => data.data[0].url)
+    )
+  );
+  return results;
+}
+
+// ──────────── CANVAS COVER TEXT ────────────
+function drawCoverText(canvas, coverBrief, title, author) {
+  const ctx = canvas.getContext('2d');
+  const korean = isKorean(title);
+
+  const fontMap = {
+    'BARLOW': "'Barlow Condensed'",
+    'PLAYFAIR': "'Playfair Display'",
+    'ANTON': "'Anton'",
+    'CORMORANT': "'Cormorant Garamond'",
+    'SPECTRAL': "'Spectral'",
+    'DM_SERIF': "'DM Serif Display'",
+    'LIBRE': "'Libre Baskerville'",
+    'NOTO_SANS_KR': "'Noto Sans KR'",
+    'NOTO_SERIF_KR': "'Noto Serif KR'"
+  };
+
+  const chosenFont = korean
+    ? (coverBrief.fontStyle === 'NOTO_SERIF_KR' ? "'Noto Serif KR'" : "'Noto Sans KR'")
+    : (fontMap[coverBrief.fontStyle] || "'Barlow Condensed'");
+
+  const textColor = coverBrief.textColor || '#FFFFFF';
+  const titleLines = coverBrief.titleLines || [title];
+
+  function fitText(text, maxWidth, startSize, minSize) {
+    let fontSize = startSize;
+    ctx.font = `900 ${fontSize}px ${chosenFont}, sans-serif`;
+    while (ctx.measureText(text).width > maxWidth && fontSize > minSize) {
+      fontSize -= 2;
+      ctx.font = `900 ${fontSize}px ${chosenFont}, sans-serif`;
+    }
+    return fontSize;
+  }
+
+  const startY = canvas.height * 0.15;
+  const maxWidth = canvas.width * 0.85;
+  let currentY = startY;
+
+  titleLines.forEach((line, index) => {
+    const fontSize = fitText(line, maxWidth, 100, 40);
+    ctx.font = `900 ${fontSize}px ${chosenFont}, sans-serif`;
+    ctx.fillStyle = textColor;
+    ctx.globalAlpha = 1;
+    ctx.textAlign = coverBrief.titleAlign === 'center' ? 'center' : 'left';
+    const x = coverBrief.titleAlign === 'center' ? canvas.width * 0.5 : canvas.width * 0.07;
+    ctx.fillText(line, x, currentY + fontSize);
+    currentY += fontSize + 20;
+  });
+
+  const lineY = currentY + 20;
+  ctx.fillStyle = coverBrief.accentColor || textColor;
+  ctx.globalAlpha = 0.8;
+  ctx.fillRect(canvas.width * 0.07, lineY, 80, 2);
+  ctx.globalAlpha = 1;
+
+  const authorFont = korean ? "'Noto Sans KR'" : "'Montserrat'";
+  ctx.font = `400 18px ${authorFont}, sans-serif`;
+  ctx.fillStyle = textColor;
+  ctx.globalAlpha = 0.9;
+  ctx.textAlign = 'left';
+  ctx.letterSpacing = '4px';
+  ctx.fillText(author.toUpperCase(), canvas.width * 0.07, canvas.height * 0.93);
+  ctx.letterSpacing = '0px';
+
+  ctx.font = "300 11px 'Montserrat', sans-serif";
+  ctx.fillStyle = textColor;
+  ctx.globalAlpha = 0.5;
+  ctx.textAlign = 'right';
+  ctx.fillText('anotherbook', canvas.width * 0.95, canvas.height * 0.97);
+  ctx.globalAlpha = 1;
+  ctx.textAlign = 'left';
+}
+
+// ──────────── PARSE COVER BRIEF ────────────
+function parseCoverBrief(claudeResponse) {
+  try {
+    const match = claudeResponse.match(/<coverBrief>([\s\S]*?)<\/coverBrief>/);
+    if (match) {
+      const brief = JSON.parse(match[1].trim());
+      if (!brief.authorName && brief.author) brief.authorName = brief.author;
+      return brief;
+    }
+  } catch (e) {
+    console.error('Failed to parse cover brief:', e);
+  }
+  return null;
+}
+
+// ──────────── DEV KEYBOARD SHORTCUTS ────────────
+// Ctrl+Shift+P → PDF formatting test (no API calls, ₩0)
+// Set DEV_MODE = false before shipping to production.
+
+const DEV_TEST_CHAPTERS = [
+  {
+    title: "The Morning She Stopped Counting",
+    content: `She had been counting for eleven years. The days since her last vacation — *four thousand and twelve*. The hours logged in the quarter — **eighty-seven**. The number of times she had eaten lunch away from her desk — once, and only because the building lost power.
+
+That Tuesday morning, the alarm went off at five-fifteen as it always did. Elena reached for her phone with the practiced efficiency of someone who had long since stopped needing to think about it. She silenced it before the second pulse. She was already awake.
+
+The apartment was quiet in the way that expensive apartments in expensive cities are quiet — the silence of good insulation, of neighbors who also worked too much, of a life arranged precisely to minimize distraction.
+
+She made coffee. She did not look out the window.
+
+Later, she would struggle to explain what happened in the bathroom. She was brushing her teeth when she caught her own eyes in the mirror, and something — some *fraying thread* in the careful fabric of her composure — simply gave way.
+
+She stood there for what might have been three minutes or thirty. The electric toothbrush kept humming. She did not notice when it stopped.
+
+The face looking back at her was not quite a stranger's. But it was not entirely hers either. It belonged to someone who had been somewhere else for a very long time.
+
+She called in sick for the first time in six years. She used the word *tired* and felt, immediately, that it was the most honest thing she had said in recent memory.
+
+The day stretched out in front of her, **unscheduled and bewildering**. She did not know what to do with it.
+
+She started by sitting on the floor.`
+  },
+  {
+    title: "What Remains When Everything Is Quiet",
+    content: `There is a particular quality to afternoon light in October that Elena had not seen in years. Not because it had changed — light does not change — but because she had always been inside by then, behind glass, behind the blue glow of a monitor, behind the steady accumulation of things that *needed doing*.
+
+She sat on the bench in the small park two blocks from her building. She had passed this park every morning for four years and had never once sat in it.
+
+A dog came and pressed its nose against her knee. Its owner apologized, and Elena said, *"Please don't,"* meaning: please do not take it away.
+
+She thought about her mother, who had always said that the trouble with Elena was not that she worked too hard but that she had **forgotten how to want things for herself**. At the time, Elena had found this observation irritating in the way that accurate things often are.
+
+She had wants. She wanted promotions. She wanted quarterly targets met. She wanted to be the kind of person other people described as exceptional.
+
+She had achieved all of these things.
+
+The dog was still there, patient and warm against her leg.
+
+She thought: *I do not know what I like.*
+
+Not in the way she had sometimes thought it during a bad week, as a complaint. But as a genuine question, a *discovery of absence* — the way you might reach for something on a shelf and find only air.
+
+What did she like? What would she choose, if choosing were allowed to be simple?
+
+The light moved through the leaves. A child across the path was eating something orange and getting it on everything. The dog finally left with its owner, glancing back once.
+
+Elena stayed until the cold came in. **She did not check her phone.**
+
+This, she thought, was a beginning. She was not sure of what. But she had learned, in the long years of her careful, efficient life, that beginnings often did not announce themselves. They arrived quietly, like afternoon light, and you either noticed them or you didn't.
+
+She noticed.`
+  },
+  {
+    title: "잊혀진 빛을 찾아서",
+    content: `지수는 창문 앞에 서서 서울의 skyline을 바라보았다. *그 순간만큼은* 시간이 멈춘 것 같았다. 11년 동안 매일 아침 이 창문을 지나쳤지만, 한 번도 제대로 바라본 적이 없었다.
+
+"또 야근이에요?" 동료 민준이 물었다. 그의 목소리에는 걱정과 체념이 함께 섞여 있었다.
+
+지수는 고개를 끄덕였다. "어쩔 수 없어요. 마감이 내일인데." She said it in Korean but thought it in English — the language of deadlines, of quarterly reviews, of performance metrics that never quite added up to a life.
+
+커피 한 잔을 손에 들고, 그녀는 다시 노트북 앞에 앉았다. 화면에는 숫자들이 가득했다 — revenue projections, KPI dashboards, pivot tables. *아름다운 것은 아무것도 없었다.* 그저 효율과 성과만이 존재할 뿐이었다.
+
+퇴근길, 지수는 처음으로 이어폰을 끼지 않았다. 홍대 거리에는 버스킹 음악이 흘러넘쳤다 — 어떤 청년이 기타를 치며 조용히 노래하고 있었다. 가사는 알아들을 수 없었지만, *그 멜로디는 오래전 잊고 있던 무언가를 건드렸다.*
+
+"행복하세요?" 그 청년이 갑자기 물었다. 지수는 깜짝 놀라 걸음을 멈췄다.
+
+She had no answer. In Korean or in English.
+
+그날 밤, 지수는 일기장을 꺼냈다. 마지막으로 쓴 날짜는 2019년 3월 7일이었다. 거의 5년 전. 페이지를 넘기자 그때의 자신이 보였다 — 꿈이 있었고, 좋아하는 것들이 있었고, *시간을 세지 않았던* 지수가.
+
+그 페이지 아래, 그녀는 천천히 펜을 들었다. 오늘의 날짜를 쓰고, 딱 한 문장만 적었다.
+
+나는 무엇을 좋아하는가.
+
+It was a beginning. Small and uncertain — the kind that doesn't announce itself. But she had written it in Korean, her mother tongue, the language she had slowly stopped using for anything that mattered.
+
+*그것으로 충분했다.*`
+  }
+];
+
+async function devTestPDF() {
+  if (!DEV_MODE) return;
+  showToast('🔧 Dev Mode: PDF Test');
+
+  const overlay = document.getElementById('pdf-progress-overlay');
+  const msgEl   = document.getElementById('pdf-progress-msg');
+  const barEl   = document.getElementById('pdf-progress-bar');
+  if (overlay) overlay.style.display = 'flex';
+  if (barEl)   barEl.style.width = '35%';
+  if (msgEl)   msgEl.textContent = 'PDF 서버로 전송 중...';
+
+  try {
+    const response = await fetch(`${PDF_SERVER_URL}/generate-pdf`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        bookTitle: "The Light I Almost Forgot",
+        authorName: "Sara Kim",
+        language: "en",
+        coverDesign: {
+          coverColor: "#2C1B5E",
+          textColor: "#FFFFFF",
+          accentColor: "#D4AF37",
+          symbol: "a single floating key",
+          layout: "title_dominant"
+        },
+        coverImageUrl: null,
+        chapters: DEV_TEST_CHAPTERS
+      })
+    });
+
+    if (!response.ok) throw new Error(`Server error ${response.status}`);
+
+    const blob = await response.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = 'dev-pdf-test.pdf';
+    a.click();
+
+    if (overlay) overlay.style.display = 'none';
+    showToast('✅ PDF 다운로드 완료!');
+  } catch (err) {
+    if (overlay) overlay.style.display = 'none';
+    showToast('⚠️ PDF 생성 실패: ' + err.message);
+    console.error('[DEV] PDF test failed:', err);
+  }
+}
+
+
+document.addEventListener('keydown', function(e) {
+  if (!DEV_MODE) return;
+  if (e.ctrlKey && e.shiftKey && e.key === 'P') { e.preventDefault(); devTestPDF(); }
+});
+</script>
+
+<!-- DEV MODE: Cover Test Result Modal -->
+<div id="dev-cover-modal">
+  <div class="dev-modal-card">
+    <div class="dev-modal-label">🔧 Cover Test Result</div>
+    <canvas id="dev-cover-canvas"></canvas>
+    <div class="dev-modal-hint">Ctrl+Shift+P to test this in PDF</div>
+    <button class="dev-modal-close"
+      onclick="document.getElementById('dev-cover-modal').style.display='none'">
+      Close
+    </button>
+  </div>
+</div>
+
+
+</body>
+</html>
