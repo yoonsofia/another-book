@@ -2319,7 +2319,9 @@ ${qualityStdFn(1)}
 ${rules}
 ${lotteryRule}
 ${languageInstruction}
-**Response format — output only the chapter body. No chapter number, title, or JSON. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**`
+**Response format — output only the chapter body. No chapter number, title, or JSON. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**
+
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`
       : `${languageInstruction}
 
 당신은 한국어 베스트셀러 소설 작가입니다. 아래 소설의 챕터 1 파트 1을 집필해주세요.
@@ -2337,9 +2339,11 @@ ${qualityStdFn(1)}
 ${rules}
 ${lotteryRule}
 ${languageInstruction}
-**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**`;
+**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**
 
-    const ch1Part1Raw = await apiCall(ch1Part1Prompt, 4000);
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`;
+
+    const ch1Part1Raw = await apiCall(ch1Part1Prompt, 3500);
     const ch1Part1Content = ch1Part1Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
 
     setLoadMsg('📖 풍부한 장면을 펼치고 있어요...');
@@ -2363,7 +2367,9 @@ ${qualityStdFn(2)}
 ${rules}
 ${lotteryRule}
 ${languageInstruction}
-**Response format — output only the continuation. No chapter number, title, or JSON. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**`
+**Response format — output only the continuation. No chapter number, title, or JSON. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**
+
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`
       : `${languageInstruction}
 
 당신은 한국어 베스트셀러 소설 작가입니다. 파트 1에 이어 챕터 1의 파트 2를 집필해주세요.
@@ -2381,9 +2387,11 @@ ${qualityStdFn(2)}
 ${rules}
 ${lotteryRule}
 ${languageInstruction}
-**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**`;
+**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**
 
-    const ch1Part2Raw = await apiCall(ch1Part2Prompt, 4000);
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`;
+
+    const ch1Part2Raw = await apiCall(ch1Part2Prompt, 3500);
     const ch1Part2Content = ch1Part2Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
 
     setLoadMsg('🎨 마무리 중...');
@@ -2408,6 +2416,8 @@ ${rules}
 ${lotteryRule}
 ${languageInstruction}
 **Response format — output only the story continuation. No chapter number, no title. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines.**
+
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.
 
 After writing the story chapter, you MUST output a cover brief on a new line in this exact format with no variations:
 
@@ -2455,6 +2465,8 @@ ${lotteryRule}
 ${languageInstruction}
 **응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목 없이. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분.**
 
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.
+
 스토리 챕터를 쓴 후, 반드시 새 줄에 아래 형식 그대로 커버 브리프를 출력하세요. 형식을 바꾸지 마세요:
 
 이 책의 표지를 위해 완전히 다른 Ideogram 이미지 프롬프트 4개를 생성하세요. 각각은 시각적 스타일, 레이아웃, 색상 팔레트, 타이포그래피 방향이 진정으로 달라야 합니다.
@@ -2483,7 +2495,7 @@ ${languageInstruction}
 
 이 블록은 필수입니다. 절대 생략하지 마세요.`;
 
-    const ch1Part3Raw = await apiCall(ch1Part3Prompt, 4000);
+    const ch1Part3Raw = await apiCall(ch1Part3Prompt, 3500);
     let ch1Part3Content = ch1Part3Raw
       .replace(/<coverBrief>[\s\S]*?<\/coverBrief>/g, '')
       .replace(/^```[\s\S]*?\n|```$/gm,'')
@@ -2960,24 +2972,24 @@ async function showCoverSelection(imageUrls, coverBrief, title, author) {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 16px;
     box-sizing: border-box;
     overflow-y: auto;
   `;
 
   modal.innerHTML = `
-    <h2 style="color: #F5F0E8; font-family: 'Montserrat', sans-serif;
-               font-weight: 300; letter-spacing: 6px; font-size: 14px;
-               text-transform: uppercase; margin-bottom: 24px;">
-      Choose Your Cover
+    <h2 style="color: #F5F0E8; font-family: 'Noto Sans KR', sans-serif;
+               font-weight: 300; letter-spacing: 4px; font-size: 13px;
+               text-transform: uppercase; margin-bottom: 14px;">
+      표지를 선택해주세요
     </h2>
     <div id="cover-grid" style="
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-      max-width: 640px;
+      gap: 12px;
+      max-width: 600px;
       width: 100%;
-      margin-bottom: 24px;
+      margin-bottom: 14px;
     ">
       ${composedCovers.map((dataUrl, i) => `
         <div class="cover-option" data-index="${i}" data-ideogram-url="${imageUrls[i]}" style="
@@ -2989,26 +3001,28 @@ async function showCoverSelection(imageUrls, coverBrief, title, author) {
         ">
           <img src="${dataUrl}" style="
             width: 100%;
+            max-height: 280px;
+            object-fit: cover;
+            border-radius: 4px;
             display: block;
           " />
         </div>
       `).join('')}
     </div>
     <button id="use-cover-btn" style="
-      padding: 16px 48px;
+      padding: 12px 40px;
       background: #FFD600;
       color: #0D0D0D;
       border: none;
       border-radius: 4px;
-      font-family: 'Montserrat', sans-serif;
+      font-family: 'Noto Sans KR', sans-serif;
       font-size: 14px;
       font-weight: 700;
-      letter-spacing: 3px;
-      text-transform: uppercase;
+      letter-spacing: 2px;
       cursor: pointer;
       opacity: 0.4;
       pointer-events: none;
-    ">Use This Cover</button>
+    ">이 표지로 계속하기 →</button>
   `;
 
   document.body.appendChild(modal);
@@ -3419,7 +3433,9 @@ ${qualityStdFn(1)}
 ${rules}
 ${lotteryRule}
 ${languageInstruction}
-**Response format — output only the chapter body. No chapter number, title, or JSON. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**`
+**Response format — output only the chapter body. No chapter number, title, or JSON. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**
+
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`
           : `${languageInstruction}
 
 당신은 한국어 베스트셀러 소설 작가입니다. 아래 소설의 챕터 ${chNum} 파트 1을 집필해주세요.
@@ -3433,9 +3449,11 @@ ${qualityStdFn(1)}
 ${rules}
 ${lotteryRule}
 ${languageInstruction}
-**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**`;
+**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**
 
-        const part1Raw = await apiCall(chPart1Prompt, 4000);
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`;
+
+        const part1Raw = await apiCall(chPart1Prompt, 3500);
         const part1Content = part1Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
 
         const chPart2Prompt = isEnglish
@@ -3453,7 +3471,9 @@ Continue directly from Part 1. ${isLast ? 'Final chapter — bring the story to 
 ${rules}
 ${lotteryRule}
 ${languageInstruction}
-**Response format — output only the continuation. No chapter number, title, or JSON. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**`
+**Response format — output only the continuation. No chapter number, title, or JSON. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**
+
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`
           : `${languageInstruction}
 
 당신은 한국어 베스트셀러 소설 작가입니다. 파트 1에 이어 챕터 ${chNum}의 파트 2를 집필해주세요.
@@ -3467,9 +3487,11 @@ ${part1Content}
 ${rules}
 ${lotteryRule}
 ${languageInstruction}
-**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**`;
+**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**
 
-        const part2Raw = await apiCall(chPart2Prompt, 4000);
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`;
+
+        const part2Raw = await apiCall(chPart2Prompt, 3500);
         const part2Content = part2Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
         const content = part1Content + '\n\n' + part2Content;
         story.chapters.push({number:chNum, title:chTitle, content});
