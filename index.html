@@ -371,6 +371,14 @@ body{
 .age-card:hover{border-color:var(--gold);background:rgba(201,168,76,.04);}
 .age-card.sel{border-color:var(--burg);background:rgba(123,28,49,.07);color:var(--burg);box-shadow:0 0 0 1px var(--burg);}
 
+/* ── GENDER CARDS (Step 2) ── */
+.field-label{font-size:13px;font-weight:700;color:var(--txt-md);margin:0 0 10px;letter-spacing:.3px;}
+.card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px;}
+.card-option{background:white;border:2px solid var(--cream-dp);border-radius:12px;padding:14px 10px;cursor:pointer;text-align:center;font-size:15px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--txt-md);transition:all .22s;}
+.card-option:hover{border-color:var(--gold);background:rgba(201,168,76,.04);}
+.card-option.sel{border-color:var(--burg);background:rgba(123,28,49,.07);color:var(--burg);box-shadow:0 0 0 1px var(--burg);}
+.btn-next:disabled{opacity:.45;cursor:not-allowed;transform:none !important;box-shadow:none !important;}
+
 /* ── HINT GRID (Steps 2 & 5) ── */
 .hint-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
 .hint-item{background:var(--cream-dk);border-radius:12px;padding:14px 12px;text-align:center;}
@@ -1863,17 +1871,20 @@ function renderStep1(body){
     <p class="q-sub">이야기의 주인공이 될 분의 이름과 나이대를 알려주세요</p>
     <input class="txt-inp" id="inp-name" placeholder="이름을 입력해주세요... (예: 지수, 민준, 소연)" value="${ans.name||''}" onkeydown="if(event.key==='Enter')nextStep()">
     ${ans.language === 'en' ? `<div class="tip-box" style="margin-bottom:16px;line-height:1.7;">💡 <strong>영어 소설을 선택하셨나요?</strong><br>한국 이름 입력 시 AI가 자동으로 영어식으로 표기해요.<br><span style="color:var(--txt-md)">예: 지수 → Jisoo, 민준 → Minjun, 서연 → Seoyeon</span><br><br>원하는 영어 표기가 따로 있다면 영어로 직접 입력하는 것을 추천해요!<br><span style="color:var(--txt-md)">예: "Ji-su", "Jay", "Sophia"</span></div>` : ''}
-    <p class="q-sub" style="margin-bottom:14px;">성별을 선택해주세요</p>
-    <div class="age-grid" id="gender-grid">
-      ${GENDERS.map(g=>`<div class="age-card${ans.gender===g?' sel':''}" onclick="pickGender('${g}')">${g}</div>`).join('')}
+    <div class="field-label">성별을 선택해주세요</div>
+    <div class="card-grid" id="gender-grid">
+      <button class="card-option${ans.gender==='여성'?' sel':''}" data-value="여성" onclick="pickGender('여성')">👩 여성</button>
+      <button class="card-option${ans.gender==='남성'?' sel':''}" data-value="남성" onclick="pickGender('남성')">👨 남성</button>
+      <button class="card-option${ans.gender==='기타'?' sel':''}" data-value="기타" onclick="pickGender('기타')">🧑 기타</button>
     </div>
-    <p class="q-sub" style="margin-bottom:14px;">나이대를 선택해주세요</p>
+    <div class="field-label">나이대를 선택해주세요</div>
     <div class="age-grid" id="age-grid">
       ${AGE_GROUPS.map(a=>`<div class="age-card${ans.ageGroup===a?' sel':''}" onclick="pickAge('${a}')">${a}</div>`).join('')}
     </div>
+    <div id="step2-err" style="display:none;text-align:center;color:var(--txt-lt);font-size:13px;margin:-10px 0 14px;font-family:'Noto Sans KR',sans-serif;">성별과 나이대를 모두 선택해주세요 😊</div>
     <div class="q-nav">
       <button class="btn-back" onclick="prevStep()">← 이전</button>
-      <button class="btn-next" onclick="nextStep()">다음 →</button>
+      <button class="btn-next" id="step2-next" onclick="nextStep()" ${ans.gender && ans.ageGroup ? '' : 'disabled'}>다음 →</button>
     </div>`;
   setTimeout(()=>document.getElementById('inp-name')?.focus(),80);
 }
@@ -1990,11 +2001,21 @@ function renderAuthorStep(body){
 // ──────────── STEP PICKERS ────────────
 function pickGender(g){
   ans.gender=g;
-  document.querySelectorAll('#gender-grid .age-card').forEach(c=>c.classList.toggle('sel',c.textContent.trim()===g));
+  document.querySelectorAll('#gender-grid .card-option').forEach(c=>c.classList.toggle('sel',c.dataset.value===g));
+  updateStep2Next();
 }
 function pickAge(a){
   ans.ageGroup=a;
   document.querySelectorAll('#age-grid .age-card').forEach(c=>c.classList.toggle('sel',c.textContent.trim()===a));
+  updateStep2Next();
+}
+function updateStep2Next(){
+  const btn=document.getElementById('step2-next');
+  const err=document.getElementById('step2-err');
+  const ready=!!(ans.gender && ans.ageGroup);
+  const hasOne=!!(ans.gender || ans.ageGroup);
+  if(btn) btn.disabled=!ready;
+  if(err) err.style.display=(!ready && hasOne)?'block':'none';
 }
 function pickTopic(i){
   ans.topicIdx=i;
@@ -2019,8 +2040,11 @@ function nextStep(){
   if(curStep===2){
     const name=(document.getElementById('inp-name')?.value||'').trim();
     if(!name){alert('이름을 입력해주세요.');return;}
-    if(!ans.gender){alert('성별을 선택해주세요.');return;}
-    if(!ans.ageGroup){alert('나이대를 선택해주세요.');return;}
+    if(!ans.gender || !ans.ageGroup){
+      const err=document.getElementById('step2-err');
+      if(err){err.style.display='block';err.scrollIntoView({behavior:'smooth',block:'center'});}
+      return;
+    }
     ans.name=name;
   }
   if(curStep===3){
