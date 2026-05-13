@@ -1,324 +1,278 @@
-\# AnotherBook Project Notes
+# AnotherBook Project Notes
 
-Last updated: 2026-05-04
+Last updated: 2026-05-13
 
+---
 
+## Project Overview
 
-\## Project Overview
+AI-powered personalized novel service. Customer answers a questionnaire, AI (Claude) writes a custom 10-chapter novel, customer receives it as a PDF or printed book.
 
-AI-powered personalized novel service. Customer answers a questionnaire,
+**Live website:** https://yoonsofia.github.io/another-book
+**PDF server:** https://anotherbook-server-production.up.railway.app
 
-AI writes a custom 10-chapter novel, customer receives it as PDF or printed book.
+---
 
+## Folder Structure
 
+```
+C:\Users\Sae saem Yoon\PROJECTS\MYFIRSTAPP\
+├── index.html               ← Single-page frontend (all UI + logic)
+├── covertest.html           ← Standalone cover dev/test page
+├── PROJECT_NOTES.md
+└── anotherbook-server\      ← Node.js backend on Railway
+    ├── server.js
+    ├── package.json
+    ├── Dockerfile
+    ├── nixpacks.toml
+    └── railway.toml
+```
 
-\*\*Live website:\*\* https://yoonsofia.github.io/another-book
+---
 
-\*\*PDF server:\*\* https://anotherbook-server-production.up.railway.app
+## Deploy Commands
 
-
-
-\---
-
-
-
-\## Folder Structure
-
-
-
-C:\\Users\\Sae saem Yoon\\PROJECTS
-
-│ ├── MYFIRSTAPP\\ ← website (index.html) │ ├── index.html │ └── PROJECT\_NOTES.md │ └── anotherbook-server\\ ← PDF server (server.js) ├── server.js ├── package.json ├── nixpacks.toml └── .railwayignore
-
-
-
-
-
-\---
-
-
-
-\## Deploy Commands
-
-
-
-\### Website (index.html → GitHub Pages):
-
+**Website (GitHub Pages):**
 ```bash
-
-cd "C:\\Users\\Sae saem Yoon\\PROJECTS\\MYFIRSTAPP"
-
+cd "C:\Users\Sae saem Yoon\PROJECTS\MYFIRSTAPP"
 git add index.html
-
 git commit -m "describe change"
-
 git push origin main
+```
 
-
-
-PDF Server
-
-cd "C:\\Users\\Sae saem Yoon\\PROJECTS\\anotherbook-server"
-
+**PDF Server (Railway):**
+```bash
+cd "C:\Users\Sae saem Yoon\PROJECTS\MYFIRSTAPP\anotherbook-server"
 railway up
-
-
-
-Pricing
-
-Digital PDF: ₩9,900
-
-Printed book: ₩39,900
-
-Gift box (book + PDF + special packaging): ₩59,900
-
-Premium gift box: ₩89,900
-
-Story Generation
-
-10 chapters per book
-
-Target: \~5,000 words per chapter (split into 3 parts of 1,500 words each)
-
-Total target: \~50,000 words (\~130 pages)
-
-max\_tokens per part: 3,000
-
-Languages supported: Korean (ko) and English (en)
-
-Korean words/cultural references allowed naturally in English stories (romanized form preferred, e.g. eomma, aigoo, ahjussi)
-
-jsPDF cannot render Hangul — use Puppeteer server for Korean PDFs
-
-Cover Design
-
-Direction:
-
-Style: Bold flat graphic illustration (NOT watercolor)
-
-One unexpected symbolic object representing story theme (e.g. cracked mirror, floating key, torn envelope, melting clock)
-
-Symbol represents what the story FEELS like, not what literally happens
-
-No people, no faces, no figures, no human silhouettes
-
-No text, no letters in the DALL-E image
-
-DALL-E 3 API Settings:
-
-model: 'dall-e-3'
-
-size: '1024x1792'
-
-quality: 'hd'
-
-style: 'vivid'
-
-DALL-E 3 Prompt Structure:
-
-Copy"Bold flat graphic illustration for a literary book cover. 
-
-Central symbolic image: \[ONE unexpected object representing theme]. 
-
-Background color: \[exact hex from Claude's decision]. 
-
-Bold graphic flat illustration style, modern literary fiction book cover art,
-
-clean bold shapes, strong color contrast, ultra crisp edges, 
-
-solid color fills, high contrast, no soft gradients, no blur, no noise,
-
-print-ready quality. No people, no faces, no figures. No text, no letters."
-
-Claude decides (returns JSON):
-
-coverColor (hex)
-
-textColor (hex)
-
-accentColor (hex)
-
-symbol (description)
-
-layout (e.g. title\_dominant, centered, split)
-
-titleSize (massive/large/small)
-
-titlePosition (top/center/bottom)
-
-titleLines (array of strings)
-
-authorPosition (bottom\_left/bottom\_right/bottom\_center)
-
-symbolSize (percentage of cover)
-
-symbolPosition (center/lower\_center/upper\_center)
-
-dallePrompt (full prompt string)
-
-Layout:
-
-Top 25%: solid color band — title text
-
-Middle \~50%: DALL-E illustration
-
-Bottom 25%: solid color band — author name + logo
-
-Forest green (#3D5A47) used as brand color for bands
-
-Smart text contrast: dark text if background brightness > 180, white otherwise
-
-Cover Selection Page Options:
-
-AI Generated Cover (Claude + DALL-E 3)
-
-Photo Upload (customer uploads their own photo)
-
-Min size: 1MB, min resolution: 1000x1500px, aspect ratio \~2:3
-
-Format: JPG or PNG
-
-Simple Text Cover (typography only)
-
-Fonts
-
-Cover:
-
-English title: Bebas Neue (400), letter-spacing 4px, large
-
-English author: Montserrat Light (300), letter-spacing 6px, uppercase
-
-Korean title: Noto Serif KR Bold (700)
-
-Korean author: Noto Sans KR Light (300), letter-spacing 4px
-
-Book Body (inside PDF):
-
-English body: Lora (400, 700), font-size 11pt, line-height 1.8
-
-Korean body: Noto Sans KR (400), font-size 11pt, line-height 2.0
-
-Google Fonts to load in server.js:
-
-Bebas Neue (400)
-
-Playfair Display (700, 900)
-
-Montserrat (300, 400)
-
-Lora (400, 700)
-
-Noto Serif KR (400, 700)
-
-Noto Sans KR (300, 400)
-
-PDF Generation
-
-Method:
-
-Primary: Puppeteer server on Railway (high quality, 300 DPI equivalent)
-
-Fallback: jsPDF in browser (lower quality, backup only)
-
-PDF Server endpoint:
-
-POST https://anotherbook-server-production.up.railway.app/generate-pdf
-
-
-
-Request body:
-
-Copy{
-
-&#x20; "bookTitle": "",
-
-&#x20; "authorName": "",
-
-&#x20; "chapters": \[],
-
-&#x20; "coverImageUrl": "",
-
-&#x20; "coverDesign": {},
-
-&#x20; "language": "ko or en",
-
-&#x20; "selectedProduct": ""
-
+```
+
+---
+
+## User Flow (Steps)
+
+1. **Landing page** — hero, feature cards, sample books, CTA
+2. **API key modal** — user enters their Claude (Anthropic) API key
+3. **Step 0: Language** — Korean / English
+4. **Step 1: Age** — age range selector
+5. **Step 2: Protagonist** — name, gender, traits, background
+6. **Step 3: Genre / Tone** — genre cards + mood tags
+7. **Step 4: Setting** — time period + location
+8. **Step 5: Story seeds** — plot elements, themes
+9. **Step 6: Author name** — name for the cover
+10. **Loading screen** — animated progress while Claude generates story
+11. **Chapter 1 preview** — user reads the first chapter
+12. **Cover selection** — user picks from 4 Ideogram-generated covers (or uploads their own)
+13. **Product selection** — Digital PDF / Printed book / Gift box
+14. **PDF download** — Puppeteer server generates and downloads the PDF
+
+---
+
+## Pricing
+
+| Product | Price |
+|---|---|
+| Digital PDF | ₩9,900 |
+| Printed book | ₩39,900 |
+| Gift box (book + PDF + special packaging) | ₩59,900 |
+| Premium gift box | ₩89,900 |
+
+---
+
+## Story Generation
+
+- 10 chapters per book
+- Target: ~5,000 words per chapter (split into 3 API calls of ~1,500 words each)
+- Total target: ~50,000 words (~130 pages)
+- `max_tokens` per part: 3,000
+- Languages: Korean (`ko`) and English (`en`)
+- Korean words/cultural references allowed naturally in English stories (romanized, e.g. eomma, aigoo, ahjussi)
+- Chapter titles generated by Claude, cleaned to remove markdown/emoji before display
+
+---
+
+## Cover System
+
+### Current approach: Ideogram V3 (via Railway)
+
+- **4 covers generated in parallel** when user reaches cover selection
+- Each cover uses a different layout variant (title_dominant, centered, split, minimal)
+- Rendering speed: TURBO
+- Aspect ratio: 2x3 (portrait)
+- API endpoint: `POST https://anotherbook-server-production.up.railway.app/generate-cover`
+- Ideogram API key stored as Railway environment variable (`IDEOGRAM_API_KEY`)
+- Cover images proxied through Railway (`/proxy-image`) to fix CORS/canvas taint issues
+
+### Cover selection UI
+
+- 4 cover thumbnails displayed in a grid
+- Selected cover drawn onto `<canvas id="cover-canvas">` with title/author text overlay
+- Canvas image used as the cover page in the PDF
+
+### Cover brief (sent to Claude first)
+
+Claude returns a JSON object with:
+- `coverColor`, `textColor`, `accentColor` (hex values)
+- `symbol` (one unexpected object representing the theme)
+- `layout` (title_dominant / centered / split / minimal)
+- `titleSize` (massive / large / small)
+- `titlePosition` (top / center / bottom)
+- `titleLines` (array of strings)
+- `authorPosition` (bottom_left / bottom_right / bottom_center)
+- `dallePrompt` (full Ideogram prompt string)
+
+### Cover design guidelines
+
+- Bold flat graphic illustration (NOT watercolor, NOT painterly)
+- One unexpected symbolic object representing story theme
+- No people, no faces, no figures, no human silhouettes
+- No text or letters in the generated image
+- 4 prompts generated simultaneously with different layout variants
+
+---
+
+## PDF Generation
+
+### Primary: Puppeteer on Railway
+
+- Endpoint: `POST https://anotherbook-server-production.up.railway.app/generate-pdf`
+- Page size: 127mm × 188mm (standard paperback)
+- Full Chromium via Dockerfile (system Chromium, not bundled)
+- Fonts loaded via Google Fonts; Korean font (NotoSansKR) base64-encoded at server startup
+- HTML template generated server-side with proper Korean/English styles
+
+**Request body:**
+```json
+{
+  "bookTitle": "",
+  "authorName": "",
+  "chapters": [],
+  "coverImageUrl": "",
+  "coverDesign": {},
+  "language": "ko or en",
+  "selectedProduct": ""
 }
+```
 
-PDF Specs:
+**PDF structure:**
+1. Cover page (full-bleed Ideogram image + title/author overlay)
+2. Table of contents (chapter titles + page numbers calculated by Puppeteer)
+3. Chapter pages (chapter title centered, body text, scene breaks, no running headers)
 
-Page size: 127mm x 188mm (standard paperback)
+### Fallback: jsPDF in browser
 
-Margins: standard book margins
+- Used when Railway server is unreachable
+- Page size: 139.7mm × 215.9mm (5.5 × 8.5 inches)
+- Helvetica font (no Korean support)
+- Renders `**bold**` and `*italic*` markdown inline
+- Cannot render Korean Hangul (use Railway path for Korean books)
 
-Cover page: full bleed image with title/author overlay
+### PDF text cleanup
 
-Table of contents: chapter titles with page numbers
+- Emojis stripped before rendering
+- Unsupported scene-break characters replaced with `---`
+- Markdown bold/italic converted inline
+- PDF filename uses book title (Korean-safe via `encodeURIComponent` in Content-Disposition header)
 
-Chapter pages: drop caps (English only), scene breaks, headers/footers optional
+---
 
-Running headers: removed (not needed)
+## Fonts
 
-Print Quality Notes:
+**Cover canvas (HTML5 Canvas):**
+- English title: Bebas Neue (400), large
+- English author: Montserrat Light (300), uppercase, letter-spacing 6px
+- Korean title: Noto Serif KR Bold (700)
+- Korean author: Noto Sans KR Light (300)
 
-DALL-E 3 outputs at 72-96 DPI natively
+**Book body (inside PDF):**
+- English: `times` / `helvetica` (built-in jsPDF), 11pt, line-height 1.8
+- Korean: Noto Sans KR (400), 11pt, line-height 2.0
 
-Bold flat graphic style upscales better than painterly styles
+---
 
-Future improvement: add Replicate API for 2x upscaling after generation
+## Cost Per Book (approximate)
 
-Cost Per Book (approximate)
+| Item | Cost |
+|---|---|
+| Chapter 1 preview (Claude) | ~₩44 |
+| Chapters 2–10 (Claude) | ~₩396 |
+| Cover brief (Claude) | ~₩15 |
+| Cover image × 4 (Ideogram TURBO) | ~₩80 |
+| **Total** | **~₩535** |
 
-Chapter 1 generation (Claude): \~₩44
+**Profit margins:**
+- Digital PDF: ₩9,900 − ₩535 ≈ ₩9,365
+- Printed book: ₩39,900 − ₩535 − printing ≈ ~₩29,900
+- Gift box: ₩59,900 − ₩535 − packaging ≈ ~₩44,400
 
-Chapters 2-10 (Claude): \~₩396
+---
 
-Cover design decision (Claude): \~₩15
+## Completed Changes (Chronological)
 
-Cover illustration (DALL-E 3 HD): \~₩58
+### Early foundation (before 2026-04)
+- Added language selector (Korean / English)
+- Author step, DALL-E 3 integration (later replaced), jsPDF generation
+- Rewrote story flow: chapter 1 preview → TOC → cover select → full PDF
+- Korean font support in PDF via Google Fonts
+- Markdown bold/italic rendering in PDF
+- Connected to Railway PDF server (Puppeteer)
+- Dev mode shortcuts: Ctrl+Shift+P (PDF test) and Ctrl+Shift+C (cover test)
 
-Total: \~₩513 per book
+### Cover system iterations
+- Built typography-only cover system with HTML5 Canvas
+- Multiple font/layout iterations (Bebas Neue, Barlow Condensed, Dancing Script, etc.)
+- Three visual cover styles: color block, organic shape, risograph (canvas-drawn)
+- Replaced DALL-E 3 with Ideogram V3 for higher quality covers
+- Fixed Ideogram V3 endpoint URL and model name
+- Moved Ideogram API key to Railway environment (not frontend)
+- Added image proxy endpoint on Railway to fix CORS/canvas taint
+- Cover selection UI with 4 variants generated in parallel (TURBO)
+- Fixed cover URL pass-through to PDF generation
 
-Profit margins:
+### PDF quality fixes
+- Fixed mid-paragraph page cuts (line-by-line pagination)
+- Stripped emojis from PDF text
+- Locked Helvetica font at document creation
+- Fixed PDF font and margin in both jsPDF paths
+- Fixed chapter title formatting (remove markdown, remove emojis)
+- Fixed PDF filename encoding
 
-Digital PDF: ₩9,900 - ₩513 = ₩9,387 profit
+### UX and form improvements (2026-05-13)
+- Full Korean UI throughout (all labels, buttons, error messages)
+- Form validation improvements
+- Added gender field to Step 2 (protagonist gender selection cards)
+- PDF filename now uses the book title correctly
 
-Printed book: ₩39,900 - ₩513 - printing = \~₩29,900 profit
+---
 
-Gift box: ₩59,900 - ₩513 - packaging = \~₩44,400 profit
+## Pending / Not Yet Implemented
 
-Pending / Not Started
+- [ ] **Payment system** — no checkout/payment integration yet
+- [ ] **Email delivery** — no system to email the PDF to the customer
+- [ ] **Physical book printing partner** — no vendor integration
+- [ ] **Price display and checkout UI** — product selection exists but no real purchase flow
+- [ ] **API key protection** — currently customer enters their own Claude API key; eventually should be server-side with billing
+- [ ] **Image upscaling** — Ideogram TURBO outputs at 72 DPI; Replicate API 2× upscale would improve print quality
+- [ ] **Analytics / order tracking** — no admin dashboard or order history
+- [ ] **Cover upload flow** — UI exists for "upload your own photo" but upload logic not implemented
+- [ ] **Simple text cover** — UI option exists but not fully wired
+- [ ] **Chapter regeneration** — no way for user to request a different chapter if they dislike it
+- [ ] **Gift message / dedication page** — planned for gift box product
+- [ ] **Mobile layout polish** — responsive but needs QA on small screens
 
-Payment system integration
+---
 
-Email delivery system
+## Known Issues / Resolved
 
-Physical book printing partner
-
-Price updates
-
-API key protection for Railway server
-
-Replicate API upscaling for print quality
-
-Analytics / order tracking
-
-Known Issues / Fixed
-
-✅ jsPDF cannot render Korean Hangul → solved by Puppeteer server
-
-✅ PDF font error (Playfair Display) → solved by using built-in fonts as fallback
-
-✅ Cover still showing watercolor/book stack → needs new DALL-E prompt applied
-
-✅ Railway crash: index.js not found → fixed package.json to use server.js
-
-✅ Railway crash: server.js missing from folder → copied from MYFIRSTAPP folder
-
-⚠️ Cover bold graphic style not yet confirmed live → needs screenshot test
-
-⚠️ Font updates not yet applied to server.js → pending railway up
-
-
-
+| Status | Issue |
+|---|---|
+| ✅ Fixed | jsPDF cannot render Korean Hangul → use Puppeteer server |
+| ✅ Fixed | PDF font error (Playfair Display not available) → use built-in fonts |
+| ✅ Fixed | DALL-E watercolor style → replaced with Ideogram flat graphic |
+| ✅ Fixed | Railway crash: index.js not found → fixed package.json `main` field |
+| ✅ Fixed | CORS/canvas taint on Ideogram URLs → image proxy on Railway |
+| ✅ Fixed | Ideogram V3 endpoint and model name → corrected API path |
+| ✅ Fixed | coverBrief leaking between generations → scoped to generation call |
+| ✅ Fixed | Mid-paragraph page cuts in PDF → line-by-line rendering |
+| ✅ Fixed | Emoji crash in PDF → strip before rendering |
+| ✅ Fixed | Chapter titles showing markdown/emoji → cleaned before display and PDF |
+| ✅ Fixed | PDF filename broken for Korean titles → Content-Disposition encoding fix |

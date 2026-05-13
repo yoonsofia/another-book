@@ -1827,12 +1827,12 @@ function submitKey(){
 
 // ──────────── STEP RENDERER ────────────
 function renderStep(){
-  const pct = ((curStep-1)/7*100).toFixed(0);
+  const pct = ((curStep-1)/6*100).toFixed(0);
   document.getElementById('prog-fill').style.width = pct+'%';
-  document.getElementById('prog-txt').textContent = `${curStep} / 7`;
+  document.getElementById('prog-txt').textContent = `${curStep} / 6`;
   const body = document.getElementById('q-body');
   body.style.animation='none'; void body.offsetHeight; body.style.animation='fadeUp .4s ease';
-  [null,renderLangStep,renderStep1,renderStep2,renderGenreStep,renderStep3,renderStep5,renderAuthorStep][curStep](body);
+  [null,renderStep1,renderStep2,renderGenreStep,renderStep3,renderStep5,renderAuthorStep][curStep](body);
 }
 
 function renderLangStep(body){
@@ -1866,7 +1866,7 @@ function pickLang(lang){
 
 function renderStep1(body){
   body.innerHTML = `
-    <div class="q-num">STEP 2 / 7</div>
+    <div class="q-num">STEP 1 / 6</div>
     <h2 class="q-title">주인공을 소개해주세요</h2>
     <p class="q-sub">이야기의 주인공이 될 분의 이름과 나이대를 알려주세요</p>
     <input class="txt-inp" id="inp-name" placeholder="이름을 입력해주세요... (예: 지수, 민준, 소연)" value="${ans.name||''}" onkeydown="if(event.key==='Enter')nextStep()">
@@ -1891,7 +1891,7 @@ function renderStep1(body){
 
 function renderStep2(body){
   body.innerHTML = `
-    <div class="q-num">STEP 3 / 7</div>
+    <div class="q-num">STEP 2 / 6</div>
     <h2 class="q-title">주인공에 대해 더 알려주세요</h2>
     <p class="q-sub">알고 있는 것만 적어주세요. 비워도 괜찮아요. 구체적일수록 더 특별한 이야기가 만들어져요.</p>
     <p class="detail-field-label">👥 소중한 사람</p>
@@ -1922,7 +1922,7 @@ function renderGenreStep(body){
       <span class="opt-lbl">${g.l}</span>
     </div>`).join('');
   body.innerHTML = `
-    <div class="q-num">STEP 4 / 7</div>
+    <div class="q-num">STEP 3 / 6</div>
     <h2 class="q-title">어떤 분위기의 이야기를 원하세요?</h2>
     <p class="q-sub">주인공의 이야기가 담길 장르와 감성을 선택해주세요</p>
     <p class="q-sub" style="font-size:13px;margin-bottom:20px;">💡 최대 2개까지 선택할 수 있어요</p>
@@ -1940,7 +1940,7 @@ function renderStep3(body){
       <span class="opt-lbl">${t.l}</span>
     </div>`).join('');
   body.innerHTML = `
-    <div class="q-num">STEP 5 / 7</div>
+    <div class="q-num">STEP 4 / 6</div>
     <h2 class="q-title">어떤 이야기를 원하시나요?</h2>
     <p class="q-sub">주인공이 경험하게 될 이야기의 주제를 선택해주세요</p>
     <div class="cards-grid">${cards}</div>
@@ -1956,7 +1956,7 @@ function renderStep3(body){
 
 function renderStep5(body){
   body.innerHTML = `
-    <div class="q-num">STEP 6 / 7</div>
+    <div class="q-num">STEP 5 / 6</div>
     <h2 class="q-title">특별히 넣고 싶은 장면이 있나요? ✨</h2>
     <p class="q-sub">기억에 남기고 싶은 장면을 자유롭게 적어주세요. 비워도 괜찮아요.</p>
     <p class="detail-field-label">📍 장소</p>
@@ -1982,7 +1982,7 @@ function renderAuthorStep(body){
     ? `💡 본인 이름, 선물받는 분 이름, 또는 그냥 두시면 '어나더북'으로 설정돼요`
     : `💡 본인 이름 또는 선물받는 분 이름을 입력하세요. 비워두면 'AnotherBook'으로 설정돼요. 한국어 이름은 자동으로 영문으로 변환돼요.`;
   body.innerHTML = `
-    <div class="q-num">STEP 7 / 7</div>
+    <div class="q-num">STEP 6 / 6</div>
     <h2 class="q-title">저자명을 입력해주세요</h2>
     <p class="q-sub">책 표지와 내지에 들어갈 이름이에요</p>
     <input class="txt-inp" id="inp-author" placeholder="${defaultName}" value="${ans.author||''}"
@@ -2035,9 +2035,6 @@ function pickGenre(l){
 // ──────────── STEP NAVIGATION ────────────
 function nextStep(){
   if(curStep===1){
-    if(!ans.language){alert('언어를 선택해주세요.');return;}
-  }
-  if(curStep===2){
     const name=(document.getElementById('inp-name')?.value||'').trim();
     if(!name){alert('이름을 입력해주세요.');return;}
     if(!ans.gender || !ans.ageGroup){
@@ -2047,7 +2044,7 @@ function nextStep(){
     }
     ans.name=name;
   }
-  if(curStep===3){
+  if(curStep===2){
     const d1=(document.getElementById('inp-d1')?.value||'').trim();
     const d2=(document.getElementById('inp-d2')?.value||'').trim();
     const d3=(document.getElementById('inp-d3')?.value||'').trim();
@@ -2066,10 +2063,10 @@ function nextStep(){
     ].filter(Boolean);
     ans.personalDetails=parts.join('\n')||'';
   }
-  if(curStep===4){
+  if(curStep===3){
     if(!ans.genres||ans.genres.length===0){alert('장르를 최소 1개 선택해주세요.');return;}
   }
-  if(curStep===5){
+  if(curStep===4){
     if(ans.topicIdx===undefined){alert('이야기 주제를 선택해주세요.');return;}
     if(TOPICS[ans.topicIdx].custom){
       const cv=(document.getElementById('custom-inp')?.value||'').trim();
@@ -2079,7 +2076,7 @@ function nextStep(){
       ans.topic=TOPICS[ans.topicIdx].l;
     }
   }
-  if(curStep===6){
+  if(curStep===5){
     const s1=(document.getElementById('inp-s1')?.value||'').trim();
     const s2=(document.getElementById('inp-s2')?.value||'').trim();
     const s3=(document.getElementById('inp-s3')?.value||'').trim();
@@ -2093,7 +2090,7 @@ function nextStep(){
     ].filter(Boolean);
     ans.specialScenes=parts.join('\n')||'';
   }
-  if(curStep<7){curStep++;renderStep();}
+  if(curStep<6){curStep++;renderStep();}
 }
 function prevStep(){
   if(curStep>1){curStep--;renderStep();}
@@ -2102,11 +2099,11 @@ function prevStep(){
 function skipStep2(){
   ans.detailPeople=''; ans.detailHobbies=''; ans.detailPlaces='';
   ans.detailPet=''; ans.detailPersonality=''; ans.detailOther='';
-  ans.personalDetails=''; curStep=5; renderStep();
+  ans.personalDetails=''; curStep=4; renderStep();
 }
 function skipToAuthor(){
   ans.scenePlaces=''; ans.scenePeople=''; ans.sceneMoments=''; ans.sceneDialogue='';
-  ans.specialScenes=''; curStep=7; renderStep();
+  ans.specialScenes=''; curStep=6; renderStep();
 }
 function skipAuthorAndGenerate(){
   ans.author = selectedLang === 'ko' ? '어나더북' : 'AnotherBook';

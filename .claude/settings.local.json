@@ -13,7 +13,10 @@
       "Bash(Get-ChildItem \"C:\\\\Users\\\\Sae saem Yoon\\\\PROJECTS\\\\MYFIRSTAPP\\\\anotherbook-server\" -Exclude node_modules)",
       "Bash(Select-Object Name, LastWriteTime)",
       "Bash(git check-ignore *)",
-      "Bash(start *)"
+      "Bash(start *)",
+      "Bash(mkdir -p edu global)",
+      "Bash(cp index.html edu/index.html)",
+      "Bash(cp index.html global/index.html)"
     ]
   }
 }
