@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -)",
+      "Bash(git add *)",
+      "Bash(git push *)",
+      "Bash(git commit *)",
+      "Bash(npm install *)",
+      "Read(//c/Users/Sae saem Yoon/PROJECTS/anotherbook-server/**)",
+      "Bash(railway up *)",
+      "Bash(railway logs *)",
+      "Bash(git update-index *)",
+      "Bash(Get-ChildItem \"C:\\\\Users\\\\Sae saem Yoon\\\\PROJECTS\\\\MYFIRSTAPP\\\\anotherbook-server\" -Exclude node_modules)",
+      "Bash(Select-Object Name, LastWriteTime)",
+      "Bash(git check-ignore *)",
+      "Bash(start *)"
+    ]
+  }
+}

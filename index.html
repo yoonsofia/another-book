@@ -276,6 +276,7 @@ body{
   gap:11px;margin-bottom:36px;
 }
 .cards-grid.small{grid-template-columns:repeat(3,1fr);}
+.cards-grid.two-col{grid-template-columns:repeat(2,1fr);}
 .opt-card{
   background:white;border:2px solid var(--cream-dp);
   border-radius:13px;padding:16px 12px;
@@ -319,6 +320,7 @@ body{
   resize:vertical;margin-bottom:36px;line-height:1.8;
 }
 .txt-area:focus{border-color:var(--burg);}
+.detail-field-label{font-size:13px;font-weight:700;color:var(--gold);margin:0 0 8px;letter-spacing:.3px;}
 .custom-box{margin-bottom:22px;display:none;}
 
 /* Nav */
@@ -1452,11 +1454,11 @@ em{font-style:italic;color:inherit;}
   <!-- ── SECTION 3: STORY PREVIEW ── -->
   <section class="lp-preview-sec">
     <div class="lp-preview-inner">
-      <div class="lp-sec-label">STORY PREVIEW</div>
+      <div class="lp-sec-label">스토리 미리보기</div>
       <h2 class="lp-sec-title">이런 이야기가 만들어져요</h2>
       <div class="lp-book-wrap">
         <div class="lp-book-page">
-          <div class="lp-book-chap">CHAPTER 1 · 새로운 시작</div>
+          <div class="lp-book-chap" id="lp-chap-label">챕터 1</div>
           <div class="lp-book-title-line">봄날의 첫 페이지</div>
           <div class="lp-book-text">
             <p>지수는 오랫동안 잊고 있었던 그 냄새를 맡았다. 오래된 책장에서 나는 종이와 먼지, 그리고 어딘가 달콤한 잉크 냄새. 그 냄새는 마치 오래전 어린 시절의 어느 오후처럼, 말 없이도 많은 것을 이야기해 주었다.</p>
@@ -1586,7 +1588,6 @@ em{font-style:italic;color:inherit;}
   <div class="story-hdr" id="story-hdr">
     <div class="story-badge2">📖 나만의 AI 스토리북</div>
     <h1 class="story-main-title" id="s-title">이야기 제목</h1>
-    <div class="story-author-line" id="s-author">주인공의 이야기</div>
   </div>
 
   <!-- Section A: Chapter 1 (filled by JS) -->
@@ -1611,7 +1612,7 @@ em{font-style:italic;color:inherit;}
       <div class="price-cards">
 
         <div class="price-card">
-          <div class="price-type">DIGITAL DOWNLOAD</div>
+          <div class="price-type">디지털 다운로드</div>
           <div class="price-name">디지털 PDF</div>
           <div class="price-desc">전체 10챕터 즉시 다운로드</div>
           <div class="price-amt">₩9,900</div>
@@ -1620,7 +1621,7 @@ em{font-style:italic;color:inherit;}
 
         <div class="price-card pop">
           <div class="pop-badge">⭐ 가장 인기</div>
-          <div class="price-type">PRINT BOOK</div>
+          <div class="price-type">실물 책 주문</div>
           <div class="price-name">실물 책</div>
           <div class="price-desc">나만의 책이 집으로 배송돼요<br>PDF도 함께 제공</div>
           <div class="price-amt">₩39,900</div>
@@ -1628,7 +1629,7 @@ em{font-style:italic;color:inherit;}
         </div>
 
         <div class="price-card">
-          <div class="price-type">GIFT BOX</div>
+          <div class="price-type">선물 박스</div>
           <div class="price-name">선물 박스</div>
           <div class="price-desc">실물 책 + PDF + 특별 패키징</div>
           <div class="price-amt">₩59,900</div>
@@ -1763,15 +1764,22 @@ const TOPICS = [
   {e:'💫',l:'운명적인 사랑'},
   {e:'✏️',l:'직접 주제 입력하기',custom:true}
 ];
-const MOODS = [
+const GENRES = [
   {e:'😊',l:'따뜻하고 감동적인'},
-  {e:'😂',l:'유쾌하고 재미있는'},
+  {e:'😄',l:'유쾌하고 재미있는'},
   {e:'💪',l:'영감을 주는'},
   {e:'😢',l:'감성적이고 깊은'},
   {e:'💕',l:'로맨틱한'},
-  {e:'🎭',l:'드라마틱한'}
+  {e:'🎭',l:'드라마틱한'},
+  {e:'🔪',l:'스릴러 / 서스펜스'},
+  {e:'👻',l:'공포 / 호러'},
+  {e:'🚀',l:'SF / 판타지'},
+  {e:'🕵️',l:'미스터리 / 추리'},
+  {e:'🌿',l:'힐링 / 잔잔한'},
+  {e:'👨‍👩‍👧',l:'가족 / 세대 이야기'}
 ];
 const AGE_GROUPS = ['20대','30대','40대','50대 이상'];
+const GENDERS = ['여성','남성','기타'];
 
 // ──────────── PAGE NAV ────────────
 function showPage(id){
@@ -1816,13 +1824,13 @@ function renderStep(){
   document.getElementById('prog-txt').textContent = `${curStep} / 7`;
   const body = document.getElementById('q-body');
   body.style.animation='none'; void body.offsetHeight; body.style.animation='fadeUp .4s ease';
-  [null,renderLangStep,renderStep1,renderStep2,renderStep3,renderStep4,renderStep5,renderAuthorStep][curStep](body);
+  [null,renderLangStep,renderStep1,renderStep2,renderGenreStep,renderStep3,renderStep5,renderAuthorStep][curStep](body);
 }
 
 function renderLangStep(body){
   body.innerHTML = `
     <div class="q-num">STEP 1 / 7</div>
-    <h2 class="q-title">어떤 언어로 책을 만들까요?<br><span style="font-size:18px;font-weight:400;color:var(--txt-lt)">What language for your book?</span></h2>
+    <h2 class="q-title">어떤 언어로 책을 만들까요?</h2>
     <p class="q-sub" style="margin-bottom:30px;"></p>
     <div class="lang-grid">
       <div class="lang-card${ans.language==='ko'?' sel':''}" onclick="pickLang('ko')">
@@ -1833,7 +1841,7 @@ function renderLangStep(body){
       <div class="lang-card${ans.language==='en'?' sel':''}" onclick="pickLang('en')">
         <span class="lang-flag">🇺🇸</span>
         <span class="lang-name">영어 소설</span>
-        <span class="lang-desc">My story written in English</span>
+        <span class="lang-desc">영어로 쓰여진 나만의 소설</span>
       </div>
     </div>
     <div class="q-nav">
@@ -1855,8 +1863,12 @@ function renderStep1(body){
     <p class="q-sub">이야기의 주인공이 될 분의 이름과 나이대를 알려주세요</p>
     <input class="txt-inp" id="inp-name" placeholder="이름을 입력해주세요... (예: 지수, 민준, 소연)" value="${ans.name||''}" onkeydown="if(event.key==='Enter')nextStep()">
     ${ans.language === 'en' ? `<div class="tip-box" style="margin-bottom:16px;line-height:1.7;">💡 <strong>영어 소설을 선택하셨나요?</strong><br>한국 이름 입력 시 AI가 자동으로 영어식으로 표기해요.<br><span style="color:var(--txt-md)">예: 지수 → Jisoo, 민준 → Minjun, 서연 → Seoyeon</span><br><br>원하는 영어 표기가 따로 있다면 영어로 직접 입력하는 것을 추천해요!<br><span style="color:var(--txt-md)">예: "Ji-su", "Jay", "Sophia"</span></div>` : ''}
+    <p class="q-sub" style="margin-bottom:14px;">성별을 선택해주세요</p>
+    <div class="age-grid" id="gender-grid">
+      ${GENDERS.map(g=>`<div class="age-card${ans.gender===g?' sel':''}" onclick="pickGender('${g}')">${g}</div>`).join('')}
+    </div>
     <p class="q-sub" style="margin-bottom:14px;">나이대를 선택해주세요</p>
-    <div class="age-grid">
+    <div class="age-grid" id="age-grid">
       ${AGE_GROUPS.map(a=>`<div class="age-card${ans.ageGroup===a?' sel':''}" onclick="pickAge('${a}')">${a}</div>`).join('')}
     </div>
     <div class="q-nav">
@@ -1870,23 +1882,43 @@ function renderStep2(body){
   body.innerHTML = `
     <div class="q-num">STEP 3 / 7</div>
     <h2 class="q-title">주인공에 대해 더 알려주세요</h2>
-    <p class="q-sub">아래 예시를 참고해서 자유롭게 적어주세요. 이야기에 자연스럽게 녹아들어요.</p>
-    <div class="hint-grid">
-      <div class="hint-item"><div class="hint-icon">❤️</div><div class="hint-cat">소중한 사람</div><div class="hint-ex">연인, 가족</div></div>
-      <div class="hint-item"><div class="hint-icon">🎵</div><div class="hint-cat">취미나 관심사</div><div class="hint-ex">음악, 요리</div></div>
-      <div class="hint-item"><div class="hint-icon">🏠</div><div class="hint-cat">좋아하는 장소</div><div class="hint-ex">카페, 바닷가</div></div>
-      <div class="hint-item"><div class="hint-icon">🐾</div><div class="hint-cat">반려동물</div><div class="hint-ex">강아지 뭉치, 고양이 나비</div></div>
-      <div class="hint-item"><div class="hint-icon">🧠</div><div class="hint-cat">MBTI</div><div class="hint-ex">INFP, ENFJ</div></div>
-      <div class="hint-item"><div class="hint-icon">💭</div><div class="hint-cat">기타 뭐든지</div><div class="hint-ex">좋아하는 것, 꿈</div></div>
-    </div>
-    <textarea class="txt-area" id="inp-details" placeholder="자유롭게 입력해주세요...">${ans.personalDetails||''}</textarea>
-    <div class="tip-box">💡 TIP: 구체적일수록 이야기가 더 특별해져요! 예: "강아지 이름은 뭉치이고, 퇴근 후 항상 한강에서 산책해요"</div>
+    <p class="q-sub">알고 있는 것만 적어주세요. 비워도 괜찮아요. 구체적일수록 더 특별한 이야기가 만들어져요.</p>
+    <p class="detail-field-label">👥 소중한 사람</p>
+    <textarea class="txt-area" id="inp-d1" style="min-height:72px;margin-bottom:18px;" placeholder="예: 10년 지기 친구 민지, 항상 웃게 만들어주는 존재 / 엄마, 말은 없지만 힘들 때 밥을 해줌">${ans.detailPeople||''}</textarea>
+    <p class="detail-field-label">🎯 취미나 관심사</p>
+    <textarea class="txt-area" id="inp-d2" style="min-height:72px;margin-bottom:18px;" placeholder="예: 새벽 산책, 필사, 식물 키우기, 오래된 책방 구경, 요리">${ans.detailHobbies||''}</textarea>
+    <p class="detail-field-label">📍 좋아하는 장소</p>
+    <textarea class="txt-area" id="inp-d3" style="min-height:72px;margin-bottom:18px;" placeholder="예: 집 근처 작은 카페, 한강 벤치, 강릉 바닷가, 동네 헌책방">${ans.detailPlaces||''}</textarea>
+    <p class="detail-field-label">🐾 반려동물</p>
+    <textarea class="txt-area" id="inp-d4" style="min-height:72px;margin-bottom:18px;" placeholder="예: 하얀 고양이 눈송이 14살, 골든리트리버 버터, 없음">${ans.detailPet||''}</textarea>
+    <p class="detail-field-label">🧠 성격 / MBTI</p>
+    <textarea class="txt-area" id="inp-d5" style="min-height:72px;margin-bottom:18px;" placeholder="예: INFJ, 조용하지만 한번 웃으면 온 방이 밝아짐, 걱정이 많지만 남 앞에서는 티 안 냄">${ans.detailPersonality||''}</textarea>
+    <p class="detail-field-label">💭 기타 꼭 넣고 싶은 것</p>
+    <textarea class="txt-area" id="inp-d6" style="min-height:72px;margin-bottom:18px;" placeholder="예: 꼭 나오는 대사, 실제 있었던 일, 특별한 물건, 좋아하는 음식">${ans.detailOther||''}</textarea>
     <div class="q-nav">
       <button class="btn-back" onclick="prevStep()">← 이전</button>
       <div class="step-nav-right">
         <button class="btn-skip" onclick="skipStep2()">건너뛰기 → AI가 알아서 채울게요 🤖</button>
         <button class="btn-next" onclick="nextStep()">다음 →</button>
       </div>
+    </div>`;
+}
+
+function renderGenreStep(body){
+  const cards = GENRES.map(g=>`
+    <div class="opt-card${ans.genres?.includes(g.l)?' sel':''}" onclick="pickGenre('${g.l}')" data-val="${g.l}">
+      <span class="opt-em">${g.e}</span>
+      <span class="opt-lbl">${g.l}</span>
+    </div>`).join('');
+  body.innerHTML = `
+    <div class="q-num">STEP 4 / 7</div>
+    <h2 class="q-title">어떤 분위기의 이야기를 원하세요?</h2>
+    <p class="q-sub">주인공의 이야기가 담길 장르와 감성을 선택해주세요</p>
+    <p class="q-sub" style="font-size:13px;margin-bottom:20px;">💡 최대 2개까지 선택할 수 있어요</p>
+    <div class="cards-grid two-col" id="genre-cards">${cards}</div>
+    <div class="q-nav">
+      <button class="btn-back" onclick="prevStep()">← 이전</button>
+      <button class="btn-next" onclick="nextStep()">다음 →</button>
     </div>`;
 }
 
@@ -1897,7 +1929,7 @@ function renderStep3(body){
       <span class="opt-lbl">${t.l}</span>
     </div>`).join('');
   body.innerHTML = `
-    <div class="q-num">STEP 4 / 7</div>
+    <div class="q-num">STEP 5 / 7</div>
     <h2 class="q-title">어떤 이야기를 원하시나요?</h2>
     <p class="q-sub">주인공이 경험하게 될 이야기의 주제를 선택해주세요</p>
     <div class="cards-grid">${cards}</div>
@@ -1910,51 +1942,41 @@ function renderStep3(body){
     </div>`;
 }
 
-function renderStep4(body){
-  const cards = MOODS.map((m,i)=>`
-    <div class="opt-card${ans.mood===m.l?' sel':''}" onclick="pickMood(${i})">
-      <span class="opt-em">${m.e}</span>
-      <span class="opt-lbl">${m.l}</span>
-    </div>`).join('');
-  body.innerHTML = `
-    <div class="q-num">STEP 5 / 7</div>
-    <h2 class="q-title">이야기의 분위기는?</h2>
-    <p class="q-sub">어떤 감성의 이야기를 원하세요?</p>
-    <div class="cards-grid small">${cards}</div>
-    <div class="q-nav">
-      <button class="btn-back" onclick="prevStep()">← 이전</button>
-      <button class="btn-next" onclick="nextStep()">다음 →</button>
-    </div>`;
-}
 
 function renderStep5(body){
   body.innerHTML = `
     <div class="q-num">STEP 6 / 7</div>
-    <h2 class="q-title">특별히 넣고 싶은 장면이 있나요?</h2>
-    <p class="q-sub">아래 예시를 참고해서 원하는 장면을 자유롭게 적어주세요</p>
-    <div class="hint-grid">
-      <div class="hint-item"><div class="hint-icon">💡</div><div class="hint-cat">장소</div><div class="hint-ex">파리 에펠탑 앞, 제주 성산일출봉</div></div>
-      <div class="hint-item"><div class="hint-icon">💡</div><div class="hint-cat">사람</div><div class="hint-ex">첫사랑과의 재회, 오랜 친구</div></div>
-      <div class="hint-item"><div class="hint-icon">💡</div><div class="hint-cat">순간</div><div class="hint-ex">깜짝 프로포즈, 뜻밖의 선물</div></div>
-    </div>
-    <textarea class="txt-area" id="inp-scenes" placeholder="자유롭게 입력해주세요...">${ans.specialScenes||''}</textarea>
+    <h2 class="q-title">특별히 넣고 싶은 장면이 있나요? ✨</h2>
+    <p class="q-sub">기억에 남기고 싶은 장면을 자유롭게 적어주세요. 비워도 괜찮아요.</p>
+    <p class="detail-field-label">📍 장소</p>
+    <textarea class="txt-area" id="inp-s1" style="min-height:72px;margin-bottom:18px;" placeholder="예: 파리 에펠탑 앞, 제주 성산일출봉, 강릉 바닷가, 우리가 처음 만난 카페">${ans.scenePlaces||''}</textarea>
+    <p class="detail-field-label">👥 사람</p>
+    <textarea class="txt-area" id="inp-s2" style="min-height:72px;margin-bottom:18px;" placeholder="예: 첫사랑과의 재회, 오랜 친구와의 만남, 돌아가신 할머니와의 추억">${ans.scenePeople||''}</textarea>
+    <p class="detail-field-label">✨ 특별한 순간</p>
+    <textarea class="txt-area" id="inp-s3" style="min-height:72px;margin-bottom:18px;" placeholder="예: 깜짝 프로포즈, 뜻밖의 선물, 생일 파티, 졸업식날">${ans.sceneMoments||''}</textarea>
+    <p class="detail-field-label">💬 꼭 나왔으면 하는 대사</p>
+    <textarea class="txt-area" id="inp-s4" style="min-height:72px;margin-bottom:18px;" placeholder="예: &quot;괜찮아, 네 편이야&quot;, &quot;늦었지만 미안해&quot;, &quot;사랑해&quot;">${ans.sceneDialogue||''}</textarea>
     <div class="q-nav">
       <button class="btn-back" onclick="prevStep()">← 이전</button>
       <div class="step-nav-right">
-        <button class="btn-skip" onclick="skipToAuthor()">건너뛰기 🤖</button>
+        <button class="btn-skip" onclick="skipToAuthor()">⏭️ 건너뛰기</button>
         <button class="btn-next" onclick="nextStep()">다음 →</button>
       </div>
     </div>`;
 }
 
 function renderAuthorStep(body){
+  const defaultName = selectedLang === 'ko' ? '어나더북' : 'AnotherBook';
+  const tipText = selectedLang === 'ko'
+    ? `💡 본인 이름, 선물받는 분 이름, 또는 그냥 두시면 '어나더북'으로 설정돼요`
+    : `💡 본인 이름 또는 선물받는 분 이름을 입력하세요. 비워두면 'AnotherBook'으로 설정돼요. 한국어 이름은 자동으로 영문으로 변환돼요.`;
   body.innerHTML = `
     <div class="q-num">STEP 7 / 7</div>
     <h2 class="q-title">저자명을 입력해주세요</h2>
     <p class="q-sub">책 표지와 내지에 들어갈 이름이에요</p>
-    <input class="txt-inp" id="inp-author" placeholder="어나더북" value="${ans.author||''}"
+    <input class="txt-inp" id="inp-author" placeholder="${defaultName}" value="${ans.author||''}"
       onkeydown="if(event.key==='Enter')submitWithAuthor()">
-    <div class="tip-box">💡 본인 이름, 선물받는 분 이름, 또는 그냥 두시면 '어나더북'으로 설정돼요</div>
+    <div class="tip-box">${tipText}</div>
     <div class="q-nav">
       <button class="btn-back" onclick="prevStep()">← 이전</button>
       <div class="step-nav-right">
@@ -1966,9 +1988,13 @@ function renderAuthorStep(body){
 }
 
 // ──────────── STEP PICKERS ────────────
+function pickGender(g){
+  ans.gender=g;
+  document.querySelectorAll('#gender-grid .age-card').forEach(c=>c.classList.toggle('sel',c.textContent.trim()===g));
+}
 function pickAge(a){
   ans.ageGroup=a;
-  document.querySelectorAll('.age-card').forEach(c=>c.classList.toggle('sel',c.textContent.trim()===a));
+  document.querySelectorAll('#age-grid .age-card').forEach(c=>c.classList.toggle('sel',c.textContent.trim()===a));
 }
 function pickTopic(i){
   ans.topicIdx=i;
@@ -1977,26 +2003,49 @@ function pickTopic(i){
   if(box) box.style.display=TOPICS[i].custom?'block':'none';
   if(TOPICS[i].custom) setTimeout(()=>document.getElementById('custom-inp')?.focus(),60);
 }
-function pickMood(i){
-  ans.mood=MOODS[i].l;
-  document.querySelectorAll('#q-body .opt-card').forEach((c,idx)=>c.classList.toggle('sel',idx===i));
+function pickGenre(l){
+  if(!ans.genres) ans.genres=[];
+  const idx=ans.genres.indexOf(l);
+  if(idx>-1){ ans.genres.splice(idx,1); }
+  else { if(ans.genres.length>=2) return; ans.genres.push(l); }
+  document.querySelectorAll('#genre-cards .opt-card').forEach(c=>c.classList.toggle('sel',ans.genres.includes(c.dataset.val)));
 }
 
 // ──────────── STEP NAVIGATION ────────────
 function nextStep(){
   if(curStep===1){
-    if(!ans.language){alert('언어를 선택해주세요 / Please select a language.');return;}
+    if(!ans.language){alert('언어를 선택해주세요.');return;}
   }
   if(curStep===2){
     const name=(document.getElementById('inp-name')?.value||'').trim();
     if(!name){alert('이름을 입력해주세요.');return;}
+    if(!ans.gender){alert('성별을 선택해주세요.');return;}
     if(!ans.ageGroup){alert('나이대를 선택해주세요.');return;}
     ans.name=name;
   }
   if(curStep===3){
-    ans.personalDetails=(document.getElementById('inp-details')?.value||'').trim();
+    const d1=(document.getElementById('inp-d1')?.value||'').trim();
+    const d2=(document.getElementById('inp-d2')?.value||'').trim();
+    const d3=(document.getElementById('inp-d3')?.value||'').trim();
+    const d4=(document.getElementById('inp-d4')?.value||'').trim();
+    const d5=(document.getElementById('inp-d5')?.value||'').trim();
+    const d6=(document.getElementById('inp-d6')?.value||'').trim();
+    ans.detailPeople=d1; ans.detailHobbies=d2; ans.detailPlaces=d3;
+    ans.detailPet=d4; ans.detailPersonality=d5; ans.detailOther=d6;
+    const parts=[
+      d1&&`소중한 사람: ${d1}`,
+      d2&&`취미/관심사: ${d2}`,
+      d3&&`좋아하는 장소: ${d3}`,
+      d4&&`반려동물: ${d4}`,
+      d5&&`성격/MBTI: ${d5}`,
+      d6&&`기타: ${d6}`
+    ].filter(Boolean);
+    ans.personalDetails=parts.join('\n')||'';
   }
   if(curStep===4){
+    if(!ans.genres||ans.genres.length===0){alert('장르를 최소 1개 선택해주세요.');return;}
+  }
+  if(curStep===5){
     if(ans.topicIdx===undefined){alert('이야기 주제를 선택해주세요.');return;}
     if(TOPICS[ans.topicIdx].custom){
       const cv=(document.getElementById('custom-inp')?.value||'').trim();
@@ -2006,11 +2055,19 @@ function nextStep(){
       ans.topic=TOPICS[ans.topicIdx].l;
     }
   }
-  if(curStep===5){
-    if(!ans.mood){alert('분위기를 선택해주세요.');return;}
-  }
   if(curStep===6){
-    ans.specialScenes=(document.getElementById('inp-scenes')?.value||'').trim();
+    const s1=(document.getElementById('inp-s1')?.value||'').trim();
+    const s2=(document.getElementById('inp-s2')?.value||'').trim();
+    const s3=(document.getElementById('inp-s3')?.value||'').trim();
+    const s4=(document.getElementById('inp-s4')?.value||'').trim();
+    ans.scenePlaces=s1; ans.scenePeople=s2; ans.sceneMoments=s3; ans.sceneDialogue=s4;
+    const parts=[
+      s1&&`장소: ${s1}`,
+      s2&&`사람: ${s2}`,
+      s3&&`특별한 순간: ${s3}`,
+      s4&&`대사: ${s4}`
+    ].filter(Boolean);
+    ans.specialScenes=parts.join('\n')||'';
   }
   if(curStep<7){curStep++;renderStep();}
 }
@@ -2018,10 +2075,46 @@ function prevStep(){
   if(curStep>1){curStep--;renderStep();}
   else goHome();
 }
-function skipStep2(){ ans.personalDetails=''; curStep=4; renderStep(); }
-function skipToAuthor(){ ans.specialScenes=''; curStep=7; renderStep(); }
-function skipAuthorAndGenerate(){ ans.author='어나더북'; generateStory(); }
-function submitWithAuthor(){ ans.author=(document.getElementById('inp-author')?.value||'').trim()||'어나더북'; generateStory(); }
+function skipStep2(){
+  ans.detailPeople=''; ans.detailHobbies=''; ans.detailPlaces='';
+  ans.detailPet=''; ans.detailPersonality=''; ans.detailOther='';
+  ans.personalDetails=''; curStep=5; renderStep();
+}
+function skipToAuthor(){
+  ans.scenePlaces=''; ans.scenePeople=''; ans.sceneMoments=''; ans.sceneDialogue='';
+  ans.specialScenes=''; curStep=7; renderStep();
+}
+function skipAuthorAndGenerate(){
+  ans.author = selectedLang === 'ko' ? '어나더북' : 'AnotherBook';
+  generateStory();
+}
+function submitWithAuthor(){
+  const raw = (document.getElementById('inp-author')?.value||'').trim();
+  ans.author = raw || (selectedLang === 'ko' ? '어나더북' : 'AnotherBook');
+  generateStory();
+}
+
+async function resolveAuthorDisplay(){
+  const raw = ans.author?.trim() || (selectedLang === 'ko' ? '어나더북' : 'AnotherBook');
+  if(selectedLang !== 'ko'){
+    const hasKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(raw);
+    if(hasKorean){
+      try{
+        const romanized = await apiCall(
+          `Romanize this Korean name into natural English order (given name first, family name last, no hyphens unless conventional): "${raw}"\nRespond with ONLY the romanized name, nothing else.`,
+          30
+        );
+        ans.authorDisplay = romanized.trim() || 'AnotherBook';
+      } catch(e){
+        ans.authorDisplay = 'AnotherBook';
+      }
+    } else {
+      ans.authorDisplay = raw || 'AnotherBook';
+    }
+  } else {
+    ans.authorDisplay = raw || '어나더북';
+  }
+}
 
 // ──────────── LOADING ────────────
 const MSGS = [
@@ -2112,6 +2205,7 @@ function setLoadMsg(msg){
 
 // ──────────── GENERATE ────────────
 async function generateStory(){
+  await resolveAuthorDisplay();
   showPage('page-loading');
   ['ls1','ls2','ls3','ls4'].forEach((id,i)=>{
     const el=document.getElementById(id);
@@ -2122,6 +2216,9 @@ async function generateStory(){
   startLoading();
 
   const isEnglish = selectedLang === 'en';
+  const languageInstruction = selectedLang === 'ko'
+    ? `IMPORTANT: Write the ENTIRE story in Korean (한국어) as the primary language. All narrative and descriptions must be in Korean.\nHowever, you MAY use English words or sentences naturally when:\n- A character is speaking English in the scene\n- A character is learning English and practices it\n- English words appear naturally in Korean daily life (e.g. 카페, 오케이, Fighting!)\n- Signs, menus, or text in the story are in English\nThis mirrors how real Korean literary fiction is written — Korean-first but naturally incorporating English where it fits the story organically.`
+    : `IMPORTANT: Write the ENTIRE story in English only. All narrative and dialogue must be in English. Keep Korean proper nouns romanized (e.g. Gangneung, Seo-yeon, doenjang jjigae) but do not write any Korean characters anywhere in the story.`;
   const writerRole = isEnglish
     ? `You are a bestselling English novelist.\nStyle: Literary commercial fiction, warm and emotional tone.\nVocabulary: Natural adult English, accessible but sophisticated.\nProtagonist: ${ans.name}\n\nFormatting: You may use *italic* sparingly for emphasis (internal thoughts, a single stressed word). Never use **bold** — bold markdown is unprofessional in literary fiction body text and must not appear anywhere in the story.\n\nYou may naturally include Korean words and phrases where they feel authentic to the story.\nROMANIZED Korean words are ALWAYS fine: names (eomma, appa, unnie, oppa, sunbae), food (japchae, kimbap, tteokbokki, samgyeopsal), places (Hongdae, Sinchon, Yeouido), expressions (daebak, aigoo, fighting).\nHANGUL SCRIPT is also fine to use naturally: pet names (뭉치), affectionate calls (지수야, 엄마), money amounts (30억 원), signs/menus, brief Korean dialogue when a character speaks Korean.\nUse both romanized and Hangul naturally as a skilled literary author would.\n\nThis is an English language book. Write everything in English only. No Korean characters anywhere in the story text. Character names should be romanized (e.g. Mongchi not 몽치). Cultural terms should be translated or explained in English.`
     : '당신은 한국어 베스트셀러 소설 작가입니다.\n형식: *이탤릭체*는 강조에 드물게 사용할 수 있습니다(예: 내면의 생각, 강조할 단어). **굵은 글씨**는 절대 사용하지 마세요 — 문학 소설 본문에 볼드체는 적합하지 않습니다.';
@@ -2143,17 +2240,25 @@ async function generateStory(){
 
   try {
     // ── Step 1: Design story structure ──
-    setLoadMsg(isEnglish ? '⏳ Designing your story structure...' : '⏳ 이야기 구조 설계 중...');
+    setLoadMsg('⏳ 이야기 구조 설계 중...');
     const outlinePrompt = isEnglish
-      ? `${writerRole} Based on the information below, create the title and 10 chapter titles for a 10-chapter novel.
+      ? `${languageInstruction}
+
+${writerRole} Based on the information below, create the title and 10 chapter titles for a 10-chapter novel.
 
 ${storyInfo}
+
+${languageInstruction}
 
 Output ONLY pure JSON, no other text:
 {"title":"novel title","subtitle":"subtitle","chapters":[{"number":1,"title":"chapter title"},{"number":2,"title":"chapter title"},{"number":3,"title":"chapter title"},{"number":4,"title":"chapter title"},{"number":5,"title":"chapter title"},{"number":6,"title":"chapter title"},{"number":7,"title":"chapter title"},{"number":8,"title":"chapter title"},{"number":9,"title":"chapter title"},{"number":10,"title":"chapter title"}]}`
-      : `당신은 한국어 베스트셀러 소설 작가입니다. 아래 정보를 바탕으로 10챕터 소설의 제목과 각 챕터 제목을 만들어주세요.
+      : `${languageInstruction}
+
+당신은 한국어 베스트셀러 소설 작가입니다. 아래 정보를 바탕으로 10챕터 소설의 제목과 각 챕터 제목을 만들어주세요.
 
 ${storyInfo}
+
+${languageInstruction}
 
 반드시 순수 JSON만 출력, 다른 텍스트 없이:
 {"title":"소설 제목","subtitle":"부제목","chapters":[{"number":1,"title":"챕터 제목"},{"number":2,"title":"챕터 제목"},{"number":3,"title":"챕터 제목"},{"number":4,"title":"챕터 제목"},{"number":5,"title":"챕터 제목"},{"number":6,"title":"챕터 제목"},{"number":7,"title":"챕터 제목"},{"number":8,"title":"챕터 제목"},{"number":9,"title":"챕터 제목"},{"number":10,"title":"챕터 제목"}]}`;
@@ -2163,15 +2268,17 @@ ${storyInfo}
     markLoadStep('ls1');
 
     // ── Step 2: Chapter titles complete ──
-    setLoadMsg(isEnglish ? 'Chapter titles ready...' : '챕터 제목이 완성됐어요...');
+    setLoadMsg('챕터 제목이 완성됐어요...');
     await new Promise(r=>setTimeout(r,300));
     markLoadStep('ls2');
 
     // ── Step 3: Write Chapter 1 (Part 1 + Part 2) ──
-    setLoadMsg(isEnglish ? '✍️ Writing Chapter 1...' : '✍️ 챕터 1을 집필하고 있어요...');
+    setLoadMsg('✍️ 챕터 1을 집필하고 있어요...');
     const ch1Title = outline.chapters[0].title;
     const ch1Part1Prompt = isEnglish
-      ? `${writerRole}
+      ? `${languageInstruction}
+
+${writerRole}
 
 Write Part 1 of 3 for Chapter 1 of the novel below.
 
@@ -2187,8 +2294,11 @@ ${qualityStdFn(1)}
 
 ${rules}
 ${lotteryRule}
+${languageInstruction}
 **Response format — output only the chapter body. No chapter number, title, or JSON. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**`
-      : `당신은 한국어 베스트셀러 소설 작가입니다. 아래 소설의 챕터 1 파트 1을 집필해주세요.
+      : `${languageInstruction}
+
+당신은 한국어 베스트셀러 소설 작가입니다. 아래 소설의 챕터 1 파트 1을 집필해주세요.
 
 **소설 정보:**
 제목: ${outline.title}
@@ -2202,14 +2312,17 @@ ${qualityStdFn(1)}
 
 ${rules}
 ${lotteryRule}
+${languageInstruction}
 **응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**`;
 
-    const ch1Part1Raw = await apiCall(ch1Part1Prompt, 3000);
+    const ch1Part1Raw = await apiCall(ch1Part1Prompt, 4000);
     const ch1Part1Content = ch1Part1Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
 
-    setLoadMsg(isEnglish ? '📖 Developing your scenes...' : '📖 풍부한 장면을 펼치고 있어요...');
+    setLoadMsg('📖 풍부한 장면을 펼치고 있어요...');
     const ch1Part2Prompt = isEnglish
-      ? `${writerRole}
+      ? `${languageInstruction}
+
+${writerRole}
 
 Write Part 2 of 3 for Chapter 1, continuing directly from Part 1.
 
@@ -2225,8 +2338,11 @@ ${qualityStdFn(2)}
 
 ${rules}
 ${lotteryRule}
+${languageInstruction}
 **Response format — output only the continuation. No chapter number, title, or JSON. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**`
-      : `당신은 한국어 베스트셀러 소설 작가입니다. 파트 1에 이어 챕터 1의 파트 2를 집필해주세요.
+      : `${languageInstruction}
+
+당신은 한국어 베스트셀러 소설 작가입니다. 파트 1에 이어 챕터 1의 파트 2를 집필해주세요.
 
 **소설 정보:**
 제목: ${outline.title}
@@ -2240,14 +2356,17 @@ ${qualityStdFn(2)}
 
 ${rules}
 ${lotteryRule}
+${languageInstruction}
 **응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**`;
 
-    const ch1Part2Raw = await apiCall(ch1Part2Prompt, 3000);
+    const ch1Part2Raw = await apiCall(ch1Part2Prompt, 4000);
     const ch1Part2Content = ch1Part2Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
 
-    setLoadMsg(isEnglish ? '🎨 Finishing touches...' : '🎨 마무리 중...');
+    setLoadMsg('🎨 마무리 중...');
     const ch1Part3Prompt = isEnglish
-      ? `${writerRole}
+      ? `${languageInstruction}
+
+${writerRole}
 
 Write Part 3 of 3 for Chapter 1, the final section of this chapter.
 
@@ -2263,6 +2382,7 @@ ${qualityStdFn(3)}
 
 ${rules}
 ${lotteryRule}
+${languageInstruction}
 **Response format — output only the story continuation. No chapter number, no title. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines.**
 
 After writing the story chapter, you MUST output a cover brief on a new line in this exact format with no variations:
@@ -2270,7 +2390,7 @@ After writing the story chapter, you MUST output a cover brief on a new line in 
 Generate 4 completely different Ideogram image prompts for this book cover. Each one must have a genuinely different visual style, layout, color palette, and typography direction.
 
 Rules for all 4:
-- Include the exact title '${outline.title}' and author name '${ans.author?.trim() || 'AnotherBook'}'
+- Include the exact title '${outline.title}' and author name '${ans.authorDisplay}'
 - Match the mood and genre of the story
 - Each must look like it belongs to a different design school
 
@@ -2292,7 +2412,9 @@ Rules for all 4:
 </coverBrief>
 
 This block is mandatory. Do not skip it.`
-      : `당신은 한국어 베스트셀러 소설 작가입니다. 챕터 1의 마지막 파트 3을 집필해주세요.
+      : `${languageInstruction}
+
+당신은 한국어 베스트셀러 소설 작가입니다. 챕터 1의 마지막 파트 3을 집필해주세요.
 
 **소설 정보:**
 제목: ${outline.title}
@@ -2306,6 +2428,7 @@ ${qualityStdFn(3)}
 
 ${rules}
 ${lotteryRule}
+${languageInstruction}
 **응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목 없이. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분.**
 
 스토리 챕터를 쓴 후, 반드시 새 줄에 아래 형식 그대로 커버 브리프를 출력하세요. 형식을 바꾸지 마세요:
@@ -2313,7 +2436,7 @@ ${lotteryRule}
 이 책의 표지를 위해 완전히 다른 Ideogram 이미지 프롬프트 4개를 생성하세요. 각각은 시각적 스타일, 레이아웃, 색상 팔레트, 타이포그래피 방향이 진정으로 달라야 합니다.
 
 모든 4개의 규칙:
-- 정확한 제목 '${outline.title}'과 저자 이름 '${ans.author?.trim() || 'AnotherBook'}'을 포함하세요
+- 정확한 제목 '${outline.title}'과 저자 이름 '${ans.authorDisplay}'을 포함하세요
 - 이야기의 분위기와 장르에 맞추세요
 - 각각은 다른 디자인 학파에 속하는 것처럼 보여야 합니다
 
@@ -2351,7 +2474,7 @@ ${lotteryRule}
     // ── Step 4: Done ──
     await new Promise(r=>setTimeout(r,300));
     markLoadStep('ls4');
-    setProgress(100, isEnglish ? '✅ Complete!' : '✅ 완성!');
+    setProgress(100, '✅ 완성!');
 
     story = {
       title: outline.title,
@@ -2363,14 +2486,14 @@ ${lotteryRule}
 
     const coverBrief = storedCoverBrief;
     const bookTitle = outline.title;
-    const authorName = ans.author?.trim() || 'AnotherBook';
+    const authorName = ans.authorDisplay;
 
     if (coverBrief) {
       coverBrief.authorName = authorName;
-      showStatus('Generating your book covers...');
+      showStatus('🎨 표지를 생성하고 있어요...');
       const imageUrls = await generateBookCover(coverBrief);
       if (imageUrls && imageUrls.length > 0) {
-        showStatus('Choose your cover...');
+        showStatus('표지를 선택해주세요...');
         const selectedCover = await showCoverSelection(imageUrls, coverBrief, bookTitle, authorName);
         proceedToPDF(selectedCover, coverBrief, bookTitle, authorName);
       } else {
@@ -2389,22 +2512,30 @@ ${lotteryRule}
 
 // ──────────── SHARED PROMPT BUILDERS ────────────
 function buildStoryInfo(){
+  const pronouns = ans.gender === '여성' ? 'she/her (그녀/그녀의)'
+                 : ans.gender === '남성' ? 'he/him (그/그의)'
+                 : 'they/them (성별 중립)';
   return `이야기 주제: ${ans.topic}
 주인공 이름: ${ans.name}
+주인공 성별: ${ans.gender||'없음'} — 인칭대명사: ${pronouns}
 주인공 나이대: ${ans.ageGroup||'없음'}
 주인공 관련 정보: ${ans.personalDetails||'없음'}
-이야기 분위기: ${ans.mood}
+이야기 장르/분위기: ${ans.genres?.join(' / ')||'없음'}
 특별 요청 장면: ${ans.specialScenes||'없음'}`;
 }
 
 function buildRules(){
+  const pronouns = ans.gender === '여성' ? 'she/her (그녀/그녀의)'
+                 : ans.gender === '남성' ? 'he/him (그/그의)'
+                 : 'they/them (성별 중립)';
   return `**개인화 규칙:**
 1. 주인공의 이름(${ans.name})은 모든 챕터에 자연스럽게 등장해야 함
-2. 주인공 나이대(${ans.ageGroup||'없음'})에 어울리는 생활 방식, 고민, 감성으로 묘사할 것
-3. 주인공 관련 정보(${ans.personalDetails||'없음'})에 언급된 취미, 장소, 소중한 사람 등을 최소 5개 챕터에 자연스럽게 녹여줄 것
-4. 특별 요청 장면(${ans.specialScenes||'없음'})이 있다면 2-3단락 분량의 온전한 장면으로 묘사
-5. 선택한 분위기(${ans.mood})를 전체 이야기에 일관되게 유지
-6. 이야기는 반드시 긍정적이고 희망적인 결말로 끝낼 것
+2. 주인공의 인칭대명사 ${pronouns}를 전체 이야기에 일관되게 사용할 것
+3. 주인공 나이대(${ans.ageGroup||'없음'})에 어울리는 생활 방식, 고민, 감성으로 묘사할 것
+4. 주인공 관련 정보(${ans.personalDetails||'없음'})에 언급된 취미, 장소, 소중한 사람 등을 최소 5개 챕터에 자연스럽게 녹여줄 것
+5. 특별 요청 장면(${ans.specialScenes||'없음'})이 있다면 2-3단락 분량의 온전한 장면으로 묘사
+6. 선택한 장르/분위기(${ans.genres?.join(' / ')||'없음'})를 전체 이야기에 일관되게 유지
+7. 이야기는 반드시 긍정적이고 희망적인 결말로 끝낼 것
 
 **콘텐츠 규칙:**
 1. 전 연령 대상 콘텐츠 — 성적이거나 성인용 내용 금지
@@ -2437,13 +2568,17 @@ function displayStory(d){
   const ch1 = d.chapters[0];
 
   document.getElementById('s-title').textContent = d.title;
-  document.getElementById('s-author').textContent = isEn ? `${ans.name}'s Story` : `${ans.name}의 이야기`;
+  const lpChapLabel = document.getElementById('lp-chap-label');
+  if (lpChapLabel) lpChapLabel.textContent = ch1.title ? `챕터 1 · ${ch1.title}` : '챕터 1';
 
   // Section A: Chapter 1
   const ch1Section = document.getElementById('ch1-section');
   ch1Section.innerHTML = `
+    <div style="background:#f9f5f0;border:1px solid #e8e0d5;border-radius:8px;padding:12px 16px;margin-bottom:20px;text-align:center;font-size:14px;color:#666;">
+      📖 1장 미리보기 · 다 읽으신 후 아래에서 원하시는 옵션을 선택해주세요 ↓
+    </div>
     <div class="ch-hdr">
-      <div class="ch-label">CHAPTER 1 · 무료 미리보기</div>
+      <div class="ch-label">챕터 1 · 무료 미리보기</div>
       <h2 class="ch-title">${ch1.title}</h2>
     </div>
     <div class="ch-content">${fmtContent(ch1.content)}</div>`;
@@ -2490,9 +2625,8 @@ async function downloadPDF() {
   if (!story) return;
 
   const isEn   = selectedLang === 'en';
-  const name   = ans.name || (isEn ? 'Reader' : '독자');
-  const fileName = `${name}의_이야기.pdf`;
-  const today  = new Date().toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric' });
+  const today = new Date().toISOString().slice(0, 10);
+  const fileName = `anotherbook-${today}.pdf`;
 
   const overlay = document.getElementById('pdf-progress-overlay');
   const barEl   = document.getElementById('pdf-progress-bar');
@@ -2916,7 +3050,7 @@ async function getCoverDesign(){
   const systemPrompt = `You are a bold graphic designer for a premium literary fiction publisher. Based on this story, output ONLY a JSON object with no explanation. STRICT COLOR RULES: NEVER use teal, blue-gray, navy, gray, or muted safe colors. For sad/longing mood use #1C0A00 or #2D0A0A. For romantic/warm use #8B1A1A or #7B2D8B. For hopeful/growth use #1B3A2D or #2D4A1E. For mysterious/tense use #0D0D1A or #1A0A2E. For joyful/bright use #8B3A00 or #CC5500. For modern/bold use #1A1A1A or #F5F0E8. textColor always #F5F0E8 or #FFFFFF. accentColor always bold and contrasting. STRICT FONT RULES: For sad/longing choose SPECTRAL or CORMORANT. For romantic/warm choose PLAYFAIR or DANCING. For mysterious/tense choose SPECTRAL or ANTON. For hopeful/uplifting choose DM_SERIF or JAKARTA. For dramatic/intense choose BARLOW or ANTON. For literary/quiet choose CORMORANT or DM_SERIF. For modern/contemporary choose DM_SANS or JAKARTA. For bold/political choose BARLOW or BEBAS. For quiet/minimal/literary (Sally Rooney style) choose LIBRE or CORMORANT. For dark/dramatic/deep sea choose ABRIL or SPECTRAL. STRICT LAYOUT RULES: Use layoutStyle STACKED_LARGE for full-width dramatic covers (Amanda Gorman style) — titleAlign left, fontSize 130px. Use layoutStyle CENTERED_MINIMAL for quiet literary covers (Sally Rooney style) — titleAlign center, fontSize 72px, letterSpacing 8px. Use layoutStyle STACKED_MID for balanced default covers — titleAlign left, fontSize 110px. STRICT TITLE RULES: never put a single short word like I, A, or THE alone on one line. Maximum 3 lines. Group words so lines are roughly equal length. Return JSON: { coverColor, textColor, accentColor, titleLines, fontStyle, layoutStyle, mood }`;
   const userPrompt = `Title: ${bookTitle}
 Theme: ${ans.topic}
-Mood: ${ans.mood}
+Genre/Mood: ${ans.genres?.join(' / ')||''}
 Language: ${selectedLang === 'ko' ? 'Korean' : 'English'}`;
   const raw = await apiCall(userPrompt, 400, systemPrompt);
   return extractJSON(raw);
@@ -3146,7 +3280,7 @@ async function generateFullCover(){
   await document.fonts.ready;
 
   const bookTitle = story?.title||'';
-  const authorName = ans.author?.trim() || 'AnotherBook';
+  const authorName = ans.authorDisplay;
 
   const canvas = document.getElementById('cover-canvas');
   const previewImg = document.getElementById('cover-preview-img');
@@ -3208,6 +3342,9 @@ async function confirmCoverAndMakePDF(){
       sp(0,'준비 중...');
 
       const isEnglish = selectedLang === 'en';
+      const languageInstruction = selectedLang === 'ko'
+        ? `IMPORTANT: Write the ENTIRE story in Korean (한국어) as the primary language. All narrative and descriptions must be in Korean.\nHowever, you MAY use English words or sentences naturally when:\n- A character is speaking English in the scene\n- A character is learning English and practices it\n- English words appear naturally in Korean daily life (e.g. 카페, 오케이, Fighting!)\n- Signs, menus, or text in the story are in English\nThis mirrors how real Korean literary fiction is written — Korean-first but naturally incorporating English where it fits the story organically.`
+        : `IMPORTANT: Write the ENTIRE story in English only. All narrative and dialogue must be in English. Keep Korean proper nouns romanized (e.g. Gangneung, Seo-yeon, doenjang jjigae) but do not write any Korean characters anywhere in the story.`;
       const writerRole = isEnglish
         ? `You are a bestselling English novelist.\nStyle: Literary commercial fiction, warm and emotional tone.\nVocabulary: Natural adult English, accessible but sophisticated.\nProtagonist: ${ans.name}\n\nYou may naturally include Korean words and phrases where they feel authentic to the story.\nROMANIZED Korean words are ALWAYS fine: names (eomma, appa, unnie, oppa, sunbae), food (japchae, kimbap, tteokbokki, samgyeopsal), places (Hongdae, Sinchon, Yeouido), expressions (daebak, aigoo, fighting).\nHANGUL SCRIPT is also fine to use naturally: pet names (뭉치), affectionate calls (지수야, 엄마), money amounts (30억 원), signs/menus, brief Korean dialogue when a character speaks Korean.\nUse both romanized and Hangul naturally as a skilled literary author would.\n\nThis is an English language book. Write everything in English only. No Korean characters anywhere in the story text. Character names should be romanized (e.g. Mongchi not 몽치). Cultural terms should be translated or explained in English.`
         : '당신은 한국어 베스트셀러 소설 작가입니다.';
@@ -3244,7 +3381,9 @@ async function confirmCoverAndMakePDF(){
           : `\n**이전 챕터 요약:**\n${summaries.join('\n')}\n`;
 
         const chPart1Prompt = isEnglish
-          ? `${writerRole}
+          ? `${languageInstruction}
+
+${writerRole}
 Write Part 1 of 3 for Chapter ${chNum} of the novel below.
 **Novel info:** Title: ${story.title}
 ${storyInfo}
@@ -3255,8 +3394,11 @@ ${prevCtx}
 ${qualityStdFn(1)}
 ${rules}
 ${lotteryRule}
+${languageInstruction}
 **Response format — output only the chapter body. No chapter number, title, or JSON. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**`
-          : `당신은 한국어 베스트셀러 소설 작가입니다. 아래 소설의 챕터 ${chNum} 파트 1을 집필해주세요.
+          : `${languageInstruction}
+
+당신은 한국어 베스트셀러 소설 작가입니다. 아래 소설의 챕터 ${chNum} 파트 1을 집필해주세요.
 **소설 정보:** 제목: ${story.title}
 ${storyInfo}
 **전체 챕터 구성:**
@@ -3266,13 +3408,16 @@ ${prevCtx}
 ${qualityStdFn(1)}
 ${rules}
 ${lotteryRule}
+${languageInstruction}
 **응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**`;
 
-        const part1Raw = await apiCall(chPart1Prompt, 3000);
+        const part1Raw = await apiCall(chPart1Prompt, 4000);
         const part1Content = part1Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
 
         const chPart2Prompt = isEnglish
-          ? `${writerRole}
+          ? `${languageInstruction}
+
+${writerRole}
 Write Part 2 of 2 for Chapter ${chNum}, continuing directly from Part 1.
 **Novel info:** Title: ${story.title}
 ${storyInfo}
@@ -3283,8 +3428,11 @@ Continue directly from Part 1. ${isLast ? 'Final chapter — bring the story to 
 **Length and quality:** ${qualityStdFn(chNum)}
 ${rules}
 ${lotteryRule}
+${languageInstruction}
 **Response format — output only the continuation. No chapter number, title, or JSON. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**`
-          : `당신은 한국어 베스트셀러 소설 작가입니다. 파트 1에 이어 챕터 ${chNum}의 파트 2를 집필해주세요.
+          : `${languageInstruction}
+
+당신은 한국어 베스트셀러 소설 작가입니다. 파트 1에 이어 챕터 ${chNum}의 파트 2를 집필해주세요.
 **소설 정보:** 제목: ${story.title}
 ${storyInfo}
 **파트 1 내용:**
@@ -3294,9 +3442,10 @@ ${part1Content}
 **분량 및 품질:** ${qualityStdFn(chNum)}
 ${rules}
 ${lotteryRule}
+${languageInstruction}
 **응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**`;
 
-        const part2Raw = await apiCall(chPart2Prompt, 2000);
+        const part2Raw = await apiCall(chPart2Prompt, 4000);
         const part2Content = part2Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
         const content = part1Content + '\n\n' + part2Content;
         story.chapters.push({number:chNum, title:chTitle, content});
@@ -3320,7 +3469,7 @@ ${lotteryRule}
 
 async function generatePDF(sp) {
   try {
-    showLoading(selectedLanguage === 'ko' ? 'PDF 생성 중...' : 'Generating PDF...');
+    showLoading('PDF 생성 중...');
 
     const response = await fetch(`${PDF_SERVER_URL}/generate-pdf`, {
       method: 'POST',
@@ -3346,7 +3495,7 @@ async function generatePDF(sp) {
     a.click();
 
     hideLoading();
-    showToast(selectedLanguage === 'ko' ? '✅ PDF 다운로드 완료!' : '✅ PDF downloaded!');
+    showToast('✅ PDF 다운로드 완료!');
 
   } catch (error) {
     console.error('Railway PDF failed, using fallback:', error);
@@ -3647,7 +3796,7 @@ async function generatePDFPrimary(sp) {
   setTimeout(()=>{
     if(overlay) overlay.style.display='none';
     const suc=document.getElementById('pdf-success-msg');
-    suc.textContent = selectedLang === 'en' ? '✅ PDF download complete!' : '✅ PDF 다운로드 완료!';
+    suc.textContent = '✅ PDF 다운로드 완료!';
     suc.style.display='block';
     setTimeout(()=>{ suc.style.display='none'; },5000);
   },500);
@@ -3816,40 +3965,42 @@ async function generatePDFFallback() {
     doc.setFillColor(255, 255, 255);
     doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
-    doc.setTextColor(0);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(16);
+    doc.setFontSize(13);
     doc.text('Contents', margin, margin + 10);
 
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(11);
+    doc.setFontSize(10.5);
     let tocY = margin + 30;
 
-    chapters.forEach((chapter, index) => {
-      const chapterTitle = chapter.title || `Chapter ${index + 1}`;
-      const pageNum = chapter.pageNumber || '';
-
-      doc.setTextColor(0);
-      doc.text(chapterTitle, margin, tocY);
-      doc.text(String(pageNum), pageWidth - margin, tocY, { align: 'right' });
-
-      const dotsWidth = pageWidth - margin * 2 - doc.getTextWidth(chapterTitle) - doc.getTextWidth(String(pageNum)) - 4;
-      const dotCount = Math.floor(dotsWidth / doc.getTextWidth('.'));
-      doc.setTextColor(180);
-      doc.text('.'.repeat(dotCount), margin + doc.getTextWidth(chapterTitle) + 2, tocY);
-      doc.setTextColor(0);
-
-      tocY += 9;
+    chapters.forEach((chapter) => {
+      doc.text(chapter.title, margin, tocY);
+      tocY += 10;
     });
 
+    const totalPages = doc.internal.getNumberOfPages();
+    addPageNumbers(doc, totalPages, margin);
     doc.save((story.title || 'my-story') + '.pdf');
     if(overlay) overlay.style.display = 'none';
-    showToast(selectedLang === 'en' ? '✅ PDF download complete!' : '✅ PDF 다운로드 완료!');
+    showToast('✅ PDF 다운로드 완료!');
 
   } catch(fallbackError) {
     console.error('Fallback also failed:', fallbackError);
     if(overlay) overlay.style.display = 'none';
     showToast('⚠️ PDF 생성 중 문제가 발생했어요. 다시 시도해주세요.');
+  }
+}
+
+function addPageNumbers(doc, totalPages, margin) {
+  for (let i = 2; i <= totalPages; i++) { // start from page 2, skip cover
+    doc.setPage(i);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(100);
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    doc.text(String(i - 1), pageWidth / 2, pageHeight - 10, { align: 'center' });
+    doc.setTextColor(0);
   }
 }
 
@@ -4078,7 +4229,7 @@ async function devTestPDF() {
   const barEl   = document.getElementById('pdf-progress-bar');
   if (overlay) overlay.style.display = 'flex';
   if (barEl)   barEl.style.width = '35%';
-  if (msgEl)   msgEl.textContent = 'Dev: sending to Railway PDF server...';
+  if (msgEl)   msgEl.textContent = 'PDF 서버로 전송 중...';
 
   try {
     const response = await fetch(`${PDF_SERVER_URL}/generate-pdf`, {
@@ -4110,10 +4261,10 @@ async function devTestPDF() {
     a.click();
 
     if (overlay) overlay.style.display = 'none';
-    showToast('✅ Dev PDF downloaded!');
+    showToast('✅ PDF 다운로드 완료!');
   } catch (err) {
     if (overlay) overlay.style.display = 'none';
-    showToast('⚠️ Dev PDF failed: ' + err.message);
+    showToast('⚠️ PDF 생성 실패: ' + err.message);
     console.error('[DEV] PDF test failed:', err);
   }
 }

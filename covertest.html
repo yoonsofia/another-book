@@ -3,71 +3,280 @@
 <head>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@900&family=Libre+Baskerville:wght@700&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
 <style>
-body { background: #111; display: flex; flex-direction: column; align-items: center; padding: 20px; gap: 20px; }
+body { background: #111; display: flex; flex-direction: column; align-items: center; padding: 20px; gap: 12px; }
 canvas { border: 1px solid #333; }
-button { padding: 12px 24px; font-size: 16px; cursor: pointer; background: white; border: none; border-radius: 8px; }
+.buttons { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+button { padding: 10px 18px; font-size: 14px; cursor: pointer; background: white; border: none; border-radius: 8px; font-family: sans-serif; }
 </style>
 </head>
 <body>
-<button onclick="draw(0)">Cover 1: Black + Yellow</button>
-<button onclick="draw(1)">Cover 2: Pink + Circles</button>
-<button onclick="draw(2)">Cover 3: Cream + Navy</button>
+<div class="buttons">
+  <button onclick="draw(0)">A: Risograph</button>
+  <button onclick="draw(1)">B: Big Letters BG</button>
+  <button onclick="draw(2)">C: Gradient</button>
+  <button onclick="draw(3)">D: Torn Paper</button>
+  <button onclick="draw(4)">E: Grain Texture</button>
+  <button onclick="draw(5)">F: Halftone Dots</button>
+  <button onclick="draw(6)">G: Angled Text</button>
+</div>
 <canvas id="c" width="600" height="900"></canvas>
 <script>
+const title = ['THE LIGHT', 'I ALMOST', 'FORGOT'];
+const author = 'SARA KIM';
+
+function addGrain(ctx, amount) {
+  for (let i = 0; i < amount; i++) {
+    ctx.fillStyle = `rgba(0,0,0,${Math.random() * 0.06})`;
+    ctx.fillRect(Math.random()*600, Math.random()*900, 1.5, 1.5);
+  }
+}
+
+function drawAuthor(ctx, color) {
+  ctx.font = "400 16px 'Montserrat', Arial, sans-serif";
+  ctx.fillStyle = color;
+  ctx.globalAlpha = 1;
+  ctx.textAlign = 'left';
+  ctx.letterSpacing = '6px';
+  ctx.fillText(author, 36, 865);
+  ctx.letterSpacing = '0px';
+}
+
 function draw(idx) {
   const canvas = document.getElementById('c');
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, 600, 900);
+  ctx.globalAlpha = 1;
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
 
+  // A: RISOGRAPH
   if (idx === 0) {
+    ctx.fillStyle = '#F5F0E8';
+    ctx.fillRect(0, 0, 600, 900);
+    // Layer 1 - cyan shape
+    ctx.globalAlpha = 0.75;
+    ctx.fillStyle = '#00B4CC';
+    ctx.beginPath();
+    ctx.ellipse(220, 400, 220, 300, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Layer 2 - magenta shape offset
+    ctx.fillStyle = '#E8157B';
+    ctx.beginPath();
+    ctx.ellipse(260, 430, 220, 300, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Layer 3 - yellow rectangle
+    ctx.fillStyle = '#FFD600';
+    ctx.beginPath();
+    ctx.ellipse(300, 460, 180, 260, 0.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    // Title text
+    ctx.font = "900 92px 'Barlow Condensed', Arial Black, sans-serif";
+    ctx.fillStyle = '#1A0A0A';
+    ctx.textAlign = 'left';
+    ctx.shadowColor = 'rgba(255,255,255,0.8)';
+    ctx.shadowBlur = 8;
+    ctx.fillText(title[0], 36, 160);
+    ctx.fillText(title[1], 36, 265);
+    ctx.fillText(title[2], 36, 370);
+    ctx.shadowBlur = 0;
+    addGrain(ctx, 12000);
+    drawAuthor(ctx, '#1A0A0A');
+  }
+
+  // B: BIG LETTERS BACKGROUND
+  if (idx === 1) {
     ctx.fillStyle = '#0D0D0D';
     ctx.fillRect(0, 0, 600, 900);
+    // Giant background letters
+    ctx.font = "900 210px 'Barlow Condensed', Arial Black, sans-serif";
+    ctx.fillStyle = 'rgba(255,214,0,0.08)';
+    ctx.textAlign = 'left';
+    ctx.fillText('THE', -10, 220);
+    ctx.fillText('LIG', -10, 420);
+    ctx.fillText('HT', -10, 620);
+    ctx.fillText('ALM', -10, 820);
+    // Foreground title
+    ctx.font = "900 88px 'Barlow Condensed', Arial Black, sans-serif";
     ctx.fillStyle = '#FFD600';
-    ctx.fillRect(0, 500, 600, 400);
-    ctx.font = "900 108px 'Barlow Condensed', Arial Black, sans-serif";
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#FFD600'; ctx.fillText('THE LIGHT', 36, 170);
-    ctx.fillStyle = '#FFD600'; ctx.fillText('I ALMOST', 36, 295);
-    ctx.font = "900 108px 'Barlow Condensed', Arial Black, sans-serif";
-    ctx.fillStyle = '#0D0D0D'; ctx.fillText('FORGOT', 36, 610);
-    ctx.font = "400 18px 'Montserrat', Arial, sans-serif";
-    ctx.fillStyle = '#0D0D0D'; ctx.fillText('SARA KIM', 36, 860);
-  }
-
-  if (idx === 1) {
+    ctx.fillText(title[0], 36, 200);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(title[1], 36, 310);
     ctx.fillStyle = '#E8157B';
-    ctx.fillRect(0, 0, 600, 900);
-    ctx.beginPath(); ctx.arc(560, 800, 360, 0, Math.PI * 2);
-    ctx.fillStyle = '#0D0D0D'; ctx.fill();
-    ctx.beginPath(); ctx.arc(460, 680, 150, 0, Math.PI * 2);
-    ctx.fillStyle = '#F5F0E8'; ctx.fill();
-    ctx.font = "900 108px 'Barlow Condensed', Arial Black, sans-serif";
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#FFFFFF'; ctx.fillText('THE LIGHT', 36, 170);
-    ctx.fillStyle = '#FFFFFF'; ctx.fillText('I ALMOST', 36, 295);
-    ctx.fillStyle = '#FFFFFF'; ctx.fillText('FORGOT', 36, 420);
-    ctx.font = "400 18px 'Montserrat', Arial, sans-serif";
-    ctx.fillStyle = '#FFFFFF'; ctx.fillText('SARA KIM', 36, 860);
+    ctx.fillText(title[2], 36, 420);
+    // Accent line
+    ctx.fillStyle = '#FFD600';
+    ctx.fillRect(36, 445, 140, 3);
+    addGrain(ctx, 8000);
+    drawAuthor(ctx, '#FFFFFF');
   }
 
+  // C: GRADIENT
   if (idx === 2) {
+    const grad = ctx.createLinearGradient(0, 0, 0, 900);
+    grad.addColorStop(0, '#1A0A2E');
+    grad.addColorStop(0.5, '#6B1A6B');
+    grad.addColorStop(1, '#E8157B');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 600, 900);
+    // Radial glow
+    const glow = ctx.createRadialGradient(300, 700, 50, 300, 700, 400);
+    glow.addColorStop(0, 'rgba(255,214,0,0.25)');
+    glow.addColorStop(1, 'rgba(255,214,0,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, 600, 900);
+    // Title
+    ctx.font = "900 92px 'Barlow Condensed', Arial Black, sans-serif";
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'left';
+    ctx.shadowColor = 'rgba(0,0,0,0.4)';
+    ctx.shadowBlur = 20;
+    ctx.fillText(title[0], 36, 200);
+    ctx.fillText(title[1], 36, 310);
+    ctx.fillText(title[2], 36, 420);
+    ctx.shadowBlur = 0;
+    addGrain(ctx, 10000);
+    drawAuthor(ctx, '#F5F0E8');
+  }
+
+  // D: TORN PAPER
+  if (idx === 3) {
+    // Top half
+    ctx.fillStyle = '#1A1A2E';
+    ctx.fillRect(0, 0, 600, 900);
+    // Bottom torn section
+    ctx.fillStyle = '#FFD600';
+    ctx.beginPath();
+    ctx.moveTo(0, 900);
+    // Jagged torn edge
+    ctx.lineTo(0, 480);
+    ctx.lineTo(40, 460);
+    ctx.lineTo(80, 490);
+    ctx.lineTo(130, 455);
+    ctx.lineTo(170, 475);
+    ctx.lineTo(220, 448);
+    ctx.lineTo(265, 470);
+    ctx.lineTo(310, 445);
+    ctx.lineTo(355, 468);
+    ctx.lineTo(400, 440);
+    ctx.lineTo(445, 465);
+    ctx.lineTo(490, 442);
+    ctx.lineTo(540, 460);
+    ctx.lineTo(600, 445);
+    ctx.lineTo(600, 900);
+    ctx.closePath();
+    ctx.fill();
+    // Title - top half white
+    ctx.font = "900 92px 'Barlow Condensed', Arial Black, sans-serif";
+    ctx.fillStyle = '#F5F0E8';
+    ctx.textAlign = 'left';
+    ctx.fillText(title[0], 36, 160);
+    ctx.fillText(title[1], 36, 270);
+    // Title - bottom half dark
+    ctx.fillStyle = '#1A1A2E';
+    ctx.fillText(title[2], 36, 590);
+    addGrain(ctx, 9000);
+    drawAuthor(ctx, '#1A1A2E');
+  }
+
+  // E: GRAIN TEXTURE ONLY (on bold color blocks)
+  if (idx === 4) {
+    ctx.fillStyle = '#8B1A1A';
+    ctx.fillRect(0, 0, 600, 900);
+    // Color block accent
+    ctx.fillStyle = '#F5F0E8';
+    ctx.fillRect(0, 600, 600, 300);
+    // Thin line
+    ctx.fillStyle = '#FFD600';
+    ctx.fillRect(0, 598, 600, 4);
+    // Title
+    ctx.font = "700 88px 'Libre Baskerville', Georgia, serif";
+    ctx.fillStyle = '#F5F0E8';
+    ctx.textAlign = 'left';
+    ctx.fillText(title[0], 36, 180);
+    ctx.fillText(title[1], 36, 290);
+    ctx.fillStyle = '#8B1A1A';
+    ctx.fillText(title[2], 36, 700);
+    // Heavy grain
+    addGrain(ctx, 20000);
+    // Extra dark grain
+    for (let i = 0; i < 5000; i++) {
+      ctx.fillStyle = `rgba(0,0,0,${Math.random() * 0.08})`;
+      ctx.fillRect(Math.random()*600, Math.random()*900, 2, 2);
+    }
+    drawAuthor(ctx, '#8B1A1A');
+  }
+
+  // F: HALFTONE DOTS
+  if (idx === 5) {
     ctx.fillStyle = '#F0EBE3';
     ctx.fillRect(0, 0, 600, 900);
-    ctx.fillStyle = '#1A1A2E'; ctx.fillRect(0, 0, 16, 900);
-    ctx.fillStyle = '#1A1A2E'; ctx.fillRect(0, 730, 600, 170);
-    ctx.beginPath(); ctx.arc(460, 490, 115, 0, Math.PI * 2);
-    ctx.fillStyle = '#8B1A1A'; ctx.fill();
-    ctx.beginPath(); ctx.arc(460, 490, 75, 0, Math.PI * 2);
-    ctx.fillStyle = '#F0EBE3'; ctx.fill();
-    ctx.font = "700 88px 'Libre Baskerville', Georgia, serif";
+    // Halftone dot grid
+    const dotSpacing = 18;
+    for (let x = 0; x < 600; x += dotSpacing) {
+      for (let y = 0; y < 900; y += dotSpacing) {
+        const distFromCenter = Math.sqrt(Math.pow(x - 300, 2) + Math.pow(y - 600, 2));
+        const maxDist = 500;
+        const size = Math.max(0.5, (1 - distFromCenter / maxDist) * 7);
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fillStyle = '#1A1A2E';
+        ctx.fill();
+      }
+    }
+    // Title over halftone
+    ctx.font = "900 92px 'Barlow Condensed', Arial Black, sans-serif";
+    ctx.fillStyle = '#1A1A2E';
     ctx.textAlign = 'left';
-    ctx.fillStyle = '#1A1A2E'; ctx.fillText('THE LIGHT', 36, 160);
-    ctx.fillStyle = '#1A1A2E'; ctx.fillText('I ALMOST', 36, 268);
-    ctx.fillStyle = '#1A1A2E'; ctx.fillText('FORGOT', 36, 376);
-    ctx.font = "400 18px 'Montserrat', Arial, sans-serif";
-    ctx.fillStyle = '#F0EBE3'; ctx.fillText('SARA KIM', 36, 800);
+    ctx.fillText(title[0], 36, 180);
+    ctx.fillText(title[1], 36, 290);
+    ctx.fillText(title[2], 36, 400);
+    // Accent circle
+    ctx.beginPath();
+    ctx.arc(480, 680, 100, 0, Math.PI * 2);
+    ctx.fillStyle = '#E8157B';
+    ctx.fill();
+    drawAuthor(ctx, '#1A1A2E');
+  }
+
+  // G: ANGLED TEXT
+  if (idx === 6) {
+    ctx.fillStyle = '#0D0D0D';
+    ctx.fillRect(0, 0, 600, 900);
+    // Angled color bar
+    ctx.save();
+    ctx.translate(0, 350);
+    ctx.rotate(-Math.PI / 14);
+    ctx.fillStyle = '#E8157B';
+    ctx.fillRect(-50, -60, 800, 120);
+    ctx.restore();
+    // Angled title lines
+    ctx.font = "900 88px 'Barlow Condensed', Arial Black, sans-serif";
+    ctx.textAlign = 'left';
+    const angle = -Math.PI / 22;
+    ctx.save();
+    ctx.translate(36, 200);
+    ctx.rotate(angle);
+    ctx.fillStyle = '#FFD600';
+    ctx.fillText(title[0], 0, 0);
+    ctx.restore();
+    ctx.save();
+    ctx.translate(36, 320);
+    ctx.rotate(angle);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(title[1], 0, 0);
+    ctx.restore();
+    ctx.save();
+    ctx.translate(36, 440);
+    ctx.rotate(angle);
+    ctx.fillStyle = '#E8157B';
+    ctx.fillText(title[2], 0, 0);
+    ctx.restore();
+    addGrain(ctx, 8000);
+    drawAuthor(ctx, '#FFFFFF');
   }
 }
+
 draw(0);
 </script>
 </body>
