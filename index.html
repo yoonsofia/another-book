@@ -2416,33 +2416,19 @@ ${languageInstruction}
 
 IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.
 
-After writing the story chapter, you MUST output a cover brief on a new line in this exact format with no variations:
+After writing the story chapter, append this block exactly. Write one Ideogram image prompt that captures the mood, setting, and emotional tone of the story. The image must have NO text, NO words, NO letters, NO numbers, NO typography of any kind — title and author will be added separately via canvas.
 
-Generate 4 completely different Ideogram image prompts for this book cover. Each one must have a genuinely different visual style, layout, color palette, and typography direction.
+Examples of good Ideogram prompts:
+- "A peaceful Korean kitchen at dawn, warm golden light streaming through a window, a bowl of noodles on the table, cinematic, painterly, no text, no words, no letters"
+- "A rainy Seoul street at night, neon reflections on wet pavement, a lone figure with umbrella, cinematic atmosphere, no text, no words, no letters"
+- "A quiet Korean countryside at sunset, golden rice fields, soft warm light, peaceful mood, no text, no words, no letters"
+- "A modern Seoul cafe interior, soft morning light, coffee cup on wooden table, cozy atmosphere, no text, no words, no letters"
 
-Rules for all 4:
-- Include the exact title '${outline.title}' and author name '${ans.authorDisplay}'
-- Match the mood and genre of the story
-- Each must look like it belongs to a different design school
+Based on the story, return ONLY this JSON, no other text:
 
 <coverBrief>
-{
-  "cover1": "full ideogram prompt here...",
-  "cover2": "full ideogram prompt here...",
-  "cover3": "full ideogram prompt here...",
-  "cover4": "full ideogram prompt here...",
-  "fontStyle": "[BARLOW for dramatic/intense | PLAYFAIR for romantic/warm | LIBRE for literary/quiet | CORMORANT for elegant/sad | NOTO_SANS_KR for Korean dramatic | NOTO_SERIF_KR for Korean literary]",
-  "textColor": "[#FFFFFF for dark backgrounds | #0D0D0D for light backgrounds]",
-  "accentColor": "[a bold contrasting hex color]",
-  "titleLines": ["[TITLE LINE 1]", "[TITLE LINE 2 if needed]"],
-  "titleAlign": "[left or center]",
-  "authorName": "[the full name of the book's author exactly as entered by the user]",
-  "mood": "[one word]",
-  "language": "[en or ko]"
-}
-</coverBrief>
-
-This block is mandatory. Do not skip it.`
+{"coverBrief": "your Ideogram image prompt here, no text, no words, no letters in the image"}
+</coverBrief>`
       : `${languageInstruction}
 
 당신은 한국어 베스트셀러 소설 작가입니다. 챕터 1의 마지막 파트 3을 집필해주세요.
@@ -2464,33 +2450,19 @@ ${languageInstruction}
 
 IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.
 
-스토리 챕터를 쓴 후, 반드시 새 줄에 아래 형식 그대로 커버 브리프를 출력하세요. 형식을 바꾸지 마세요:
+스토리 챕터를 쓴 후, 아래 블록을 추가하세요. 이야기의 분위기와 감정을 담은 Ideogram 이미지 프롬프트를 영어로 한 개 작성하세요. 이미지에 텍스트, 단어, 글자, 숫자, 타이포그래피가 절대 포함되면 안 됩니다 — 제목과 저자명은 캔버스에서 별도로 추가됩니다.
 
-이 책의 표지를 위해 완전히 다른 Ideogram 이미지 프롬프트 4개를 생성하세요. 각각은 시각적 스타일, 레이아웃, 색상 팔레트가 진정으로 달라야 합니다.
+좋은 Ideogram 프롬프트 예시:
+- "A peaceful Korean kitchen at dawn, warm golden light streaming through a window, a bowl of noodles on the table, cinematic, painterly, no text, no words, no letters"
+- "A rainy Seoul street at night, neon reflections on wet pavement, a lone figure with umbrella, cinematic atmosphere, no text, no words, no letters"
+- "A quiet Korean countryside at sunset, golden rice fields, soft warm light, peaceful mood, no text, no words, no letters"
+- "A modern Seoul cafe interior, soft morning light, coffee cup on wooden table, cozy atmosphere, no text, no words, no letters"
 
-모든 4개의 규칙:
-- 이야기의 분위기와 장르에 맞추세요
-- 각각은 다른 디자인 학파에 속하는 것처럼 보여야 합니다
-- No text, no letters, no words, no typography anywhere in the image
+이야기를 바탕으로, 다른 텍스트 없이 아래 JSON만 반환하세요:
 
 <coverBrief>
-{
-  "cover1": "full ideogram prompt here...",
-  "cover2": "full ideogram prompt here...",
-  "cover3": "full ideogram prompt here...",
-  "cover4": "full ideogram prompt here...",
-  "fontStyle": "[BARLOW: 극적/강렬 | PLAYFAIR: 로맨틱/따뜻 | LIBRE: 문학적/차분 | CORMORANT: 우아/슬픔 | NOTO_SANS_KR: 한국어 극적 | NOTO_SERIF_KR: 한국어 문학적]",
-  "textColor": "[어두운 배경은 #FFFFFF | 밝은 배경은 #0D0D0D]",
-  "accentColor": "[강한 대비의 hex 색상]",
-  "titleLines": ["[제목 1줄]", "[필요시 2줄]"],
-  "titleAlign": "[left 또는 center]",
-  "authorName": "[the full name of the book's author exactly as entered by the user]",
-  "mood": "[한 단어 분위기]",
-  "language": "[en 또는 ko]"
-}
-</coverBrief>
-
-이 블록은 필수입니다. 절대 생략하지 마세요.`;
+{"coverBrief": "your Ideogram image prompt here, no text, no words, no letters in the image"}
+</coverBrief>`;
 
     const ch1Part3Raw = await apiCall(ch1Part3Prompt, 3500);
     let ch1Part3Content = ch1Part3Raw
@@ -2918,7 +2890,7 @@ async function composeCover(imageUrl, coverBrief, title, author) {
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = function() {
-      if (coverBrief.language === 'ko') {
+      if (selectedLang === 'ko') {
         try {
           ctx.drawImage(img, 0, 0, 600, 900);
           drawCoverText(canvas, coverBrief, title, author);
@@ -2928,7 +2900,7 @@ async function composeCover(imageUrl, coverBrief, title, author) {
           const fb = document.createElement('canvas');
           fb.width = 600; fb.height = 900;
           const fbCtx = fb.getContext('2d');
-          fbCtx.fillStyle = coverBrief.coverColor || '#1A0A2E';
+          fbCtx.fillStyle = '#1A0A2E';
           fbCtx.fillRect(0, 0, 600, 900);
           drawCoverText(fb, coverBrief, title, author);
           resolve(fb.toDataURL('image/jpeg', 0.95));
@@ -2939,8 +2911,8 @@ async function composeCover(imageUrl, coverBrief, title, author) {
       }
     };
     img.onerror = function() {
-      if (coverBrief.language === 'ko') {
-        ctx.fillStyle = coverBrief.coverColor || '#1A0A2E';
+      if (selectedLang === 'ko') {
+        ctx.fillStyle = '#1A0A2E';
         ctx.fillRect(0, 0, 600, 900);
         drawCoverText(canvas, coverBrief, title, author);
       }
@@ -3272,11 +3244,11 @@ async function renderCover(canvas, design, bookTitle, authorName){
   ctx.globalAlpha = 1.0;
 
   // 4. Author name — below divider, Montserrat Light uppercase
-  ctx.font          = `400 16px ${bodyFont}`;
+  ctx.font          = `400 36px ${bodyFont}`;
   ctx.fillStyle     = design.textColor || '#F5F0E8';
   ctx.globalAlpha   = 0.85;
   ctx.letterSpacing = '5px';
-  ctx.fillText((authorName || '').toUpperCase(), leftMargin, dividerY + 28);
+  ctx.fillText((authorName || '').toUpperCase(), leftMargin, dividerY + 50);
   ctx.globalAlpha   = 1.0;
   ctx.letterSpacing = '0px';
 
@@ -3678,9 +3650,9 @@ async function generatePDFPrimary(sp) {
       }
     }
 
-    // Author: NotoSerifKR 13pt black, centered, 198mm from top
+    // Author: NotoSerifKR 16pt black, centered, 198mm from top
     doc.setFont(bodyFont, 'normal');
-    doc.setFontSize(13);
+    doc.setFontSize(16);
     doc.setTextColor(0, 0, 0);
     doc.text(ans.authorDisplay || '', PW / 2, 198, {align: 'center'});
   } else {
@@ -4239,13 +4211,14 @@ function isKorean(text) {
 async function generateBookCover(coverBrief) {
   console.log('coverBrief:', coverBrief);
 
-  const prompt1 = coverBrief.cover1;
-  const prompt2 = coverBrief.cover2;
-  const prompt3 = coverBrief.cover3;
-  const prompt4 = coverBrief.cover4;
+  const prompt = coverBrief.coverBrief;
+  if (!prompt) {
+    console.error('No coverBrief prompt found in parsed brief');
+    return [];
+  }
 
   const results = await Promise.all(
-    [prompt1, prompt2, prompt3, prompt4].map(prompt =>
+    [0, 1, 2, 3].map(() =>
       fetch(`${window.PDF_SERVER_URL}/generate-cover`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -4312,7 +4285,7 @@ function drawCoverText(canvas, coverBrief, title, author) {
   ctx.globalAlpha = 1;
 
   const authorFont = korean ? "'Noto Sans KR'" : "'Montserrat'";
-  ctx.font = `400 18px ${authorFont}, sans-serif`;
+  ctx.font = `400 36px ${authorFont}, sans-serif`;
   ctx.fillStyle = textColor;
   ctx.globalAlpha = 0.9;
   ctx.textAlign = 'left';
