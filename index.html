@@ -2466,12 +2466,12 @@ IMPORTANT: You must always finish the chapter with a complete, proper ending. Ne
 
 스토리 챕터를 쓴 후, 반드시 새 줄에 아래 형식 그대로 커버 브리프를 출력하세요. 형식을 바꾸지 마세요:
 
-이 책의 표지를 위해 완전히 다른 Ideogram 이미지 프롬프트 4개를 생성하세요. 각각은 시각적 스타일, 레이아웃, 색상 팔레트, 타이포그래피 방향이 진정으로 달라야 합니다.
+이 책의 표지를 위해 완전히 다른 Ideogram 이미지 프롬프트 4개를 생성하세요. 각각은 시각적 스타일, 레이아웃, 색상 팔레트가 진정으로 달라야 합니다.
 
 모든 4개의 규칙:
-- 정확한 제목 '${outline.title}'과 저자 이름 '${ans.authorDisplay}'을 포함하세요
 - 이야기의 분위기와 장르에 맞추세요
 - 각각은 다른 디자인 학파에 속하는 것처럼 보여야 합니다
+- No text, no letters, no words, no typography anywhere in the image
 
 <coverBrief>
 {
@@ -3542,14 +3542,18 @@ async function generatePDF(sp) {
 
   } catch (error) {
     console.error('Railway PDF failed, using fallback:', error);
-    generatePDFFallback();
+    if (selectedLang === 'ko') {
+      await generatePDFPrimary(sp);
+    } else {
+      generatePDFFallback();
+    }
   }
 }
 
 async function setupKoreanPDFFont(doc) {
   try {
     const response = await fetch(
-      'https://cdn.jsdelivr.net/gh/threeHeaven/jspdf-korean/NanumGothic.ttf'
+      'https://fonts.gstatic.com/s/notoserifkr/v15/3JnmSDn90Gmq2mr3blnHaTZXTihC8O1ZNH1isa8.woff2'
     );
     if (!response.ok) throw new Error('Font fetch failed');
     const buffer = await response.arrayBuffer();
@@ -3561,11 +3565,11 @@ async function setupKoreanPDFFont(doc) {
       binary += String.fromCharCode.apply(null, chunk);
     }
     const base64 = btoa(binary);
-    doc.addFileToVFS('NanumGothic.ttf', base64);
-    doc.addFont('NanumGothic.ttf', 'NanumGothic', 'normal');
-    doc.addFont('NanumGothic.ttf', 'NanumGothic', 'bold');
-    console.log('Korean font loaded successfully');
-    return 'NanumGothic';
+    doc.addFileToVFS('NotoSerifKR.woff2', base64);
+    doc.addFont('NotoSerifKR.woff2', 'NotoSerifKR', 'normal');
+    doc.addFont('NotoSerifKR.woff2', 'NotoSerifKR', 'bold');
+    console.log('Noto Serif KR font loaded successfully');
+    return 'NotoSerifKR';
   } catch (error) {
     console.log('Korean font load failed, using Times fallback:', error);
     return null;
@@ -3604,109 +3608,230 @@ async function generatePDFPrimary(sp) {
   sp(65,'표지 준비 중...');
   await document.fonts.ready;
 
+  console.log('[PDF] Cover image data before PDF build — selectedCoverImage:', selectedCoverImage, '| exists:', !!selectedCoverImage);
+
+  const isKorean = selectedLang === 'ko';
   const {jsPDF} = window.jspdf;
-  const doc = new jsPDF({orientation:'portrait', unit:'mm', format:[127,188], compress:true});
+
+  // Page dimensions and margins
+  const PW   = isKorean ? 148   : 127;
+  const PH   = isKorean ? 210   : 188;
+  const mL   = isKorean ? 24.9  : 25;
+  const mR   = isKorean ? 24.9  : 25;
+  const mTop = isKorean ? 24.9  : 15;
+  const mBot = isKorean ? 40.1  : 18;
+  const textW = PW - mL - mR;
+
+  const doc = new jsPDF({orientation:'portrait', unit:'mm', format:[PW,PH], compress:true});
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(11);
   doc.setCharSpace(0);
 
   // Load Korean font if needed
   let bodyFont = 'helvetica';
-  if (selectedLang === 'ko') {
+  if (isKorean) {
     sp(66, '한국어 폰트 로딩 중...');
     const koreanFont = await setupKoreanPDFFont(doc);
     if (koreanFont) bodyFont = koreanFont;
   }
 
-  // Cover page (use pre-rendered canvas)
+  // Cover page
   const coverCanvas = document.getElementById('cover-canvas');
-  if(coverCanvas){
-    doc.addImage(coverCanvas.toDataURL('image/jpeg',0.95),'JPEG',0,0,127,188);
+  if (isKorean) {
+    // White background
+    doc.setFillColor(255, 255, 255);
+    doc.rect(0, 0, PW, PH, 'F');
+
+    // Title: NotoSerifKR 20pt black, centered, 20mm from top
+    doc.setFont(bodyFont, 'normal');
+    doc.setFontSize(20);
+    doc.setTextColor(0, 0, 0);
+    const coverTitleLines = doc.splitTextToSize(story.title || '', PW - 18);
+    doc.text(coverTitleLines, PW / 2, 20, {align: 'center'});
+
+    // Ideogram image: 130mm × 160mm, centered (9mm side margins), 30mm from top
+    const imgX = 9, imgY = 30, imgW = 130, imgH = 160;
+    try {
+      let imgDataUrl = null;
+      if (selectedCoverImage) {
+        const proxyUrl = `${window.PDF_SERVER_URL}/proxy-image?url=${encodeURIComponent(selectedCoverImage)}`;
+        const resp = await fetch(proxyUrl);
+        if (resp.ok) {
+          const blob = await resp.blob();
+          imgDataUrl = await new Promise(res => {
+            const reader = new FileReader();
+            reader.onload = e => res(e.target.result);
+            reader.readAsDataURL(blob);
+          });
+        }
+      }
+      if (!imgDataUrl && coverCanvas) {
+        imgDataUrl = coverCanvas.toDataURL('image/jpeg', 0.95);
+      }
+      console.log('[PDF] imgDataUrl resolved:', !!imgDataUrl, '| source:', imgDataUrl ? (selectedCoverImage ? 'proxy-fetch' : 'canvas-fallback') : 'none');
+      if (imgDataUrl) {
+        doc.addImage(imgDataUrl, 'JPEG', imgX, imgY, imgW, imgH);
+      }
+    } catch(e) {
+      if (coverCanvas) {
+        doc.addImage(coverCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', imgX, imgY, imgW, imgH);
+      }
+    }
+
+    // Author: NotoSerifKR 13pt black, centered, 198mm from top
+    doc.setFont(bodyFont, 'normal');
+    doc.setFontSize(13);
+    doc.setTextColor(0, 0, 0);
+    doc.text(ans.authorDisplay || '', PW / 2, 198, {align: 'center'});
+  } else {
+    if (coverCanvas) {
+      doc.addImage(coverCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, PW, PH);
+    }
   }
 
-  const PW=127, PH=188;
-  const mL=25, mR=25, mTop=15, mBot=18;
-  const textW = PW - mL - mR;
-  let globalPage = 1;
+  // Publication info page (Korean only, page 2 — no page number)
+  if (isKorean) {
+    doc.addPage();
+    const today = new Date();
+    const publishDate = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
+    const copyrightYear = today.getFullYear();
 
-  const drawPageHeader = () => {
-    // Running header removed
-  };
+    // 책 제목 — centered, 16pt, 50mm from top
+    doc.setFont(bodyFont, 'normal');
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0);
+    doc.text(story.title || '', PW / 2, 50, {align: 'center'});
+
+    // 정보 테이블 — 30mm from left, starting at 80mm, 10mm line spacing
+    doc.setFont(bodyFont, 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    const tableX = 30;
+    const tableRows = [
+      `발 행 │ ${publishDate}`,
+      `저 자 │ ${ans.authorDisplay || ''}`,
+      `펴낸곳 │ 어나더북`,
+      `이메일 │ hello@anotherbook.ai`,
+    ];
+    tableRows.forEach((row, i) => {
+      doc.text(row, tableX, 80 + i * 10);
+    });
+
+    // 설명 텍스트 — centered, 9pt, 140mm from top
+    doc.setFont(bodyFont, 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+    doc.text('이 책은 어나더북(AnotherBook)이 제작한', PW / 2, 140, {align: 'center'});
+    doc.text('세상에 하나뿐인 맞춤형 소설입니다.', PW / 2, 148, {align: 'center'});
+
+    // 저작권 — centered, 9pt, 160mm from top
+    doc.text(`© ${copyrightYear} AnotherBook. All rights reserved.`, PW / 2, 160, {align: 'center'});
+  }
+
+  let globalPage = 1;
 
   const drawPageNum = () => {
     doc.setFont(bodyFont,'normal');
     doc.setFontSize(9);
     doc.setTextColor(136,136,136);
-    doc.text(`— ${globalPage} —`, PW/2, PH - 5, {align:'center'});
+    doc.text(`— ${globalPage} —`, PW/2, PH - (isKorean ? 6 : 5), {align:'center'});
   };
 
-  // Pre-calculate chapter start pages for TOC
-  const AVG_CHARS_PER_LINE = 67;
-  const LINES_PER_BODY_PAGE = 21;
-  const FIRST_PAGE_LINES = 15;
-  const chapStartPages = [];
-  let estPage = 3;
-  for (const ch of story.chapters) {
-    chapStartPages.push(estPage);
-    const totalLines = Math.ceil(ch.content.length / AVG_CHARS_PER_LINE);
-    const totalPages = 1 + Math.max(0, Math.ceil((totalLines - FIRST_PAGE_LINES) / LINES_PER_BODY_PAGE));
-    estPage += totalPages;
-  }
+  if (isKorean) {
+    // ── Page 3: Conditional — gift → dedication, else → blank ──
+    doc.addPage();
+    if (selectedProduct === 'gift') {
+      doc.setFont(bodyFont, 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(0, 0, 0);
+      doc.text(
+        ['이 이야기를 읽을 당신에게.', '당신의 이야기이니까요.'],
+        PW / 2, PH / 2,
+        {align: 'center'}
+      );
+    }
 
-  // TOC page
-  doc.addPage();
-  globalPage++;
-  let tocY = mTop + 12;
+    // ── Page 4: Blank (always) ──
+    doc.addPage();
 
-  doc.setFont(bodyFont,'bold');
-  doc.setFontSize(26);
-  doc.setTextColor(61,90,71);
-  doc.text((selectedLang === 'en') ? 'Contents' : '목  차', PW/2, tocY, {align:'center'});
-  tocY += 12;
+    // ── Page 5: 목차 ──
+    doc.addPage();
+    doc.setFont(bodyFont, 'normal');
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0);
+    doc.text('차 례', PW / 2, 40, {align: 'center'});
+    doc.setFont(bodyFont, 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+    story.chapters.forEach((ch, i) => {
+      doc.text(`${ch.number}　${ch.title}`, mL, 60 + i * 12);
+    });
 
-  doc.setDrawColor(196,168,130);
-  doc.setLineWidth(0.4);
-  doc.line((PW-50)/2, tocY, (PW+50)/2, tocY);
-  tocY += 10;
+  } else {
+    // ── English: pre-calculate TOC page numbers ──
+    const AVG_CHARS_PER_LINE  = 67;
+    const LINES_PER_BODY_PAGE = 21;
+    const FIRST_PAGE_LINES    = 15;
+    const chapStartPages = [];
+    let estPage = 3;
+    for (const ch of story.chapters) {
+      chapStartPages.push(estPage);
+      const totalLines = Math.ceil(ch.content.length / AVG_CHARS_PER_LINE);
+      const totalPages = 1 + Math.max(0, Math.ceil((totalLines - FIRST_PAGE_LINES) / LINES_PER_BODY_PAGE));
+      estPage += totalPages;
+    }
 
-  for (let i = 0; i < story.chapters.length; i++) {
-    const ch = story.chapters[i];
-    const pgNum = chapStartPages[i];
-    const entryY = tocY + i * 12;
+    // ── English TOC page ──
+    doc.addPage();
+    globalPage++;
+    let tocY = mTop + 12;
 
-    // Chapter number
-    doc.setFont(bodyFont,'normal');
-    doc.setFontSize(12);
-    doc.setTextColor(196,168,130);
-    doc.text(`${ch.number}.`, mL + 5, entryY, {align:'right'});
+    doc.setFont(bodyFont,'bold');
+    doc.setFontSize(26);
+    doc.setTextColor(61,90,71);
+    doc.text('Contents', PW/2, tocY, {align:'center'});
+    tocY += 12;
 
-    // Chapter title
-    doc.setFont(bodyFont,'normal');
-    doc.setFontSize(13);
-    doc.setTextColor(44,44,44);
-    const maxChars = 28;
-    const titleShort = ch.title.length > maxChars ? ch.title.substring(0, maxChars-1)+'…' : ch.title;
-    const titleEndX = mL + 8 + doc.getTextWidth(titleShort) + 2;
-    doc.text(titleShort, mL + 8, entryY);
+    doc.setDrawColor(196,168,130);
+    doc.setLineWidth(0.4);
+    doc.line((PW-50)/2, tocY, (PW+50)/2, tocY);
+    tocY += 10;
 
-    // Page number
-    doc.setFont(bodyFont,'normal');
-    doc.setFontSize(11);
-    doc.setTextColor(136,136,136);
-    const pgNumStr = String(pgNum);
-    const pgNumW = doc.getTextWidth(pgNumStr);
-    const pgStartX = PW - mR - pgNumW - 2;
-    doc.text(pgNumStr, PW - mR, entryY, {align:'right'});
+    for (let i = 0; i < story.chapters.length; i++) {
+      const ch = story.chapters[i];
+      const pgNum = chapStartPages[i];
+      const entryY = tocY + i * 12;
 
-    // Dashed connector
-    if (pgStartX > titleEndX + 4) {
-      try {
-        doc.setDrawColor(200,200,200);
-        doc.setLineWidth(0.1);
-        doc.setLineDashPattern([0.5, 2], 0);
-        doc.line(titleEndX, entryY - 1.2, pgStartX, entryY - 1.2);
-        doc.setLineDashPattern([], 0);
-      } catch(e3) { /* skip connector if method unavailable */ }
+      doc.setFont(bodyFont,'normal');
+      doc.setFontSize(12);
+      doc.setTextColor(196,168,130);
+      doc.text(`${ch.number}.`, mL + 5, entryY, {align:'right'});
+
+      doc.setFont(bodyFont,'normal');
+      doc.setFontSize(13);
+      doc.setTextColor(44,44,44);
+      const maxChars = 28;
+      const titleShort = ch.title.length > maxChars ? ch.title.substring(0, maxChars-1)+'…' : ch.title;
+      const titleEndX = mL + 8 + doc.getTextWidth(titleShort) + 2;
+      doc.text(titleShort, mL + 8, entryY);
+
+      doc.setFont(bodyFont,'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(136,136,136);
+      const pgNumStr = String(pgNum);
+      const pgNumW = doc.getTextWidth(pgNumStr);
+      const pgStartX = PW - mR - pgNumW - 2;
+      doc.text(pgNumStr, PW - mR, entryY, {align:'right'});
+
+      if (pgStartX > titleEndX + 4) {
+        try {
+          doc.setDrawColor(200,200,200);
+          doc.setLineWidth(0.1);
+          doc.setLineDashPattern([0.5, 2], 0);
+          doc.line(titleEndX, entryY - 1.2, pgStartX, entryY - 1.2);
+          doc.setLineDashPattern([], 0);
+        } catch(e3) {}
+      }
     }
   }
 
@@ -3718,118 +3843,159 @@ async function generatePDFPrimary(sp) {
     globalPage++;
     ch.pageNumber = doc.internal.getCurrentPageInfo().pageNumber;
 
-    drawPageHeader();
-    let y = mTop + 10;
+    if (isKorean) {
+      // ── Korean chapter layout ──
+      // Chapter number: centered, 16pt, 60mm from top
+      doc.setFont(bodyFont, 'normal');
+      doc.setFontSize(16);
+      doc.setTextColor(0, 0, 0);
+      doc.text(String(ch.number), PW / 2, 60, {align: 'center'});
 
-    // CHAPTER N label
-    doc.setFont(bodyFont,'normal');
-    doc.setFontSize(10);
-    doc.setTextColor(196,168,130);
-    doc.text(`CHAPTER ${ch.number}`, PW/2, y, {align:'center', charSpace:0.8});
-    y += 8;
+      // Chapter title: centered, 14pt, 72mm from top
+      doc.setFont(bodyFont, 'normal');
+      doc.setFontSize(14);
+      doc.setTextColor(0, 0, 0);
+      const koTitleLines = doc.splitTextToSize(ch.title, textW);
+      doc.text(koTitleLines, PW / 2, 72, {align: 'center'});
 
-    // Chapter title
-    doc.setFont(bodyFont,'bold');
-    doc.setFontSize(22);
-    doc.setTextColor(61,90,71);
-    const titleLines = doc.splitTextToSize(ch.title, textW);
-    doc.text(titleLines, PW/2, y, {align:'center'});
-    y += titleLines.length * 9 + 5;
+      // Body text: starts at 90mm from top, 10.5pt, 7mm line height, no indent
+      let y = 90;
+      const lineHeight = 7;
+      const bottomMargin = PH - 25; // 185mm — 25mm from bottom of A5 page
+      const maxWidth = PW - mL - mR;
+      doc.setFont(bodyFont, 'normal');
+      doc.setFontSize(10.5);
+      doc.setTextColor(0, 0, 0);
 
-    // Divider
-    doc.setFont(bodyFont,'normal');
-    doc.setFontSize(12);
-    doc.setTextColor(196,168,130);
-    doc.text('── ✦ ──', PW/2, y, {align:'center'});
-    y += 12;
+      const koParas = cleanMarkdownForPDF(ch.content).split(/\n\n+|\n/).filter(p=>p.trim());
+      for (const para of koParas) {
+        const cleanPara = para.trim();
+        doc.setFont(bodyFont, 'normal');
+        doc.setFontSize(10.5);
+        doc.setTextColor(0, 0, 0);
 
-    // Body text
-    doc.setFont(bodyFont,'normal');
-    doc.setFontSize(11);
-    doc.setTextColor(44,44,44);
+        const lines = doc.splitTextToSize(cleanPara, maxWidth);
+        for (const line of lines) {
+          doc.text(line, mL, y);
+          y += lineHeight;
+          if (y > bottomMargin) {
+            doc.addPage();
+            doc.setFontSize(9);
+            doc.text(String(globalPage), PW / 2, PH - 8, { align: 'center' });
+            globalPage++;
+            doc.setFont(bodyFont, 'normal');
+            doc.setFontSize(10.5);
+            doc.setTextColor(0, 0, 0);
+            y = 20;
+          }
+        }
+        y += 3;
+      }
+      drawPageNum();
 
-    const paras = cleanMarkdownForPDF(ch.content).split(/\n\n+|\n/).filter(p=>p.trim());
-    let isFirstParagraph = true;
+    } else {
+      // ── English chapter layout (unchanged) ──
+      let y = mTop + 10;
 
-    for (const para of paras) {
-      const cleanPara = para.trim();
+      doc.setFont(bodyFont,'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(196,168,130);
+      doc.text(`CHAPTER ${ch.number}`, PW/2, y, {align:'center', charSpace:0.8});
+      y += 8;
+
+      doc.setFont(bodyFont,'bold');
+      doc.setFontSize(22);
+      doc.setTextColor(61,90,71);
+      const titleLines = doc.splitTextToSize(ch.title, textW);
+      doc.text(titleLines, PW/2, y, {align:'center'});
+      y += titleLines.length * 9 + 5;
+
+      doc.setFont(bodyFont,'normal');
+      doc.setFontSize(12);
+      doc.setTextColor(196,168,130);
+      doc.text('── ✦ ──', PW/2, y, {align:'center'});
+      y += 12;
+
       doc.setFont(bodyFont,'normal');
       doc.setFontSize(11);
       doc.setTextColor(44,44,44);
 
-      // Page break check before paragraph
-      if (y + 14 > PH - mBot) {
-        drawPageNum();
-        doc.addPage();
-        globalPage++;
-        drawPageHeader();
-        y = mTop + 8;
+      const paras = cleanMarkdownForPDF(ch.content).split(/\n\n+|\n/).filter(p=>p.trim());
+      let isFirstParagraph = true;
+
+      for (const para of paras) {
+        const cleanPara = para.trim();
         doc.setFont(bodyFont,'normal');
         doc.setFontSize(11);
         doc.setTextColor(44,44,44);
-      }
 
-      if (cleanPara.includes('*')) {
-        const newY = renderParagraphWithItalics(
-          doc, cleanPara,
-          isFirstParagraph ? mL : mL + 8,
-          y, textW, 11, bodyFont
-        );
-        y = newY + 3;
-      } else {
-        const lines = doc.splitTextToSize(cleanPara, textW);
-        if (!isFirstParagraph) {
-          // First-line indent
-          const firstLine = lines[0] || '';
-          if (y + 7 > PH - mBot) {
-            drawPageNum();
-            doc.addPage();
-            globalPage++;
-            drawPageHeader();
-            y = mTop + 8;
-            doc.setFont(bodyFont,'normal');
-            doc.setFontSize(11);
-            doc.setTextColor(44,44,44);
-          }
-          doc.text(firstLine, mL + 8, y);
-          y += 7;
-          for (const line of lines.slice(1)) {
-            if (y + 7 > PH - mBot) {
-              drawPageNum();
-              doc.addPage();
-              globalPage++;
-              drawPageHeader();
-              y = mTop + 8;
-              doc.setFont(bodyFont,'normal');
-              doc.setFontSize(11);
-              doc.setTextColor(44,44,44);
-            }
-            doc.text(line, mL, y);
-            y += 7;
-          }
-          y += 3;
-        } else {
-          // No indent for first paragraph of each chapter
-          for (const line of lines) {
-            if (y + 7 > PH - mBot) {
-              drawPageNum();
-              doc.addPage();
-              globalPage++;
-              drawPageHeader();
-              y = mTop + 8;
-              doc.setFont(bodyFont,'normal');
-              doc.setFontSize(11);
-              doc.setTextColor(44,44,44);
-            }
-            doc.text(line, mL, y);
-            y += 7;
-          }
-          y += 3;
+        if (y + 14 > PH - mBot) {
+          drawPageNum();
+          doc.addPage();
+          globalPage++;
+          y = mTop + 8;
+          doc.setFont(bodyFont,'normal');
+          doc.setFontSize(11);
+          doc.setTextColor(44,44,44);
         }
+
+        if (cleanPara.includes('*')) {
+          const newY = renderParagraphWithItalics(
+            doc, cleanPara,
+            isFirstParagraph ? mL : mL + 8,
+            y, textW, 11, bodyFont
+          );
+          y = newY + 3;
+        } else {
+          const lines = doc.splitTextToSize(cleanPara, textW);
+          if (!isFirstParagraph) {
+            const firstLine = lines[0] || '';
+            if (y + 7 > PH - mBot) {
+              drawPageNum();
+              doc.addPage();
+              globalPage++;
+              y = mTop + 8;
+              doc.setFont(bodyFont,'normal');
+              doc.setFontSize(11);
+              doc.setTextColor(44,44,44);
+            }
+            doc.text(firstLine, mL + 8, y);
+            y += 7;
+            for (const line of lines.slice(1)) {
+              if (y + 7 > PH - mBot) {
+                drawPageNum();
+                doc.addPage();
+                globalPage++;
+                y = mTop + 8;
+                doc.setFont(bodyFont,'normal');
+                doc.setFontSize(11);
+                doc.setTextColor(44,44,44);
+              }
+              doc.text(line, mL, y);
+              y += 7;
+            }
+            y += 3;
+          } else {
+            for (const line of lines) {
+              if (y + 7 > PH - mBot) {
+                drawPageNum();
+                doc.addPage();
+                globalPage++;
+                y = mTop + 8;
+                doc.setFont(bodyFont,'normal');
+                doc.setFontSize(11);
+                doc.setTextColor(44,44,44);
+              }
+              doc.text(line, mL, y);
+              y += 7;
+            }
+            y += 3;
+          }
+        }
+        isFirstParagraph = false;
       }
-      isFirstParagraph = false;
+      drawPageNum();
     }
-    drawPageNum();
   }
 
   sp(96,'저장 중...');
