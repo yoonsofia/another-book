@@ -4304,17 +4304,38 @@ function drawCoverText(canvas, coverBrief, title, author) {
 
 // ──────────── PARSE COVER BRIEF ────────────
 function parseCoverBrief(claudeResponse) {
+  const cleaned = claudeResponse
+    .replace(/```json/g, '')
+    .replace(/```/g, '')
+    .trim();
+
+  // Pass 1: look for <coverBrief> tag
   try {
-    const match = claudeResponse.match(/<coverBrief>([\s\S]*?)<\/coverBrief>/);
+    const match = cleaned.match(/<coverBrief>([\s\S]*?)<\/coverBrief>/);
     if (match) {
       const brief = JSON.parse(match[1].trim());
-      if (!brief.authorName && brief.author) brief.authorName = brief.author;
-      return brief;
+      if (brief.coverBrief) return brief;
     }
   } catch (e) {
-    console.error('Failed to parse cover brief:', e);
+    console.error('parseCoverBrief tag match failed:', e);
   }
-  return null;
+
+  // Pass 2: find any JSON object containing "coverBrief" key
+  try {
+    const jsonMatch = cleaned.match(/\{[\s\S]*"coverBrief"[\s\S]*\}/);
+    if (jsonMatch) {
+      const brief = JSON.parse(jsonMatch[0]);
+      if (brief.coverBrief) return brief;
+    }
+  } catch (e) {
+    console.error('parseCoverBrief JSON scan failed:', e);
+  }
+
+  // Pass 3: hardcoded fallback so Ideogram always runs
+  console.warn('parseCoverBrief: no valid coverBrief found, using fallback');
+  return {
+    coverBrief: "A beautiful Korean aesthetic scene, soft warm lighting, cinematic mood, no text, no words, no letters, no typography"
+  };
 }
 
 // ──────────── DEV KEYBOARD SHORTCUTS ────────────
