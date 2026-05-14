@@ -2471,6 +2471,7 @@ IMPORTANT: You must always finish the chapter with a complete, proper ending. Ne
       .trim();
     ch1Part3Content = ch1Part3Content.replace(/<coverBrief>[\s\S]*?<\/coverBrief>/g, '').trim();
     const ch1Content = ch1Part1Content + '\n\n' + ch1Part2Content + '\n\n' + ch1Part3Content;
+    console.log('FULL RAW COVER RESPONSE:', ch1Part3Raw);
     console.log('Raw Claude response for cover:', ch1Part3Raw);
     storedCoverBrief = parseCoverBrief(ch1Part3Raw) || null;
     console.log('Parsed coverBrief:', storedCoverBrief);
@@ -2881,41 +2882,47 @@ ${chaptersHTML}
 
 // ──────────── COMPOSE COVER ────────────
 async function composeCover(imageUrl, coverBrief, title, author) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const canvas = document.createElement('canvas');
     canvas.width = 600;
     canvas.height = 900;
     const ctx = canvas.getContext('2d');
 
+    // Layout zones (px on 600×900 canvas)
+    const imgX = 0, imgY = 198, imgW = 600, imgH = 594; // 22%–88%
+
+    function render(loadedImg) {
+      // White/cream background
+      ctx.fillStyle = '#FAFAF7';
+      ctx.fillRect(0, 0, 600, 900);
+
+      // Image in middle zone only — no text overlaid on it
+      if (loadedImg) {
+        ctx.drawImage(loadedImg, imgX, imgY, imgW, imgH);
+      } else {
+        ctx.fillStyle = '#E8E4DF';
+        ctx.fillRect(imgX, imgY, imgW, imgH);
+      }
+
+      // Text above and below the image
+      drawCoverText(canvas, coverBrief, title, author);
+    }
+
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = function() {
-      if (selectedLang === 'ko') {
-        try {
-          ctx.drawImage(img, 0, 0, 600, 900);
-          drawCoverText(canvas, coverBrief, title, author);
-          resolve(canvas.toDataURL('image/jpeg', 0.95));
-        } catch (e) {
-          // Canvas tainted by CORS — use fresh canvas with solid background
-          const fb = document.createElement('canvas');
-          fb.width = 600; fb.height = 900;
-          const fbCtx = fb.getContext('2d');
-          fbCtx.fillStyle = '#1A0A2E';
-          fbCtx.fillRect(0, 0, 600, 900);
-          drawCoverText(fb, coverBrief, title, author);
-          resolve(fb.toDataURL('image/jpeg', 0.95));
-        }
-      } else {
-        ctx.drawImage(img, 0, 0, 600, 900);
+      try {
+        render(img);
+        resolve(canvas.toDataURL('image/jpeg', 0.95));
+      } catch(e) {
+        // Canvas tainted by CORS — re-render without the image
+        ctx.clearRect(0, 0, 600, 900);
+        render(null);
         resolve(canvas.toDataURL('image/jpeg', 0.95));
       }
     };
     img.onerror = function() {
-      if (selectedLang === 'ko') {
-        ctx.fillStyle = '#1A0A2E';
-        ctx.fillRect(0, 0, 600, 900);
-        drawCoverText(canvas, coverBrief, title, author);
-      }
+      render(null);
       resolve(canvas.toDataURL('image/jpeg', 0.95));
     };
     const proxiedUrl = `${window.PDF_SERVER_URL}/proxy-image?url=${encodeURIComponent(imageUrl)}`;
@@ -4234,72 +4241,45 @@ function drawCoverText(canvas, coverBrief, title, author) {
   const ctx = canvas.getContext('2d');
   const korean = isKorean(title);
 
-  const fontMap = {
-    'BARLOW': "'Barlow Condensed'",
-    'PLAYFAIR': "'Playfair Display'",
-    'ANTON': "'Anton'",
-    'CORMORANT': "'Cormorant Garamond'",
-    'SPECTRAL': "'Spectral'",
-    'DM_SERIF': "'DM Serif Display'",
-    'LIBRE': "'Libre Baskerville'",
-    'NOTO_SANS_KR': "'Noto Sans KR'",
-    'NOTO_SERIF_KR': "'Noto Serif KR'"
-  };
+  const titleFont = korean ? "'Noto Serif KR', sans-serif" : "'Barlow Condensed', sans-serif";
+  const authorFont = korean ? "'Noto Sans KR', sans-serif" : "'Montserrat', sans-serif";
 
-  const chosenFont = korean
-    ? (coverBrief.fontStyle === 'NOTO_SERIF_KR' ? "'Noto Serif KR'" : "'Noto Sans KR'")
-    : (fontMap[coverBrief.fontStyle] || "'Barlow Condensed'");
-
-  const textColor = coverBrief.textColor || '#FFFFFF';
-  const titleLines = coverBrief.titleLines || [title];
-
-  function fitText(text, maxWidth, startSize, minSize) {
-    let fontSize = startSize;
-    ctx.font = `900 ${fontSize}px ${chosenFont}, sans-serif`;
-    while (ctx.measureText(text).width > maxWidth && fontSize > minSize) {
-      fontSize -= 2;
-      ctx.font = `900 ${fontSize}px ${chosenFont}, sans-serif`;
-    }
-    return fontSize;
-  }
-
-  const startY = canvas.height * 0.15;
+  // Title — black, bold, centered, above image (title zone: 5%–22% of canvas)
+  const titleLines = (coverBrief.titleLines && coverBrief.titleLines.length > 0)
+    ? coverBrief.titleLines
+    : [title];
   const maxWidth = canvas.width * 0.85;
-  let currentY = startY;
+  const titleZoneTop = canvas.height * 0.05;   // 45px
+  const titleZoneH   = canvas.height * 0.17;   // 153px — fits between 5% and 22%
+  const lineSlot     = titleZoneH / titleLines.length;
 
-  titleLines.forEach((line, index) => {
-    const fontSize = fitText(line, maxWidth, 100, 40);
-    ctx.font = `900 ${fontSize}px ${chosenFont}, sans-serif`;
-    ctx.fillStyle = textColor;
-    ctx.globalAlpha = 1;
-    ctx.textAlign = coverBrief.titleAlign === 'center' ? 'center' : 'left';
-    const x = coverBrief.titleAlign === 'center' ? canvas.width * 0.5 : canvas.width * 0.07;
-    ctx.fillText(line, x, currentY + fontSize);
-    currentY += fontSize + 20;
+  ctx.textAlign  = 'center';
+  ctx.fillStyle  = '#111111';
+  ctx.globalAlpha = 1;
+
+  titleLines.forEach((line, i) => {
+    // Fit font to available slot height and width
+    let fontSize = Math.min(lineSlot * 0.75, 80);
+    ctx.font = `900 ${fontSize}px ${titleFont}`;
+    while (ctx.measureText(line).width > maxWidth && fontSize > 22) {
+      fontSize -= 2;
+      ctx.font = `900 ${fontSize}px ${titleFont}`;
+    }
+    // Baseline: centre of each slot
+    const baselineY = titleZoneTop + lineSlot * i + lineSlot * 0.78;
+    ctx.fillText(line, canvas.width * 0.5, baselineY);
   });
 
-  const lineY = currentY + 20;
-  ctx.fillStyle = coverBrief.accentColor || textColor;
-  ctx.globalAlpha = 0.8;
-  ctx.fillRect(canvas.width * 0.07, lineY, 80, 2);
-  ctx.globalAlpha = 1;
-
-  const authorFont = korean ? "'Noto Sans KR'" : "'Montserrat'";
-  ctx.font = `400 36px ${authorFont}, sans-serif`;
-  ctx.fillStyle = textColor;
-  ctx.globalAlpha = 0.9;
-  ctx.textAlign = 'left';
-  ctx.letterSpacing = '4px';
-  ctx.fillText(author.toUpperCase(), canvas.width * 0.07, canvas.height * 0.93);
+  // Author — black, centered, below image (93% from top = 837px)
+  ctx.font = `400 32px ${authorFont}`;
+  ctx.fillStyle  = '#111111';
+  ctx.globalAlpha = 0.85;
+  ctx.textAlign  = 'center';
+  ctx.letterSpacing = '3px';
+  ctx.fillText(author.toUpperCase(), canvas.width * 0.5, canvas.height * 0.93);
   ctx.letterSpacing = '0px';
-
-  ctx.font = "300 11px 'Montserrat', sans-serif";
-  ctx.fillStyle = textColor;
-  ctx.globalAlpha = 0.5;
-  ctx.textAlign = 'right';
-  ctx.fillText('anotherbook', canvas.width * 0.95, canvas.height * 0.97);
   ctx.globalAlpha = 1;
-  ctx.textAlign = 'left';
+  ctx.textAlign  = 'left';
 }
 
 // ──────────── PARSE COVER BRIEF ────────────
