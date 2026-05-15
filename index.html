@@ -2414,21 +2414,7 @@ ${lotteryRule}
 ${languageInstruction}
 **Response format — output only the story continuation. No chapter number, no title. No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines.**
 
-IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.
-
-After writing the story chapter, append this block exactly. Write one Ideogram image prompt that captures the mood, setting, and emotional tone of the story. The image must have NO text, NO words, NO letters, NO numbers, NO typography of any kind — title and author will be added separately via canvas.
-
-Examples of good Ideogram prompts:
-- "A peaceful Korean kitchen at dawn, warm golden light streaming through a window, a bowl of noodles on the table, cinematic, painterly, no text, no words, no letters"
-- "A rainy Seoul street at night, neon reflections on wet pavement, a lone figure with umbrella, cinematic atmosphere, no text, no words, no letters"
-- "A quiet Korean countryside at sunset, golden rice fields, soft warm light, peaceful mood, no text, no words, no letters"
-- "A modern Seoul cafe interior, soft morning light, coffee cup on wooden table, cozy atmosphere, no text, no words, no letters"
-
-Based on the story, return ONLY this JSON, no other text:
-
-<coverBrief>
-{"coverBrief": "your Ideogram image prompt here, no text, no words, no letters in the image"}
-</coverBrief>`
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`
       : `${languageInstruction}
 
 당신은 한국어 베스트셀러 소설 작가입니다. 챕터 1의 마지막 파트 3을 집필해주세요.
@@ -2448,32 +2434,20 @@ ${lotteryRule}
 ${languageInstruction}
 **응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목 없이. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분.**
 
-IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.
-
-스토리 챕터를 쓴 후, 아래 블록을 추가하세요. 이야기의 분위기와 감정을 담은 Ideogram 이미지 프롬프트를 영어로 한 개 작성하세요. 이미지에 텍스트, 단어, 글자, 숫자, 타이포그래피가 절대 포함되면 안 됩니다 — 제목과 저자명은 캔버스에서 별도로 추가됩니다.
-
-좋은 Ideogram 프롬프트 예시:
-- "A peaceful Korean kitchen at dawn, warm golden light streaming through a window, a bowl of noodles on the table, cinematic, painterly, no text, no words, no letters"
-- "A rainy Seoul street at night, neon reflections on wet pavement, a lone figure with umbrella, cinematic atmosphere, no text, no words, no letters"
-- "A quiet Korean countryside at sunset, golden rice fields, soft warm light, peaceful mood, no text, no words, no letters"
-- "A modern Seoul cafe interior, soft morning light, coffee cup on wooden table, cozy atmosphere, no text, no words, no letters"
-
-이야기를 바탕으로, 다른 텍스트 없이 아래 JSON만 반환하세요:
-
-<coverBrief>
-{"coverBrief": "your Ideogram image prompt here, no text, no words, no letters in the image"}
-</coverBrief>`;
+IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`;
 
     const ch1Part3Raw = await apiCall(ch1Part3Prompt, 3500);
-    let ch1Part3Content = ch1Part3Raw
-      .replace(/<coverBrief>[\s\S]*?<\/coverBrief>/g, '')
-      .replace(/^```[\s\S]*?\n|```$/gm,'')
-      .trim();
-    ch1Part3Content = ch1Part3Content.replace(/<coverBrief>[\s\S]*?<\/coverBrief>/g, '').trim();
+    const ch1Part3Content = ch1Part3Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
     const ch1Content = ch1Part1Content + '\n\n' + ch1Part2Content + '\n\n' + ch1Part3Content;
-    console.log('FULL RAW COVER RESPONSE:', ch1Part3Raw);
-    console.log('Raw Claude response for cover:', ch1Part3Raw);
-    storedCoverBrief = parseCoverBrief(ch1Part3Raw) || null;
+
+    const storySummary = ch1Content.slice(0, 500);
+    const coverBriefRaw = await apiCall(
+      `Based on this story summary: ${storySummary}\n\nCreate a cover image prompt. Return ONLY this JSON with no other text:\n{"coverBrief": "your Ideogram prompt here, beautiful scene, no people, no person, no human, no text, no words, no letters"}`,
+      300,
+      'You are a book cover designer. Return only valid JSON, nothing else.'
+    );
+    console.log('Cover brief raw response:', coverBriefRaw);
+    storedCoverBrief = parseCoverBrief(coverBriefRaw) || null;
     console.log('Parsed coverBrief:', storedCoverBrief);
     markLoadStep('ls3');
 
@@ -4314,7 +4288,7 @@ function parseCoverBrief(claudeResponse) {
   // Pass 3: hardcoded fallback so Ideogram always runs
   console.warn('parseCoverBrief: no valid coverBrief found, using fallback');
   return {
-    coverBrief: "A beautiful Korean aesthetic scene, soft warm lighting, cinematic mood, no text, no words, no letters, no typography"
+    coverBrief: "A beautiful Korean aesthetic scene, soft warm lighting, cinematic mood, nature and architecture only, no people, no person, no human figures, no statues, no sculptures, no faces, no text, no words, no letters, no typography"
   };
 }
 
