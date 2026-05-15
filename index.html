@@ -1754,6 +1754,24 @@ let selectedProduct = 'digital'; // 'digital', 'physical', 'gift'
 let selectedCoverImage = null;
 let storedCoverBrief = null;
 
+const genreStyleMap = {
+  '따뜻하고 감동적인': 'soft watercolor illustration, warm golden tones, heartwarming, gentle light',
+  '유쾌하고 재미있는': 'bright flat illustration, playful colors, cheerful, modern graphic design',
+  '영감을 주는': 'minimal modern design, clean lines, inspirational, soft gradient',
+  '감성적이고 깊은': 'moody watercolor, deep emotion, soft shadows, artistic',
+  '로맨틱한': 'pastel romantic illustration, dreamy soft light, delicate flowers',
+  '드라마틱한': 'cinematic dramatic lighting, high contrast, bold composition',
+  '스릴러 / 서스펜스': 'dark noir style, dramatic shadows, tension, muted colors',
+  '공포 / 호러': 'dark atmospheric, eerie mood, deep shadows, unsettling',
+  'SF / 판타지': 'digital art, futuristic sci-fi, vibrant neon, cosmic',
+  '미스터리 / 추리': 'vintage noir illustration, mysterious atmosphere, muted tones',
+  '힐링 / 잔잔한': 'ghibli-inspired illustration, peaceful nature, soft warm light',
+  '가족 / 세대 이야기': 'warm watercolor, nostalgic, family warmth, soft golden tones'
+};
+
+const COVER_NEGATIVE_PROMPT = 'people, person, human, woman, man, girl, boy, face, hands, body, statue, sculpture, text, words, letters, typography, numbers, signs';
+const COVER_NEGATIVE_CONSTRAINTS = 'no people, no person, no human figures, no faces, no hands, no body parts, no statues, no sculptures, no text, no words, no letters, no typography, no numbers, no signs';
+
 // ──────────── QUESTIONNAIRE DATA ────────────
 const TOPICS = [
   {e:'💰',l:'복권 당첨'},
@@ -2441,8 +2459,9 @@ IMPORTANT: You must always finish the chapter with a complete, proper ending. Ne
     const ch1Content = ch1Part1Content + '\n\n' + ch1Part2Content + '\n\n' + ch1Part3Content;
 
     const storySummary = ch1Content.slice(0, 500);
+    const genreStyle = (ans.genres || []).map(g => genreStyleMap[g]).filter(Boolean).join(', ') || 'cinematic mood, beautiful scene';
     const coverBriefRaw = await apiCall(
-      `Based on this story summary: ${storySummary}\n\nCreate a cover image prompt. Return ONLY this JSON with no other text:\n{"coverBrief": "your Ideogram prompt here, beautiful scene, no people, no person, no human, no text, no words, no letters"}`,
+      `Based on this story summary: ${storySummary}\n\nVisual style to use: ${genreStyle}\n\nCreate a cover image prompt in this style. Return ONLY this JSON with no other text:\n{"coverBrief": "your Ideogram prompt here, ${genreStyle}, ${COVER_NEGATIVE_CONSTRAINTS}"}`,
       300,
       'You are a book cover designer. Return only valid JSON, nothing else.'
     );
@@ -4192,20 +4211,33 @@ function isKorean(text) {
 async function generateBookCover(coverBrief) {
   console.log('coverBrief:', coverBrief);
 
-  const prompt = coverBrief.coverBrief;
-  if (!prompt) {
+  const basePrompt = coverBrief.coverBrief;
+  if (!basePrompt) {
     console.error('No coverBrief prompt found in parsed brief');
     return [];
   }
 
+  const genreStyle = (ans.genres || []).map(g => genreStyleMap[g]).filter(Boolean).join(', ');
+  const styleClause = genreStyle ? `, ${genreStyle}` : '';
+  const baseWithStyle = `${basePrompt}${styleClause}, ${COVER_NEGATIVE_CONSTRAINTS}`;
+
+  const variations = [
+    'close-up detail shot, intimate perspective, version one, primary composition',
+    'wide establishing shot, grand scale perspective, version two, alternative composition',
+    'overhead bird\'s eye view, flat lay composition, version three, different angle',
+    'side angle view, atmospheric depth, bokeh background, version four, unique perspective'
+  ];
+
   const results = await Promise.all(
-    [0, 1, 2, 3].map(() =>
-      fetch(`${window.PDF_SERVER_URL}/generate-cover`, {
+    variations.map((variation, i) => {
+      const prompt = `${baseWithStyle}, ${variation}`;
+      console.log(`Ideogram prompt ${i + 1}:`, prompt);
+      return fetch(`${window.PDF_SERVER_URL}/generate-cover`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
-      }).then(r => r.json()).then(data => data.data[0].url)
-    )
+        body: JSON.stringify({ prompt, negative_prompt: COVER_NEGATIVE_PROMPT })
+      }).then(r => r.json()).then(data => data.data[0].url);
+    })
   );
   return results;
 }
