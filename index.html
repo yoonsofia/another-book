@@ -2461,8 +2461,8 @@ IMPORTANT: You must always finish the chapter with a complete, proper ending. Ne
     const storySummary = ch1Content.slice(0, 500);
     const genreStyle = (ans.genres || []).map(g => genreStyleMap[g]).filter(Boolean).join(', ') || 'cinematic mood, beautiful scene';
     const coverBriefRaw = await apiCall(
-      `The story below may be in Korean. Read and understand it, then create an English-only Ideogram image prompt for the book cover.\n\nStory summary: ${storySummary}\n\nVisual style to use: ${genreStyle}\n\nReturn ONLY this JSON with English text only:\n{"coverBrief": "A [art style] book cover illustration about [one sentence English summary of theme], ${genreStyle}, no people, no faces, no human figures, no text, no words, no letters, no typography"}`,
-      300,
+      `Based on this story, write ONE SHORT SENTENCE in English describing the book's genre and core theme for a book cover.\n\nStory summary: ${storySummary}\n\nFormat: [Genre] story about [core theme in 5-10 words]. [one mood word].\n\nExample: "Romantic story about a woman finding love through cooking. Warm."\nExample: "Thriller story about secrets hidden in an old mansion. Dark."\nExample: "Healing story about friendship and self-discovery in Seoul. Gentle."\n\nReturn ONLY this JSON:\n{"coverBrief": "your one sentence here"}\n\nNo people, no faces, no text in the image.`,
+      150,
       'You are a professional book cover art director. You must return only valid JSON in English, nothing else. The coverBrief field must always be in English.'
     );
     console.log('Cover brief raw response:', coverBriefRaw);
@@ -4235,7 +4235,7 @@ async function generateBookCover(coverBrief) {
       return fetch(`${window.PDF_SERVER_URL}/generate-cover`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, negative_prompt: COVER_NEGATIVE_PROMPT })
+        body: JSON.stringify({ prompt, negative_prompt: COVER_NEGATIVE_PROMPT, magic_prompt_option: 'ON' })
       }).then(r => r.json()).then(data => data.data[0].url);
     })
   );
