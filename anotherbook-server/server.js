@@ -48,7 +48,7 @@ app.get('/proxy-image', async (req, res) => {
 
 // ── COVER GENERATION ENDPOINT ──
 app.post('/generate-cover', async (req, res) => {
-  const { prompt, magic_prompt_option } = req.body;
+  const { prompt } = req.body;
   if (!process.env.IDEOGRAM_API_KEY) {
     return res.status(500).json({ error: 'IDEOGRAM_API_KEY not configured' });
   }
@@ -61,10 +61,12 @@ app.post('/generate-cover', async (req, res) => {
       },
       body: JSON.stringify({
         prompt: prompt,
+        negative_prompt: 'people, person, human, woman, man, girl, boy, face, hands, body, portrait, realistic photo, photography, text, words, letters, typography, numbers, signs, watermark',
         aspect_ratio: '2x3',
         num_images: 1,
         rendering_speed: 'FLASH',
-        magic_prompt_option: magic_prompt_option || 'ON'
+        style_type: 'ILLUSTRATION',
+        magic_prompt_option: 'OFF'
       })
     });
     const data = await response.json();

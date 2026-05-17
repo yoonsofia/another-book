@@ -2461,8 +2461,8 @@ IMPORTANT: You must always finish the chapter with a complete, proper ending. Ne
     const storySummary = ch1Content.slice(0, 500);
     const genreStyle = (ans.genres || []).map(g => genreStyleMap[g]).filter(Boolean).join(', ') || 'cinematic mood, beautiful scene';
     const coverBriefRaw = await apiCall(
-      `Based on this story, write ONE SHORT SENTENCE in English describing the book's genre and core theme for a book cover.\n\nStory summary: ${storySummary}\n\nFormat: [Genre] story about [core theme in 5-10 words]. [one mood word].\n\nExample: "Romantic story about a woman finding love through cooking. Warm."\nExample: "Thriller story about secrets hidden in an old mansion. Dark."\nExample: "Healing story about friendship and self-discovery in Seoul. Gentle."\n\nReturn ONLY this JSON:\n{"coverBrief": "your one sentence here"}\n\nNo people, no faces, no text in the image.`,
-      150,
+      `Based on this story, write a descriptive English prompt for a book cover illustration.\n\nStory summary: ${storySummary}\n\nFormat: "[Genre] book cover illustration about [theme]. [2-3 visual elements like objects, setting, colors]. Illustrated art style, painterly, no people, no faces, no text, no words, no letters."\n\nExample output: "Melancholic literary fiction book cover illustration. Empty park bench in autumn, fallen leaves, foggy morning light, muted blue and grey tones. Illustrated art style, painterly, no people, no faces, no text, no words."\n\nReturn ONLY this JSON:\n{"coverBrief": "your prompt here"}`,
+      200,
       'You are a professional book cover art director. You must return only valid JSON in English, nothing else. The coverBrief field must always be in English.'
     );
     console.log('Cover brief raw response:', coverBriefRaw);
