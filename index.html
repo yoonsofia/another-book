@@ -2461,9 +2461,9 @@ IMPORTANT: You must always finish the chapter with a complete, proper ending. Ne
     const storySummary = ch1Content.slice(0, 500);
     const genreStyle = (ans.genres || []).map(g => genreStyleMap[g]).filter(Boolean).join(', ') || 'cinematic mood, beautiful scene';
     const coverBriefRaw = await apiCall(
-      `Based on this story summary: ${storySummary}\n\nVisual style to use: ${genreStyle}\n\nCreate a cover image prompt in this style. Return ONLY this JSON with no other text:\n{"coverBrief": "your Ideogram prompt here, ${genreStyle}, ${COVER_NEGATIVE_CONSTRAINTS}"}`,
+      `The story below may be in Korean. Read and understand it, then create an English-only Ideogram image prompt for the book cover.\n\nStory summary: ${storySummary}\n\nVisual style to use: ${genreStyle}\n\nReturn ONLY this JSON with English text only:\n{"coverBrief": "A [art style] book cover illustration about [one sentence English summary of theme], ${genreStyle}, no people, no faces, no human figures, no text, no words, no letters, no typography"}`,
       300,
-      'You are a book cover designer. Return only valid JSON, nothing else.'
+      'You are a professional book cover art director. You must return only valid JSON in English, nothing else. The coverBrief field must always be in English.'
     );
     console.log('Cover brief raw response:', coverBriefRaw);
     storedCoverBrief = parseCoverBrief(coverBriefRaw) || null;
