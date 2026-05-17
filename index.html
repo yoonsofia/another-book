@@ -2461,9 +2461,9 @@ IMPORTANT: You must always finish the chapter with a complete, proper ending. Ne
     const storySummary = ch1Content.slice(0, 500);
     const genreStyle = (ans.genres || []).map(g => genreStyleMap[g]).filter(Boolean).join(', ') || 'cinematic mood, beautiful scene';
     const coverBriefRaw = await apiCall(
-      `Based on this story, write a descriptive English prompt for a book cover illustration.\n\nStory summary: ${storySummary}\n\nFormat: "[Genre] book cover illustration about [theme]. [2-3 visual elements like objects, setting, colors]. Illustrated art style, painterly, no people, no faces, no text, no words, no letters."\n\nExample output: "Melancholic literary fiction book cover illustration. Empty park bench in autumn, fallen leaves, foggy morning light, muted blue and grey tones. Illustrated art style, painterly, no people, no faces, no text, no words."\n\nReturn ONLY this JSON:\n{"coverBrief": "your prompt here"}`,
-      200,
-      'You are a professional book cover art director. You must return only valid JSON in English, nothing else. The coverBrief field must always be in English.'
+      `Based on this story's theme and genre, generate 4 COMPLETELY DIFFERENT short image prompts for a book cover. Each must show a different scene/object.\n\nRules:\n- Each prompt max 40 words\n- No people, no faces, no human figures\n- No text, no words, no letters\n- Different subject for each (not just a different angle of the same thing)\n- Natural sentence style\n- End each with the art style: ${genreStyle}\n\nReturn ONLY this JSON:\n{"cover1": "40-word prompt, different scene 1", "cover2": "40-word prompt, different scene 2", "cover3": "40-word prompt, different scene 3", "cover4": "40-word prompt, different scene 4"}\n\nStory summary: ${storySummary.slice(0, 200)}\nGenre style: ${genreStyle}`,
+      600,
+      'You are a book cover art director. Return ONLY valid JSON in English.'
     );
     console.log('Cover brief raw response:', coverBriefRaw);
     storedCoverBrief = parseCoverBrief(coverBriefRaw) || null;
@@ -4221,26 +4221,14 @@ function isKorean(text) {
 async function generateBookCover(coverBrief) {
   console.log('coverBrief:', coverBrief);
 
-  const basePrompt = coverBrief.coverBrief;
-  if (!basePrompt) {
-    console.error('No coverBrief prompt found in parsed brief');
+  const prompts = [coverBrief.cover1, coverBrief.cover2, coverBrief.cover3, coverBrief.cover4];
+  if (!prompts[0]) {
+    console.error('No cover prompts found in parsed brief');
     return [];
   }
 
-  const genreStyle = (ans.genres || []).map(g => genreStyleMap[g]).filter(Boolean).join(', ');
-  const styleClause = genreStyle ? `, ${genreStyle}` : '';
-  const baseWithStyle = `${basePrompt}${styleClause}, ${COVER_NEGATIVE_CONSTRAINTS}`;
-
-  const variations = [
-    'close-up detail shot, intimate perspective, version one, primary composition',
-    'wide establishing shot, grand scale perspective, version two, alternative composition',
-    'overhead bird\'s eye view, flat lay composition, version three, different angle',
-    'side angle view, atmospheric depth, bokeh background, version four, unique perspective'
-  ];
-
   const results = await Promise.all(
-    variations.map((variation, i) => {
-      const prompt = `${baseWithStyle}, ${variation}`;
+    prompts.map((prompt, i) => {
       console.log(`Ideogram prompt ${i + 1}:`, prompt);
       return fetch(`${window.PDF_SERVER_URL}/generate-cover`, {
         method: 'POST',
@@ -4305,32 +4293,24 @@ function parseCoverBrief(claudeResponse) {
     .replace(/```/g, '')
     .trim();
 
-  // Pass 1: look for <coverBrief> tag
+  // Pass 1: find JSON object containing cover1~cover4
   try {
-    const match = cleaned.match(/<coverBrief>([\s\S]*?)<\/coverBrief>/);
-    if (match) {
-      const brief = JSON.parse(match[1].trim());
-      if (brief.coverBrief) return brief;
-    }
-  } catch (e) {
-    console.error('parseCoverBrief tag match failed:', e);
-  }
-
-  // Pass 2: find any JSON object containing "coverBrief" key
-  try {
-    const jsonMatch = cleaned.match(/\{[\s\S]*"coverBrief"[\s\S]*\}/);
+    const jsonMatch = cleaned.match(/\{[\s\S]*"cover1"[\s\S]*\}/);
     if (jsonMatch) {
       const brief = JSON.parse(jsonMatch[0]);
-      if (brief.coverBrief) return brief;
+      if (brief.cover1 && brief.cover2 && brief.cover3 && brief.cover4) return brief;
     }
   } catch (e) {
     console.error('parseCoverBrief JSON scan failed:', e);
   }
 
-  // Pass 3: hardcoded fallback so Ideogram always runs
-  console.warn('parseCoverBrief: no valid coverBrief found, using fallback');
+  // Pass 2: hardcoded fallback so Ideogram always runs
+  console.warn('parseCoverBrief: no valid cover prompts found, using fallback');
   return {
-    coverBrief: "A beautiful Korean aesthetic scene, soft warm lighting, cinematic mood, nature and architecture only, no people, no person, no human figures, no statues, no sculptures, no faces, no text, no words, no letters, no typography"
+    cover1: "A misty mountain valley at dawn, soft golden light breaking through pine trees, illustrated art style, painterly, no people, no text",
+    cover2: "An ancient library interior with tall bookshelves, warm candlelight, dust motes in air, illustrated art style, painterly, no people, no text",
+    cover3: "A tranquil lake at sunset reflecting orange and purple clouds, illustrated art style, painterly, no people, no text",
+    cover4: "A winding cobblestone path through autumn forest, fallen leaves, dappled light, illustrated art style, painterly, no people, no text"
   };
 }
 
