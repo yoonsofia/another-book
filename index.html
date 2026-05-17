@@ -2953,19 +2953,19 @@ async function showCoverSelection(imageUrls, coverBrief, title, author) {
       표지를 선택해주세요
     </h2>
     <div id="cover-grid" style="
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 16px;
-      max-width: 700px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 12px;
+      max-width: 400px;
       width: 100%;
-      margin-bottom: 14px;
+      margin: 0 auto 14px;
     ">
       ${imageUrls.map((imgUrl, i) => `
         <div class="cover-option" data-index="${i}" data-ideogram-url="${imgUrl}" style="
           position: relative;
           width: 180px;
-          height: 270px;
+          height: 265px;
           border-radius: 6px;
           overflow: hidden;
           cursor: pointer;
@@ -3579,29 +3579,29 @@ async function generatePDF(sp) {
 }
 
 async function setupKoreanPDFFont(doc) {
-  try {
-    const response = await fetch(
-      'https://fonts.gstatic.com/s/notoserifkr/v15/3JnmSDn90Gmq2mr3blnHaTZXTihC8O1ZNH1isa8.woff2'
-    );
-    if (!response.ok) throw new Error('Font fetch failed');
-    const buffer = await response.arrayBuffer();
-    const uint8Array = new Uint8Array(buffer);
-    let binary = '';
-    const chunkSize = 8192;
-    for (let i = 0; i < uint8Array.length; i += chunkSize) {
-      const chunk = uint8Array.subarray(i, i + chunkSize);
-      binary += String.fromCharCode.apply(null, chunk);
+  const sources = [
+    'https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-kr@5/files/noto-serif-kr-korean-400-normal.woff2',
+    'https://fonts.gstatic.com/s/notoserifkr/v15/3JnmSDn90Gmq2mr3blnHaTZXTihC8O1ZNH1isa8.woff2'
+  ];
+  for (const url of sources) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) continue;
+      const buffer = await response.arrayBuffer();
+      const bytes = new Uint8Array(buffer);
+      const binary = Array.from(bytes, b => String.fromCharCode(b)).join('');
+      const base64 = btoa(binary);
+      doc.addFileToVFS('NotoSerifKR.woff2', base64);
+      doc.addFont('NotoSerifKR.woff2', 'NotoSerifKR', 'normal');
+      doc.addFont('NotoSerifKR.woff2', 'NotoSerifKR', 'bold');
+      console.log('Korean font loaded from:', url);
+      return 'NotoSerifKR';
+    } catch (e) {
+      console.warn('Font source failed:', url, e);
     }
-    const base64 = btoa(binary);
-    doc.addFileToVFS('NotoSerifKR.woff2', base64);
-    doc.addFont('NotoSerifKR.woff2', 'NotoSerifKR', 'normal');
-    doc.addFont('NotoSerifKR.woff2', 'NotoSerifKR', 'bold');
-    console.log('Noto Serif KR font loaded successfully');
-    return 'NotoSerifKR';
-  } catch (error) {
-    console.log('Korean font load failed, using Times fallback:', error);
-    return null;
   }
+  console.warn('All Korean font sources failed, text may not render correctly');
+  return null;
 }
 
 function cleanMarkdownForPDF(text) {
@@ -3904,8 +3904,6 @@ async function generatePDFPrimary(sp) {
 
         const lines = doc.splitTextToSize(cleanPara, maxWidth);
         for (const line of lines) {
-          doc.text(line, mL, y);
-          y += lineHeight;
           if (y > bottomMargin) {
             doc.addPage();
             doc.setFontSize(9);
@@ -3916,8 +3914,20 @@ async function generatePDFPrimary(sp) {
             doc.setTextColor(0, 0, 0);
             y = 20;
           }
+          doc.text(line, mL, y);
+          y += lineHeight;
         }
         y += 3;
+        if (y > bottomMargin) {
+          doc.addPage();
+          doc.setFontSize(9);
+          doc.text(String(globalPage), PW / 2, PH - 8, { align: 'center' });
+          globalPage++;
+          doc.setFont(bodyFont, 'normal');
+          doc.setFontSize(10.5);
+          doc.setTextColor(0, 0, 0);
+          y = 20;
+        }
       }
       drawPageNum();
 
