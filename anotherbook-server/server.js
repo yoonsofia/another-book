@@ -48,7 +48,7 @@ app.get('/proxy-image', async (req, res) => {
 
 // ── COVER GENERATION ENDPOINT ──
 app.post('/generate-cover', async (req, res) => {
-  const { prompt } = req.body;
+  const { prompt, magic_prompt_option } = req.body;
   if (!process.env.IDEOGRAM_API_KEY) {
     return res.status(500).json({ error: 'IDEOGRAM_API_KEY not configured' });
   }
@@ -63,7 +63,8 @@ app.post('/generate-cover', async (req, res) => {
         prompt: prompt,
         aspect_ratio: '2x3',
         num_images: 1,
-        rendering_speed: 'FLASH'
+        rendering_speed: 'FLASH',
+        magic_prompt_option: magic_prompt_option || 'ON'
       })
     });
     const data = await response.json();
