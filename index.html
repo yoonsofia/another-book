@@ -3592,6 +3592,20 @@ async function generatePDF(sp) {
   }
 }
 
+async function setupKoreanFont(doc) {
+  const url = 'https://raw.githubusercontent.com/google/fonts/main/ofl/notosanskr/NotoSansKR-Regular.ttf';
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('Font fetch failed: ' + response.status);
+  const buffer = await response.arrayBuffer();
+  const bytes = new Uint8Array(buffer);
+  const binary = Array.from(bytes, b => String.fromCharCode(b)).join('');
+  const base64 = btoa(binary);
+  doc.addFileToVFS('NotoSansKR.ttf', base64);
+  doc.addFont('NotoSansKR.ttf', 'NotoSansKR', 'normal');
+  doc.setFont('NotoSansKR');
+  return 'NotoSansKR';
+}
+
 function splitKoreanText(text, maxChars) {
   if (!text) return [];
   const lines = [];
@@ -3656,7 +3670,12 @@ async function generatePDFPrimary(sp) {
 
   let bodyFont = 'helvetica';
   if (isKorean) {
-    try { doc.setLanguage('ko'); } catch(e) {}
+    sp(66, '한국어 폰트 로딩 중...');
+    try {
+      bodyFont = await setupKoreanFont(doc);
+    } catch(e) {
+      console.log('Korean font setup failed, using default:', e);
+    }
   }
 
   // Cover page
