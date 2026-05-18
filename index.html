@@ -2358,7 +2358,7 @@ ${languageInstruction}
 
 IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`;
 
-    const ch1Part1Raw = await apiCall(ch1Part1Prompt, 3500);
+    const ch1Part1Raw = await apiCall(ch1Part1Prompt, 8000);
     const ch1Part1Content = ch1Part1Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
 
     setLoadMsg('📖 풍부한 장면을 펼치고 있어요...');
@@ -2406,7 +2406,7 @@ ${languageInstruction}
 
 IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`;
 
-    const ch1Part2Raw = await apiCall(ch1Part2Prompt, 3500);
+    const ch1Part2Raw = await apiCall(ch1Part2Prompt, 8000);
     const ch1Part2Content = ch1Part2Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
 
     setLoadMsg('🎨 마무리 중...');
@@ -2454,7 +2454,7 @@ ${languageInstruction}
 
 IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`;
 
-    const ch1Part3Raw = await apiCall(ch1Part3Prompt, 3500);
+    const ch1Part3Raw = await apiCall(ch1Part3Prompt, 8000);
     const ch1Part3Content = ch1Part3Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
     const ch1Content = ch1Part1Content + '\n\n' + ch1Part2Content + '\n\n' + ch1Part3Content;
 
@@ -3121,9 +3121,9 @@ Language: ${selectedLang === 'ko' ? 'Korean' : 'English'}`;
 }
 
 // ──────────── STEP 3: RENDER COVER ON CANVAS (typography) ────────────
-async function renderCover(canvas, design, bookTitle, authorName){
+async function renderCover(canvas, design, bookTitle, authorName, skipBackground = false){
   const W = 800, H = 1200;
-  canvas.width = W; canvas.height = H;
+  if (!skipBackground) { canvas.width = W; canvas.height = H; }
   const ctx = canvas.getContext('2d');
   const isKo = selectedLang === 'ko';
   const titleFont = isKo ? '"Noto Sans KR",sans-serif' : '"Bebas Neue",sans-serif';
@@ -3162,6 +3162,7 @@ async function renderCover(canvas, design, bookTitle, authorName){
     ]);
   } catch(e){ /* non-fatal */ }
 
+  if (!skipBackground) {
   // 1. Solid color background — full bleed
   ctx.fillStyle = design.coverColor || '#1B2A4A';
   ctx.fillRect(0, 0, W, H);
@@ -3238,6 +3239,7 @@ async function renderCover(canvas, design, bookTitle, authorName){
     }
     ctx.globalAlpha = 1.0;
   }
+  } // end if (!skipBackground)
 
   // 3. Title — group words for 5+ word titles
   function groupTitleLines(raw) {
@@ -3353,20 +3355,18 @@ async function generateFullCover(){
     const proxiedUrl = `${window.PDF_SERVER_URL}/proxy-image?url=${encodeURIComponent(selectedCoverImage)}`;
     console.log('Confirmation screen: showing Ideogram URL:', selectedCoverImage);
 
-    // Show the selected Ideogram image directly via <img> — no canvas re-render
-    if (previewImg) {
-      previewImg.src = proxiedUrl;
-      previewImg.style.display = 'block';
-    }
-    if (canvas) canvas.style.display = 'none';
+    // Draw image onto canvas, then overlay title/author text, and show the canvas
+    if (previewImg) previewImg.style.display = 'none';
+    if (canvas) canvas.style.display = 'block';
 
-    // Also draw on the hidden canvas so jsPDF fallback can use it
     await new Promise((res) => {
       const img = new Image();
       img.crossOrigin = 'anonymous';
-      img.onload = () => {
+      img.onload = async () => {
+        canvas.width = 800; canvas.height = 1200;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        await renderCover(canvas, coverDesign, bookTitle, authorName, true);
         res();
       };
       img.onerror = async () => { await renderCover(canvas, coverDesign, bookTitle, authorName); res(); };
@@ -3479,7 +3479,7 @@ ${languageInstruction}
 
 IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`;
 
-        const part1Raw = await apiCall(chPart1Prompt, 3500);
+        const part1Raw = await apiCall(chPart1Prompt, 8000);
         const part1Content = part1Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
 
         const chPart2Prompt = isEnglish
@@ -3517,7 +3517,7 @@ ${languageInstruction}
 
 IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`;
 
-        const part2Raw = await apiCall(chPart2Prompt, 3500);
+        const part2Raw = await apiCall(chPart2Prompt, 8000);
         const part2Content = part2Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
         const content = part1Content + '\n\n' + part2Content;
         story.chapters.push({number:chNum, title:chTitle, content});
