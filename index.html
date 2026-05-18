@@ -3539,6 +3539,17 @@ IMPORTANT: You must always finish the chapter with a complete, proper ending. Ne
   }
 }
 
+function showLoading(msg) {
+  const overlay = document.getElementById('pdf-progress-overlay');
+  if (overlay) overlay.style.display = 'flex';
+  const msgEl = document.getElementById('pdf-progress-msg');
+  if (msgEl) msgEl.textContent = msg || 'PDF 생성 중...';
+}
+function hideLoading() {
+  const overlay = document.getElementById('pdf-progress-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
 async function generatePDF(sp) {
   try {
     showLoading('PDF 생성 중...');
@@ -3628,7 +3639,7 @@ async function generatePDFPrimary(sp) {
   if(!window.jspdf){
     await new Promise((res,rej)=>{
       const s=document.createElement('script');
-      s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+      s.src='https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js';
       s.onload=res; s.onerror=()=>rej(new Error('jsPDF CDN 로드 실패'));
       document.head.appendChild(s);
     });
@@ -4137,7 +4148,7 @@ async function generatePDFFallback() {
     if(!window.jspdf){
       await new Promise((res,rej)=>{
         const s=document.createElement('script');
-        s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        s.src='https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js';
         s.onload=res; s.onerror=()=>rej(new Error('jsPDF CDN 로드 실패'));
         document.head.appendChild(s);
       });
