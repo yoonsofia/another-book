@@ -3590,30 +3590,12 @@ async function generatePDF(sp) {
   }
 }
 
-async function setupKoreanPDFFont(doc) {
-  const sources = [
-    'https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-kr@5/files/noto-serif-kr-korean-400-normal.woff2',
-    'https://fonts.gstatic.com/s/notoserifkr/v15/3JnmSDn90Gmq2mr3blnHaTZXTihC8O1ZNH1isa8.woff2'
-  ];
-  for (const url of sources) {
-    try {
-      const response = await fetch(url);
-      if (!response.ok) continue;
-      const buffer = await response.arrayBuffer();
-      const bytes = new Uint8Array(buffer);
-      const binary = Array.from(bytes, b => String.fromCharCode(b)).join('');
-      const base64 = btoa(binary);
-      doc.addFileToVFS('NotoSerifKR.woff2', base64);
-      doc.addFont('NotoSerifKR.woff2', 'NotoSerifKR', 'normal');
-      doc.addFont('NotoSerifKR.woff2', 'NotoSerifKR', 'bold');
-      console.log('Korean font loaded from:', url);
-      return 'NotoSerifKR';
-    } catch (e) {
-      console.warn('Font source failed:', url, e);
-    }
+function splitKoreanText(text, maxChars) {
+  const lines = [];
+  for (let i = 0; i < text.length; i += maxChars) {
+    lines.push(text.slice(i, i + maxChars));
   }
-  console.warn('All Korean font sources failed, text may not render correctly');
-  return null;
+  return lines;
 }
 
 function cleanMarkdownForPDF(text) {
@@ -3667,12 +3649,9 @@ async function generatePDFPrimary(sp) {
   doc.setFontSize(11);
   doc.setCharSpace(0);
 
-  // Load Korean font if needed
   let bodyFont = 'helvetica';
   if (isKorean) {
-    sp(66, '한국어 폰트 로딩 중...');
-    const koreanFont = await setupKoreanPDFFont(doc);
-    if (koreanFont) bodyFont = koreanFont;
+    try { doc.setLanguage('ko'); } catch(e) {}
   }
 
   // Cover page
@@ -3686,7 +3665,7 @@ async function generatePDFPrimary(sp) {
     doc.setFont(bodyFont, 'normal');
     doc.setFontSize(20);
     doc.setTextColor(0, 0, 0);
-    const coverTitleLines = doc.splitTextToSize(story.title || '', PW - 18);
+    const coverTitleLines = splitKoreanText(story.title || '', 22);
     doc.text(coverTitleLines, PW / 2, 20, {align: 'center'});
 
     // Ideogram image: 130mm × 160mm, centered (9mm side margins), 30mm from top
@@ -3895,7 +3874,7 @@ async function generatePDFPrimary(sp) {
       doc.setFont(bodyFont, 'normal');
       doc.setFontSize(14);
       doc.setTextColor(0, 0, 0);
-      const koTitleLines = doc.splitTextToSize(ch.title, textW);
+      const koTitleLines = splitKoreanText(ch.title, 22);
       doc.text(koTitleLines, PW / 2, 72, {align: 'center'});
 
       // Body text: starts at 90mm from top, 10.5pt, 7mm line height, no indent
@@ -3914,7 +3893,7 @@ async function generatePDFPrimary(sp) {
         doc.setFontSize(10.5);
         doc.setTextColor(0, 0, 0);
 
-        const lines = doc.splitTextToSize(cleanPara, maxWidth);
+        const lines = splitKoreanText(cleanPara, 22);
         for (const line of lines) {
           if (y > bottomMargin) {
             doc.addPage();
