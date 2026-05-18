@@ -3551,6 +3551,8 @@ function hideLoading() {
 }
 
 async function generatePDF(sp) {
+  const bookTitle = storyData?.title || novelTitle || story?.title || '제목 없음';
+  const authorName = ans?.authorDisplay || '';
   try {
     showLoading('PDF 생성 중...');
 
@@ -3591,9 +3593,12 @@ async function generatePDF(sp) {
 }
 
 function splitKoreanText(text, maxChars) {
+  if (!text) return [];
   const lines = [];
-  for (let i = 0; i < text.length; i += maxChars) {
-    lines.push(text.slice(i, i + maxChars));
+  let remaining = text;
+  while (remaining.length > 0) {
+    lines.push(remaining.slice(0, maxChars));
+    remaining = remaining.slice(maxChars);
   }
   return lines;
 }
@@ -3935,7 +3940,7 @@ async function generatePDFPrimary(sp) {
       doc.setFont(bodyFont,'bold');
       doc.setFontSize(22);
       doc.setTextColor(61,90,71);
-      const titleLines = doc.splitTextToSize(ch.title, textW);
+      const titleLines = splitKoreanText(ch.title, 22);
       doc.text(titleLines, PW/2, y, {align:'center'});
       y += titleLines.length * 9 + 5;
 
@@ -3976,7 +3981,7 @@ async function generatePDFPrimary(sp) {
           );
           y = newY + 3;
         } else {
-          const lines = doc.splitTextToSize(cleanPara, textW);
+          const lines = splitKoreanText(cleanPara, 22);
           if (!isFirstParagraph) {
             const firstLine = lines[0] || '';
             if (y + 7 > PH - mBot) {
@@ -4182,7 +4187,7 @@ async function generatePDFFallback() {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(10.5);
 
-      const lines = doc.splitTextToSize(cleanMarkdownForPDF(chapters[i].content || ''), textWidth);
+      const lines = splitKoreanText(cleanMarkdownForPDF(chapters[i].content || ''), 22);
       let y = 35;
       const bottomMargin = margin + 15;
 
