@@ -3266,7 +3266,21 @@ async function renderCover(canvas, design, bookTitle, authorName, skipBackground
   const totalTitleHeight = lines.length * lineH;
   const startY = (H * 0.65 - totalTitleHeight) / 2 + lineH;
 
-  ctx.fillStyle     = design.textColor || '#F5F0E8';
+  // Dark scrim band over photo backgrounds so title + author are always legible
+  if (skipBackground) {
+    const scrimDivY  = startY + (lines.length - 1) * lineH + 15;
+    const bandTop    = Math.max(0, startY - lineH * 1.1);
+    const bandBot    = Math.min(H, scrimDivY + 120);
+    const scrimGrad  = ctx.createLinearGradient(0, bandTop, 0, bandBot);
+    scrimGrad.addColorStop(0,    'rgba(0,0,0,0)');
+    scrimGrad.addColorStop(0.12, 'rgba(0,0,0,0.65)');
+    scrimGrad.addColorStop(0.88, 'rgba(0,0,0,0.65)');
+    scrimGrad.addColorStop(1,    'rgba(0,0,0,0)');
+    ctx.fillStyle = scrimGrad;
+    ctx.fillRect(0, bandTop, W, bandBot - bandTop);
+  }
+
+  ctx.fillStyle     = skipBackground ? '#FFFFFF' : (design.textColor || '#F5F0E8');
   ctx.textAlign     = isKo ? 'left' : layout.titleAlign;
   ctx.letterSpacing = layout.letterSpacing;
 
@@ -3304,8 +3318,8 @@ async function renderCover(canvas, design, bookTitle, authorName, skipBackground
 
   // 4. Author name — below divider, Montserrat Light uppercase
   ctx.font          = `400 36px ${bodyFont}`;
-  ctx.fillStyle     = design.textColor || '#F5F0E8';
-  ctx.globalAlpha   = 0.85;
+  ctx.fillStyle     = skipBackground ? '#FFFFFF' : (design.textColor || '#F5F0E8');
+  ctx.globalAlpha   = 1.0;
   ctx.letterSpacing = '5px';
   ctx.fillText((authorName || '').toUpperCase(), leftMargin, dividerY + 50);
   ctx.globalAlpha   = 1.0;
