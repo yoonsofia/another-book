@@ -3551,7 +3551,7 @@ function hideLoading() {
 }
 
 async function generatePDF(sp) {
-  const bookTitle = storyData?.title || novelTitle || story?.title || '제목 없음';
+  const bookTitle = story?.title || '제목 없음';
   const authorName = ans?.authorDisplay || '';
   try {
     showLoading('PDF 생성 중...');
@@ -3562,10 +3562,10 @@ async function generatePDF(sp) {
       body: JSON.stringify({
         bookTitle: bookTitle,
         authorName: authorName,
-        chapters: generatedChapters,
+        chapters: story.chapters,
         coverImageUrl: selectedCoverImage,
         coverDesign: coverDesign,
-        language: selectedLanguage,
+        language: selectedLang,
         selectedProduct: selectedProduct
       })
     });

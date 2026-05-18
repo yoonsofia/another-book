@@ -116,6 +116,7 @@ app.post('/generate-pdf', async (req, res) => {
       language
     });
 
+    const isLinux = process.platform === 'linux';
     browser = await puppeteer.launch({
       headless: 'new',
       args: [
@@ -124,9 +125,8 @@ app.post('/generate-pdf', async (req, res) => {
         '--disable-dev-shm-usage',
         '--disable-accelerated-2d-canvas',
         '--no-first-run',
-        '--no-zygote',
         '--disable-gpu',
-        '--single-process'
+        ...(isLinux ? ['--no-zygote', '--single-process'] : [])
       ]
     });
 
@@ -174,10 +174,10 @@ app.post('/generate-pdf', async (req, res) => {
 
     await browser.close();
 
+    const safeFilename = encodeURIComponent((bookTitle || 'my-story') + '.pdf');
     res.set({
       'Content-Type': 'application/pdf',
-      'Content-Disposition':
-        `attachment; filename="${bookTitle || 'my-story'}.pdf"`,
+      'Content-Disposition': `attachment; filename="story.pdf"; filename*=UTF-8''${safeFilename}`,
       'Content-Length': pdfBuffer.length
     });
 
