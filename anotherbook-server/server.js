@@ -65,7 +65,7 @@ app.post('/generate-cover', async (req, res) => {
         aspect_ratio: '2x3',
         num_images: 1,
         rendering_speed: 'FLASH',
-        style_type: 'ILLUSTRATION',
+        style_type: 'DESIGN',
         magic_prompt_option: 'OFF'
       })
     });
