@@ -1,7 +1,7 @@
 const express = require('express');
 const puppeteer = require('puppeteer');
 const cors = require('cors');
-require('dotenv').config();
+require('dotenv').config(); // v2
 
 let koreanFontBase64 = '';
 
