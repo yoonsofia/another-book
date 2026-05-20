@@ -167,9 +167,10 @@ app.post('/generate-pdf', async (req, res) => {
       width: '127mm',
       height: '188mm',
       printBackground: true,
-      displayHeaderFooter: false,
-      margin: { top: 0, bottom: 0,
-                left: 0, right: 0 }
+      displayHeaderFooter: true,
+      headerTemplate: '<div></div>',
+      footerTemplate: `<div style="width:100%;text-align:center;font-size:7pt;color:#999;font-family:'Lora',Georgia,serif;padding-bottom:4mm;"><span class="pageNumber"></span></div>`,
+      margin: { top: 0, bottom: '15mm', left: 0, right: 0 }
     });
 
     await browser.close();
@@ -270,7 +271,6 @@ function generateBookHTML({
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  width: 127mm;
   font-family: ${isKorean
     ? "'NotoSansKR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif"
     : "'Lora', Georgia, serif"};
@@ -278,81 +278,62 @@ body {
   background: white;
 }
 
-/* ── COVER PAGE (color allowed here only) ── */
+/* ── COVER PAGE ── */
 .cover-page {
   width: 127mm;
   height: 188mm;
-  background-color: ${coverBg};
-  display: flex;
-  flex-direction: column;
+  background-color: #1B2A4A;
   position: relative;
   overflow: hidden;
+  page: cover-page;
   page-break-after: always;
 }
 
 .cover-image {
   position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  opacity: 0.85;
-}
-
-.cover-overlay {
-  position: relative;
-  z-index: 2;
+  inset: 0;
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 12mm 10mm;
+  object-fit: cover;
+}
+
+.cover-scrim {
+  position: absolute;
+  left: 0; right: 0;
+  top: 22%;
+  padding: 10mm 10mm 14mm;
+  background: linear-gradient(to bottom,
+    rgba(0,0,0,0) 0%,
+    rgba(0,0,0,0.68) 12%,
+    rgba(0,0,0,0.68) 80%,
+    rgba(0,0,0,0) 100%);
 }
 
 .cover-title {
-  font-family: ${isKorean
-    ? "'NotoSansKR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif"
-    : "'Bebas Neue', sans-serif"};
-  font-size: ${isKorean ? '22pt' : '28pt'};
-  font-weight: ${isKorean ? '700' : '400'};
-  color: ${textColor};
-  line-height: 1.2;
-  letter-spacing: ${isKorean ? '0.02em' : '0.01em'};
-  max-width: 90%;
+  font-family: 'NotoSansKR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+  font-size: ${isKorean ? '22pt' : '26pt'};
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1.25;
+  text-align: left;
+  margin-bottom: 3mm;
 }
 
 .cover-author {
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 300;
-  font-size: 11pt;
-  color: ${textColor};
+  font-family: 'NotoSansKR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+  font-size: 10pt;
+  font-weight: 400;
+  color: #FFFFFF;
   opacity: 0.85;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-
-.cover-logo {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 8pt;
-  color: ${accentColor};
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  text-align: center;
-  margin-top: 4mm;
-}
-
-.cover-accent-line {
-  width: 40%;
-  height: 1px;
-  background: ${accentColor};
-  margin: 4mm 0;
+  letter-spacing: 0.05em;
+  text-align: left;
 }
 
 /* ── TOC PAGE ── */
 .toc-page {
-  width: 127mm;
-  height: 188mm;
-  padding: 90px 15mm 20mm;
+  width: auto;
+  min-height: 155mm;
+  padding: 20mm 0 20mm;
   page-break-after: always;
   display: flex;
   flex-direction: column;
@@ -411,9 +392,9 @@ body {
 
 /* ── CHAPTER PAGES ── */
 .chapter-page {
-  width: 127mm;
-  min-height: 188mm;
-  padding: 18mm 15mm 20mm;
+  width: auto;
+  min-height: 155mm;
+  padding: 0 0 15mm;
   page-break-before: always;
 }
 
@@ -426,7 +407,7 @@ body {
   color: #1a1a1a;
   text-align: center;
   letter-spacing: 8px;
-  margin-top: 12mm;
+  margin-top: 10mm;
   margin-bottom: 8px;
 }
 
@@ -488,12 +469,16 @@ ${!isKorean ? `
 }
 
 /* ── PRINT SETTINGS ── */
-@media print {
-  @page {
-    size: 127mm 188mm;
-    margin: 0;
-  }
+@page {
+  size: 127mm 188mm;
+  margin: 18mm 15mm 0;
+}
 
+@page cover-page {
+  margin: 0;
+}
+
+@media print {
   p {
     orphans: 3;
     widows: 3;
@@ -507,20 +492,11 @@ ${!isKorean ? `
 <!-- COVER PAGE -->
 <div class="cover-page">
   ${coverImageUrl
-    ? `<img class="cover-image"
-            src="${coverImageUrl}"
-            alt="cover"
-            crossorigin="anonymous">`
+    ? `<img class="cover-image" src="${coverImageUrl}" alt="cover" crossorigin="anonymous">`
     : ''}
-  <div class="cover-overlay">
-    <div>
-      <div class="cover-title">${bookTitle || ''}</div>
-      <div class="cover-accent-line"></div>
-    </div>
-    <div>
-      ${coverAuthor ? `<div class="cover-author">${coverAuthor}</div>` : ''}
-      <div class="cover-logo">anotherbook</div>
-    </div>
+  <div class="cover-scrim">
+    <div class="cover-title">${bookTitle || ''}</div>
+    ${authorName ? `<div class="cover-author">${authorName}</div>` : ''}
   </div>
 </div>
 
