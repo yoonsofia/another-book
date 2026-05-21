@@ -190,18 +190,6 @@ app.post('/generate-pdf', async (req, res) => {
       }
     });
 
-    // Calculate actual page numbers and update TOC placeholders
-    await page.evaluate(() => {
-      const PAGE_H_PX = (188 / 25.4) * 96;
-      document.querySelectorAll('.chapter-page').forEach((el, i) => {
-        let top = 0, node = el;
-        while (node) { top += (node.offsetTop || 0); node = node.offsetParent; }
-        const pageNum = Math.floor(top / PAGE_H_PX) + 1;
-        const span = document.getElementById('toc-pnum-' + i);
-        if (span) span.textContent = pageNum;
-      });
-    });
-
     const pdfBuffer = await page.pdf({
       width: '127mm',
       height: '188mm',
@@ -287,13 +275,11 @@ function generateBookHTML({
     `;
   }).join('\n');
 
-  // Table of contents with dot leaders and page number placeholders
+  // Table of contents — chapter number + title only, no page numbers
   const tocHTML = chapters.map((ch, i) => `
     <div class="toc-entry">
       <span class="toc-num">${i + 1}</span>
       <span class="toc-title">${convertMarkdown(ch.title || '')}</span>
-      <span class="toc-dots"></span>
-      <span class="toc-page-num" id="toc-pnum-${i}">—</span>
     </div>
   `).join('\n');
 
@@ -387,10 +373,8 @@ body {
 .toc-entry {
   display: flex;
   align-items: baseline;
-  gap: 2mm;
-  margin-bottom: 5mm;
-  font-size: 10pt;
-  line-height: 1.5;
+  gap: 4mm;
+  margin-bottom: 6mm;
 }
 
 .toc-num {
@@ -398,7 +382,7 @@ body {
     ? "'NotoSansKR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif"
     : "'Lora', serif"};
   font-size: 9pt;
-  color: #000000;
+  color: #999999;
   min-width: 5mm;
   font-weight: 400;
   flex-shrink: 0;
@@ -408,31 +392,10 @@ body {
   font-family: ${isKorean
     ? "'NotoSansKR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif"
     : "'Lora', serif"};
-  color: #000000;
-  font-size: 10pt;
-  line-height: 1.4;
-  white-space: nowrap;
-  overflow: hidden;
+  color: #1a1a1a;
+  font-size: 10.5pt;
+  line-height: 1.45;
   flex-shrink: 1;
-}
-
-.toc-dots {
-  flex: 1;
-  border-bottom: 1px dotted #999;
-  margin-bottom: 3px;
-  min-width: 5mm;
-  flex-shrink: 0;
-}
-
-.toc-page-num {
-  font-family: ${isKorean
-    ? "'NotoSansKR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif"
-    : "'Lora', serif"};
-  font-size: 9pt;
-  color: #000000;
-  min-width: 7mm;
-  text-align: right;
-  flex-shrink: 0;
 }
 
 /* ── CHAPTER PAGES ── */
