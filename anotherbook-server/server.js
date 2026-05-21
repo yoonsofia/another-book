@@ -61,7 +61,7 @@ app.post('/generate-cover', async (req, res) => {
       },
       body: JSON.stringify({
         prompt: prompt,
-        negative_prompt: 'people, person, human, woman, man, girl, boy, face, hands, body, portrait, realistic photo, photography, text, words, letters, typography, numbers, signs, watermark',
+        negative_prompt: 'people, person, human, woman, man, girl, boy, face, hands, body, portrait, photorealistic, hyperrealistic, 3D render, CGI, photograph, photography, realistic photo, text, words, letters, typography, numbers, signs, watermark',
         aspect_ratio: '2x3',
         num_images: 1,
         rendering_speed: 'FLASH',

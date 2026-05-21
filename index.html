@@ -1755,18 +1755,18 @@ let selectedCoverImage = null;
 let storedCoverBrief = null;
 
 const genreStyleMap = {
-  '따뜻하고 감동적인': 'soft watercolor illustration, warm golden tones, heartwarming, gentle light',
-  '유쾌하고 재미있는': 'bright flat illustration, playful colors, cheerful, modern graphic design',
-  '영감을 주는': 'minimal modern design, clean lines, inspirational, soft gradient',
-  '감성적이고 깊은': 'moody watercolor, deep emotion, soft shadows, artistic',
-  '로맨틱한': 'pastel romantic illustration, dreamy soft light, delicate flowers',
-  '드라마틱한': 'cinematic dramatic lighting, high contrast, bold composition',
-  '스릴러 / 서스펜스': 'dark noir style, dramatic shadows, tension, muted colors',
-  '공포 / 호러': 'dark atmospheric, eerie mood, deep shadows, unsettling',
-  'SF / 판타지': 'digital art, futuristic sci-fi, vibrant neon, cosmic',
-  '미스터리 / 추리': 'vintage noir illustration, mysterious atmosphere, muted tones',
-  '힐링 / 잔잔한': 'ghibli-inspired illustration, peaceful nature, soft warm light',
-  '가족 / 세대 이야기': 'warm watercolor, nostalgic, family warmth, soft golden tones'
+  '따뜻하고 감동적인': 'soft watercolor illustration, warm golden tones, heartwarming, flat design',
+  '유쾌하고 재미있는': 'bright flat illustration, playful bold colors, cheerful, vector graphic design',
+  '영감을 주는': 'minimal vector design, clean geometric lines, inspirational, flat color blocks',
+  '감성적이고 깊은': 'moody minimalist illustration, muted tones, flat semi-abstract shapes',
+  '로맨틱한': 'pastel romantic vector illustration, soft flat design, delicate botanical shapes',
+  '드라마틱한': 'bold graphic illustration, high contrast flat design, dramatic vector composition',
+  '스릴러 / 서스펜스': 'dark minimalist illustration, flat noir vector style, muted limited color palette',
+  '공포 / 호러': 'dark minimalist illustration, eerie flat design, limited dark palette, vector art',
+  'SF / 판타지': 'minimalist sci-fi illustration, flat vector design, vibrant geometric shapes, cosmic',
+  '미스터리 / 추리': 'vintage minimalist illustration, flat graphic style, mysterious muted tones',
+  '힐링 / 잔잔한': 'gentle nature illustration, peaceful flat design, soft muted vector art',
+  '가족 / 세대 이야기': 'warm flat illustration, nostalgic vector style, soft golden color palette'
 };
 
 const COVER_NEGATIVE_PROMPT = 'people, person, human, woman, man, girl, boy, face, hands, body, statue, sculpture, text, words, letters, typography, numbers, signs';
@@ -2323,7 +2323,7 @@ ${languageInstruction}
     const storySummary = ch1Content.slice(0, 500);
     const genreStyle = (ans.genres || []).map(g => genreStyleMap[g]).filter(Boolean).join(', ') || 'cinematic mood, beautiful scene';
     const coverBriefRaw = await apiCall(
-      `Based on this story's theme and genre, generate 4 COMPLETELY DIFFERENT short image prompts for a book cover. Each must show a different scene/object.\n\nRules:\n- Each prompt max 40 words\n- No people, no faces, no human figures\n- No text, no words, no letters\n- Different subject for each (not just a different angle of the same thing)\n- Natural sentence style\n- End each with the art style: ${genreStyle}\n\nReturn ONLY this JSON:\n{"cover1": "40-word prompt, different scene 1", "cover2": "40-word prompt, different scene 2", "cover3": "40-word prompt, different scene 3", "cover4": "40-word prompt, different scene 4"}\n\nStory summary: ${storySummary.slice(0, 200)}\nGenre style: ${genreStyle}`,
+      `Based on this story's theme and genre, generate 4 COMPLETELY DIFFERENT short image prompts for a book cover. Each must show a different scene/object.\n\nSTYLE REQUIREMENT — every prompt must produce: minimalistic digital illustration, vector art style, flat or semi-flat design, clean limited color palette, symbolic or metaphorical imagery. No photorealism, no 3D rendering, no photography.\n\nRules:\n- Each prompt max 40 words\n- No people, no faces, no human figures\n- No text, no words, no letters\n- Different subject for each (not just a different angle of the same thing)\n- End each prompt with: ${genreStyle}, minimalistic vector illustration, flat design\n\nReturn ONLY this JSON:\n{"cover1": "40-word prompt, scene 1", "cover2": "40-word prompt, scene 2", "cover3": "40-word prompt, scene 3", "cover4": "40-word prompt, scene 4"}\n\nStory summary: ${storySummary.slice(0, 200)}\nGenre style: ${genreStyle}`,
       600,
       'You are a book cover art director. Return ONLY valid JSON in English.'
     );
@@ -3964,10 +3964,10 @@ function parseCoverBrief(claudeResponse) {
   // Pass 2: hardcoded fallback so Ideogram always runs
   console.warn('parseCoverBrief: no valid cover prompts found, using fallback');
   return {
-    cover1: "A misty mountain valley at dawn, soft golden light breaking through pine trees, illustrated art style, painterly, no people, no text",
-    cover2: "An ancient library interior with tall bookshelves, warm candlelight, dust motes in air, illustrated art style, painterly, no people, no text",
-    cover3: "A tranquil lake at sunset reflecting orange and purple clouds, illustrated art style, painterly, no people, no text",
-    cover4: "A winding cobblestone path through autumn forest, fallen leaves, dappled light, illustrated art style, painterly, no people, no text"
+    cover1: "A misty mountain valley at dawn with pine trees, minimalistic vector illustration, flat design, clean limited color palette, no people, no text",
+    cover2: "An open book floating among stars and geometric shapes, minimalistic vector illustration, flat design, symbolic, limited color palette, no people, no text",
+    cover3: "A single tree on a hill at golden hour, minimalistic vector illustration, flat semi-abstract design, warm color palette, no people, no text",
+    cover4: "Winding path through autumn forest with falling leaves, minimalistic vector illustration, flat design, clean composition, muted color palette, no people, no text"
   };
 }
 
