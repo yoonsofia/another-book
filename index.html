@@ -2191,6 +2191,7 @@ async function apiCall(promptText, maxTok, systemPrompt){
       'Content-Type':'application/json',
       'x-api-key': apiKey,
       'anthropic-version':'2023-06-01',
+      'anthropic-beta':'prompt-caching-2024-07-31',
       'anthropic-dangerous-direct-browser-access':'true'
     },
     body: JSON.stringify(body)
@@ -2261,18 +2262,6 @@ async function generateStory(){
   const writerRole = isEnglish
     ? `You are a bestselling English novelist.\nStyle: Literary commercial fiction, warm and emotional tone.\nVocabulary: Natural adult English, accessible but sophisticated.\nProtagonist: ${ans.name}\n\nFormatting: You may use *italic* sparingly for emphasis (internal thoughts, a single stressed word). Never use **bold** — bold markdown is unprofessional in literary fiction body text and must not appear anywhere in the story.\n\nYou may naturally include Korean words and phrases where they feel authentic to the story.\nROMANIZED Korean words are ALWAYS fine: names (eomma, appa, unnie, oppa, sunbae), food (japchae, kimbap, tteokbokki, samgyeopsal), places (Hongdae, Sinchon, Yeouido), expressions (daebak, aigoo, fighting).\nHANGUL SCRIPT is also fine to use naturally: pet names (뭉치), affectionate calls (지수야, 엄마), money amounts (30억 원), signs/menus, brief Korean dialogue when a character speaks Korean.\nUse both romanized and Hangul naturally as a skilled literary author would.\n\nThis is an English language book. Write everything in English only. No Korean characters anywhere in the story text. Character names should be romanized (e.g. Mongchi not 몽치). Cultural terms should be translated or explained in English.`
     : '당신은 한국어 베스트셀러 소설 작가입니다.\n형식: *이탤릭체*는 강조에 드물게 사용할 수 있습니다(예: 내면의 생각, 강조할 단어). **굵은 글씨**는 절대 사용하지 마세요 — 문학 소설 본문에 볼드체는 적합하지 않습니다.';
-  const qualityStdFn = isEnglish
-    ? (part) => part === 1
-        ? `Write Part 1 of this chapter. Minimum 1,500 words.\nWrite with rich detail, full scene development, complete dialogue exchanges, and deep interiority.\nDo not summarize. Do not rush.\nTake your time with each scene.\nExpand every moment fully.\nShow don't tell throughout.\nInclude at least 2 fully developed scenes.`
-        : part === 2
-          ? `Write Part 2 continuing directly from Part 1. Minimum 1,500 words.\nContinue with the same rich detail and pacing.\nInclude character reflection and internal monologue.\nDo not wrap up or conclude - more story follows.`
-          : `Write Part 3 as the final section of this chapter. Minimum 1,500 words.\nBring this chapter to a satisfying but open ending that creates anticipation for the next chapter.\nInclude a memorable closing image or line.`
-    : (part) => part === 1
-        ? `이 챕터의 1부를 써주세요.\n최소 1,500 한국어 단어.\n풍부한 묘사, 완전한 장면 전개, 대화와 내면 독백을 포함하세요.\n요약하지 마세요. 서두르지 마세요.\n각 장면을 완전히 펼쳐주세요.`
-        : part === 2
-          ? `1부에서 바로 이어서 2부를 써주세요.\n최소 1,500 한국어 단어.\n같은 풍부한 디테일과 페이싱으로 계속하세요.`
-          : `이 챕터의 마지막 섹션을 써주세요.\n최소 1,500 한국어 단어.\n다음 챕터에 대한 기대감을 주는 기억에 남는 마무리로 끝내주세요.`;
-
   const storyInfo = buildStoryInfo();
   const rules = buildRules();
   const lotteryRule = buildLotteryRule();
@@ -2311,152 +2300,25 @@ ${languageInstruction}
     await new Promise(r=>setTimeout(r,300));
     markLoadStep('ls2');
 
-    // ── Step 3: Write Chapter 1 (Part 1 + Part 2) ──
+    // ── Step 3: Write Chapter 1 ──
     setLoadMsg('✍️ 챕터 1을 집필하고 있어요...');
     const ch1Title = outline.chapters[0].title;
-    const ch1Part1Prompt = isEnglish
-      ? `${languageInstruction}
 
-${writerRole}
+    const chapterSysPrompt = buildChapterSystemPrompt({
+      isEnglish,
+      outline: outline.chapters,
+      languageInstruction,
+      writerRole,
+      rules,
+      lotteryRule
+    });
 
-Write Part 1 of 3 for Chapter 1 of the novel below.
-
-**Novel info:**
-Title: ${outline.title}
-${storyInfo}
-
-**Full chapter outline:**
-${outline.chapters.map(c=>`Chapter ${c.number}: ${c.title}`).join('\n')}
-
-**Now writing — Chapter 1: ${ch1Title} (Part 1 of 3)**
-${qualityStdFn(1)}
-
-${rules}
-${lotteryRule}
-${languageInstruction}
-**Response format — output only the chapter body. No chapter number, title, or JSON. No markdown headers (#, ##, ###). No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**
-
-IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`
-      : `${languageInstruction}
-
-당신은 한국어 베스트셀러 소설 작가입니다. 아래 소설의 챕터 1 파트 1을 집필해주세요.
-
-**소설 정보:**
-제목: ${outline.title}
-${storyInfo}
-
-**전체 챕터 구성:**
-${outline.chapters.map(c=>`챕터 ${c.number}: ${c.title}`).join('\n')}
-
-**현재 집필 — 챕터 1: ${ch1Title} (파트 1/3)**
-${qualityStdFn(1)}
-
-${rules}
-${lotteryRule}
-${languageInstruction}
-**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. 마크다운 헤더(#, ##, ###) 사용 금지. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**
-
-IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`;
-
-    const ch1Part1Raw = await apiCall(ch1Part1Prompt, 8000);
-    const ch1Part1Content = ch1Part1Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
-
-    setLoadMsg('📖 풍부한 장면을 펼치고 있어요...');
-    const ch1Part2Prompt = isEnglish
-      ? `${languageInstruction}
-
-${writerRole}
-
-Write Part 2 of 3 for Chapter 1, continuing directly from Part 1.
-
-**Novel info:**
-Title: ${outline.title}
-${storyInfo}
-
-**Part 1 content:**
-${ch1Part1Content}
-
-**Now writing — Chapter 1: ${ch1Title} (Part 2 of 3)**
-${qualityStdFn(2)}
-
-${rules}
-${lotteryRule}
-${languageInstruction}
-**Response format — output only the continuation. No chapter number, title, or JSON. No markdown headers (#, ##, ###). No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**
-
-IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`
-      : `${languageInstruction}
-
-당신은 한국어 베스트셀러 소설 작가입니다. 파트 1에 이어 챕터 1의 파트 2를 집필해주세요.
-
-**소설 정보:**
-제목: ${outline.title}
-${storyInfo}
-
-**파트 1 내용:**
-${ch1Part1Content}
-
-**현재 집필 — 챕터 1: ${ch1Title} (파트 2/3)**
-${qualityStdFn(2)}
-
-${rules}
-${lotteryRule}
-${languageInstruction}
-**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. 마크다운 헤더(#, ##, ###) 사용 금지. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**
-
-IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`;
-
-    const ch1Part2Raw = await apiCall(ch1Part2Prompt, 8000);
-    const ch1Part2Content = ch1Part2Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
-
-    setLoadMsg('🎨 마무리 중...');
-    const ch1Part3Prompt = isEnglish
-      ? `${languageInstruction}
-
-${writerRole}
-
-Write Part 3 of 3 for Chapter 1, the final section of this chapter.
-
-**Novel info:**
-Title: ${outline.title}
-${storyInfo}
-
-**Part 2 content (continue from here):**
-${ch1Part2Content}
-
-**Now writing — Chapter 1: ${ch1Title} (Part 3 of 3)**
-${qualityStdFn(3)}
-
-${rules}
-${lotteryRule}
-${languageInstruction}
-**Response format — output only the story continuation. No chapter number, no title. No markdown headers (#, ##, ###). No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines.**
-
-IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`
-      : `${languageInstruction}
-
-당신은 한국어 베스트셀러 소설 작가입니다. 챕터 1의 마지막 파트 3을 집필해주세요.
-
-**소설 정보:**
-제목: ${outline.title}
-${storyInfo}
-
-**파트 2 내용 (여기서 이어서):**
-${ch1Part2Content}
-
-**현재 집필 — 챕터 1: ${ch1Title} (파트 3/3)**
-${qualityStdFn(3)}
-
-${rules}
-${lotteryRule}
-${languageInstruction}
-**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목 없이. 마크다운 헤더(#, ##, ###) 사용 금지. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분.**
-
-IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`;
-
-    const ch1Part3Raw = await apiCall(ch1Part3Prompt, 8000);
-    const ch1Part3Content = ch1Part3Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
-    const ch1Content = ch1Part1Content + '\n\n' + ch1Part2Content + '\n\n' + ch1Part3Content;
+    const ch1Raw = await apiCall(
+      buildChapterUserPrompt({ chNum: 1, chTitle: ch1Title, isEnglish, isLast: false, prevTail: null }),
+      6000,
+      chapterSysPrompt
+    );
+    const ch1Content = ch1Raw.replace(/^```[\s\S]*?\n|```$/gm, '').trim();
 
     const storySummary = ch1Content.slice(0, 500);
     const genreStyle = (ans.genres || []).map(g => genreStyleMap[g]).filter(Boolean).join(', ') || 'cinematic mood, beautiful scene';
@@ -2559,6 +2421,76 @@ function buildLotteryRule(){
   2. 두 번째 비트: 핸드폰으로 당첨금을 검색해 **로또 1등 당첨금 약 30억 원**이라는 숫자를 직접 확인하는 순간 — 이 두 번째 충격이 첫 번째보다 훨씬 더 강렬하고 감정적이어야 함
 - 30억 원이라는 금액은 이 장면에서 반드시 명시적으로 언급되어야 함
 ` : '';
+}
+
+// ──────────── CHAPTER GENERATION HELPERS ────────────
+
+// Returns a system-prompt array with cache_control — reused (and cached) across all 10 chapter calls.
+function buildChapterSystemPrompt({ isEnglish, outline, languageInstruction, writerRole, rules, lotteryRule }) {
+  const outlineLines = outline.map(c =>
+    isEnglish ? `Chapter ${c.number}: ${c.title}` : `챕터 ${c.number}: ${c.title}`
+  ).join('\n');
+  const body = [
+    languageInstruction,
+    writerRole,
+    isEnglish ? '**Novel info:**' : '**소설 정보:**',
+    buildStoryInfo(),
+    rules,
+    lotteryRule || '',
+    isEnglish
+      ? `**Complete novel outline:**\n${outlineLines}`
+      : `**전체 챕터 구성:**\n${outlineLines}`
+  ].filter(s => s.trim()).join('\n\n');
+  return [{ type: 'text', text: body, cache_control: { type: 'ephemeral' } }];
+}
+
+// Returns the user-message prompt for a single-call, complete-arc chapter.
+function buildChapterUserPrompt({ chNum, chTitle, isEnglish, isLast, prevTail }) {
+  const prevCtx = prevTail
+    ? (isEnglish
+        ? `**End of Chapter ${chNum - 1} — continue the story from here:**\n${prevTail}\n\n`
+        : `**챕터 ${chNum - 1} 마지막 부분 — 이어서 집필:**\n${prevTail}\n\n`)
+    : '';
+
+  if (isEnglish) {
+    return `${prevCtx}Write Chapter ${chNum}: "${chTitle}"
+
+Write a complete, self-contained chapter of approximately 1,400 words.
+
+Structure the chapter as a full narrative arc:
+- Opening: Begin in a specific scene or moment that immediately pulls the reader in
+- Development: Build emotional depth through action and dialogue — include at least one fully developed scene with meaningful beats
+- Peak: A clear emotional or narrative high point unique to this chapter
+- Closing: End on a line or image that gives this chapter a sense of completion, with natural anticipation for what comes next
+${isLast ? '\nThis is the FINAL chapter. Resolve the story\'s full emotional arc. End with a moving, memorable final line that lingers.\n' : ''}
+Write the entire chapter in one continuous flow — no labeled parts or section breaks.
+
+**Response format — output only the chapter body. No chapter number, no title. No markdown headers (#, ##, ###). No **bold** — *italic* permitted sparingly. Separate paragraphs with blank lines.**
+
+IMPORTANT: You must always finish with a complete sentence and satisfying ending. If you are approaching your token limit, gracefully wrap up the current scene. Never cut off mid-sentence or mid-scene.`;
+  } else {
+    return `${prevCtx}챕터 ${chNum}을 집필해주세요: "${chTitle}"
+
+약 1,400 한국어 단어로 이루어진 완결된 단독 챕터를 써주세요.
+
+챕터를 완전한 서사 호로 구성하세요:
+- 도입: 독자를 즉시 특정 장면이나 순간 속으로 끌어들이는 시작
+- 전개: 행동과 대화를 통한 감정적 깊이 — 의미 있는 장면이 포함된 완결된 시퀀스 최소 하나
+- 정점: 이 챕터만의 명확한 감정적 또는 서사적 절정
+- 마무리: 이 챕터에 완결감을 주면서 다음으로의 자연스러운 기대감을 남기는 문장이나 장면
+${isLast ? '\n이것은 마지막 챕터입니다. 이야기의 전체 감정적 호를 완결하고, 오래 기억에 남을 마지막 문장으로 끝내주세요.\n' : ''}
+전체 챕터를 하나의 흐름으로 써주세요 — 파트 구분이나 소제목 없이.
+
+**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목 없이. 마크다운 헤더(#, ##, ###) 사용 금지. **굵은 글씨** 금지 — *이탤릭체*는 드물게 허용. 단락 사이는 빈 줄로 구분.**
+
+IMPORTANT: 반드시 완전한 문장과 적절한 마무리로 끝내주세요. 분량 한계에 가까워지면 현재 장면을 자연스럽게 마무리하세요. 절대 문장이나 장면 중간에 끊지 마세요.`;
+  }
+}
+
+// Returns the last ~300 characters of a chapter for narrative thread continuity.
+function getChapterTail(content) {
+  const trimmed = (content || '').trim();
+  return trimmed.length > 300 ? '...' + trimmed.slice(-300) : trimmed;
 }
 
 // ──────────── DISPLAY STORY ────────────
@@ -3149,29 +3081,20 @@ async function confirmCoverAndMakePDF(){
         ? `IMPORTANT: Write the ENTIRE story in Korean (한국어) as the primary language. All narrative and descriptions must be in Korean.\nHowever, you MAY use English words or sentences naturally when:\n- A character is speaking English in the scene\n- A character is learning English and practices it\n- English words appear naturally in Korean daily life (e.g. 카페, 오케이, Fighting!)\n- Signs, menus, or text in the story are in English\nThis mirrors how real Korean literary fiction is written — Korean-first but naturally incorporating English where it fits the story organically.`
         : `IMPORTANT: Write the ENTIRE story in English only. All narrative and dialogue must be in English. Keep Korean proper nouns romanized (e.g. Gangneung, Seo-yeon, doenjang jjigae) but do not write any Korean characters anywhere in the story.`;
       const writerRole = isEnglish
-        ? `You are a bestselling English novelist.\nStyle: Literary commercial fiction, warm and emotional tone.\nVocabulary: Natural adult English, accessible but sophisticated.\nProtagonist: ${ans.name}\n\nYou may naturally include Korean words and phrases where they feel authentic to the story.\nROMANIZED Korean words are ALWAYS fine: names (eomma, appa, unnie, oppa, sunbae), food (japchae, kimbap, tteokbokki, samgyeopsal), places (Hongdae, Sinchon, Yeouido), expressions (daebak, aigoo, fighting).\nHANGUL SCRIPT is also fine to use naturally: pet names (뭉치), affectionate calls (지수야, 엄마), money amounts (30억 원), signs/menus, brief Korean dialogue when a character speaks Korean.\nUse both romanized and Hangul naturally as a skilled literary author would.\n\nThis is an English language book. Write everything in English only. No Korean characters anywhere in the story text. Character names should be romanized (e.g. Mongchi not 몽치). Cultural terms should be translated or explained in English.`
-        : '당신은 한국어 베스트셀러 소설 작가입니다.';
-      const qualityStdFn = isEnglish
-        ? (part) => part === 1
-            ? `Write Part 1 of this chapter. Minimum 1,500 words.\nWrite with rich detail, full scene development, complete dialogue exchanges, and deep interiority.\nDo not summarize. Do not rush.\nTake your time with each scene.\nExpand every moment fully.\nShow don't tell throughout.\nInclude at least 2 fully developed scenes.`
-            : part === 2
-              ? `Write Part 2 continuing directly from Part 1. Minimum 1,500 words.\nContinue with the same rich detail and pacing.\nInclude character reflection and internal monologue.\nDo not wrap up or conclude - more story follows.`
-              : `Write Part 3 as the final section of this chapter. Minimum 1,500 words.\nBring this chapter to a satisfying but open ending that creates anticipation for the next chapter.\nInclude a memorable closing image or line.`
-        : (part) => part === 1
-            ? `이 챕터의 1부를 써주세요.\n최소 1,500 한국어 단어.\n풍부한 묘사, 완전한 장면 전개, 대화와 내면 독백을 포함하세요.\n요약하지 마세요. 서두르지 마세요.\n각 장면을 완전히 펼쳐주세요.`
-            : part === 2
-              ? `1부에서 바로 이어서 2부를 써주세요.\n최소 1,500 한국어 단어.\n같은 풍부한 디테일과 페이싱으로 계속하세요.`
-              : `이 챕터의 마지막 섹션을 써주세요.\n최소 1,500 한국어 단어.\n다음 챕터에 대한 기대감을 주는 기억에 남는 마무리로 끝내주세요.`;
-      const storyInfo = buildStoryInfo();
+        ? `You are a bestselling English novelist.\nStyle: Literary commercial fiction, warm and emotional tone.\nVocabulary: Natural adult English, accessible but sophisticated.\nProtagonist: ${ans.name}\n\nFormatting: You may use *italic* sparingly for emphasis (internal thoughts, a single stressed word). Never use **bold** — bold markdown is unprofessional in literary fiction body text and must not appear anywhere in the story.\n\nYou may naturally include Korean words and phrases where they feel authentic to the story.\nROMANIZED Korean words are ALWAYS fine: names (eomma, appa, unnie, oppa, sunbae), food (japchae, kimbap, tteokbokki, samgyeopsal), places (Hongdae, Sinchon, Yeouido), expressions (daebak, aigoo, fighting).\nHANGUL SCRIPT is also fine to use naturally: pet names (뭉치), affectionate calls (지수야, 엄마), money amounts (30억 원), signs/menus, brief Korean dialogue when a character speaks Korean.\nUse both romanized and Hangul naturally as a skilled literary author would.\n\nThis is an English language book. Write everything in English only. No Korean characters anywhere in the story text. Character names should be romanized (e.g. Mongchi not 몽치). Cultural terms should be translated or explained in English.`
+        : '당신은 한국어 베스트셀러 소설 작가입니다.\n형식: *이탤릭체*는 강조에 드물게 사용할 수 있습니다(예: 내면의 생각, 강조할 단어). **굵은 글씨**는 절대 사용하지 마세요 — 문학 소설 본문에 볼드체는 적합하지 않습니다.';
       const rules = buildRules();
       const lotteryRule = buildLotteryRule();
       const outline = story.allChapterTitles;
 
-      const summaries = [
-        isEnglish
-          ? `Chapter 1 "${story.chapters[0].title}": ${story.chapters[0].content.substring(0,400).replace(/\n/g,' ')}...`
-          : `챕터 1 "${story.chapters[0].title}": ${story.chapters[0].content.substring(0,400).replace(/\n/g,' ')}...`
-      ];
+      const chapterSysPrompt = buildChapterSystemPrompt({
+        isEnglish,
+        outline,
+        languageInstruction,
+        writerRole,
+        rules,
+        lotteryRule
+      });
 
       for(let i=1; i<10; i++){
         const chNum = i+1;
@@ -3179,90 +3102,14 @@ async function confirmCoverAndMakePDF(){
         const isLast = chNum===10;
         sp(Math.round(i/9*58), `챕터 ${chNum} 작성 중... (${chNum}/10)`);
 
-        const prevCtx = isEnglish
-          ? `\n**Previous chapters summary:**\n${summaries.join('\n')}\n`
-          : `\n**이전 챕터 요약:**\n${summaries.join('\n')}\n`;
-
-        const chPart1Prompt = isEnglish
-          ? `${languageInstruction}
-
-${writerRole}
-Write Part 1 of 3 for Chapter ${chNum} of the novel below.
-**Novel info:** Title: ${story.title}
-${storyInfo}
-**Full chapter outline:**
-${outline.map(c=>`Chapter ${c.number}: ${c.title}`).join('\n')}
-${prevCtx}
-**Now writing — Chapter ${chNum}: ${chTitle} (Part 1 of 3)**
-${qualityStdFn(1)}
-${rules}
-${lotteryRule}
-${languageInstruction}
-**Response format — output only the chapter body. No chapter number, title, or JSON. No markdown headers (#, ##, ###). No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**
-
-IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`
-          : `${languageInstruction}
-
-당신은 한국어 베스트셀러 소설 작가입니다. 아래 소설의 챕터 ${chNum} 파트 1을 집필해주세요.
-**소설 정보:** 제목: ${story.title}
-${storyInfo}
-**전체 챕터 구성:**
-${outline.map(c=>`챕터 ${c.number}: ${c.title}`).join('\n')}
-${prevCtx}
-**현재 집필 — 챕터 ${chNum}: ${chTitle} (파트 1/3)**
-${qualityStdFn(1)}
-${rules}
-${lotteryRule}
-${languageInstruction}
-**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. 마크다운 헤더(#, ##, ###) 사용 금지. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**
-
-IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`;
-
-        const part1Raw = await apiCall(chPart1Prompt, 8000);
-        const part1Content = part1Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
-
-        const chPart2Prompt = isEnglish
-          ? `${languageInstruction}
-
-${writerRole}
-Write Part 2 of 2 for Chapter ${chNum}, continuing directly from Part 1.
-**Novel info:** Title: ${story.title}
-${storyInfo}
-**Part 1 content:**
-${part1Content}
-**Now writing — Chapter ${chNum}: ${chTitle} (Part 2 of 2)**
-Continue directly from Part 1. ${isLast ? 'Final chapter — bring the story to a moving, memorable conclusion.' : 'End naturally into the next chapter.'}
-**Length and quality:** ${qualityStdFn(chNum)}
-${rules}
-${lotteryRule}
-${languageInstruction}
-**Response format — output only the continuation. No chapter number, title, or JSON. No markdown headers (#, ##, ###). No **bold** markdown — *italic* is permitted for emphasis only. Separate paragraphs with blank lines:**
-
-IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`
-          : `${languageInstruction}
-
-당신은 한국어 베스트셀러 소설 작가입니다. 파트 1에 이어 챕터 ${chNum}의 파트 2를 집필해주세요.
-**소설 정보:** 제목: ${story.title}
-${storyInfo}
-**파트 1 내용:**
-${part1Content}
-**현재 집필 — 챕터 ${chNum}: ${chTitle} (파트 2/2)**
-파트 1에서 이어서 써주세요. ${isLast ? '이것은 마지막 챕터입니다. 전체 이야기를 긍정적이고 감동적으로 완결하세요. 마지막 단락은 독자의 가슴에 오래 남도록 특별히 공들여 써주세요.' : '다음 챕터로 자연스럽게 이어지는 여운을 남기세요.'}
-**분량 및 품질:** ${qualityStdFn(chNum)}
-${rules}
-${lotteryRule}
-${languageInstruction}
-**응답 형식 — 챕터 본문만 출력하세요. 챕터 번호, 제목, JSON 없이 순수 본문만. 마크다운 헤더(#, ##, ###) 사용 금지. **굵은 글씨** 사용 금지 — *이탤릭체*는 강조에만 허용. 단락 사이는 빈 줄로 구분:**
-
-IMPORTANT: You must always finish the chapter with a complete, proper ending. Never stop mid-sentence, mid-paragraph, or mid-scene under any circumstances. If you are approaching the end of your available space, gracefully wrap up the current scene with a satisfying closing paragraph. The chapter must always feel intentionally complete, never accidentally cut off.`;
-
-        const part2Raw = await apiCall(chPart2Prompt, 8000);
-        const part2Content = part2Raw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
-        const content = part1Content + '\n\n' + part2Content;
+        const prevTail = getChapterTail(story.chapters[story.chapters.length - 1].content);
+        const chRaw = await apiCall(
+          buildChapterUserPrompt({ chNum, chTitle, isEnglish, isLast, prevTail }),
+          6000,
+          chapterSysPrompt
+        );
+        const content = chRaw.replace(/^```[\s\S]*?\n|```$/gm,'').trim();
         story.chapters.push({number:chNum, title:chTitle, content});
-        summaries.push(isEnglish
-          ? `Chapter ${chNum} "${chTitle}": ${content.substring(0,400).replace(/\n/g,' ')}...`
-          : `챕터 ${chNum} "${chTitle}": ${content.substring(0,400).replace(/\n/g,' ')}...`);
       }
     }
 

@@ -209,7 +209,7 @@ app.post('/generate-pdf', async (req, res) => {
       displayHeaderFooter: true,
       headerTemplate: '<div></div>',
       footerTemplate: `<div style="width:100%;text-align:center;font-size:7pt;color:#999;font-family:'Lora',Georgia,serif;padding-bottom:4mm;"><span class="pageNumber"></span></div>`,
-      margin: { top: 0, bottom: '15mm', left: 0, right: 0 }
+      margin: { top: 0, bottom: '20mm', left: 0, right: 0 }
     });
 
     await browser.close();
@@ -516,7 +516,7 @@ ${!isKorean ? `
 /* ── PRINT SETTINGS ── */
 @page {
   size: 127mm 188mm;
-  margin: 18mm 15mm 0;
+  margin: 18mm 15mm 10mm;
 }
 
 @page cover-page {
