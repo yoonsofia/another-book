@@ -364,10 +364,22 @@ body {
 .toc-page {
   width: auto;
   min-height: 155mm;
-  padding: 20mm 0 20mm;
+  padding: 15mm 0 20mm;
   page-break-after: always;
   display: flex;
   flex-direction: column;
+}
+
+.toc-heading {
+  font-family: ${isKorean
+    ? "'NotoSansKR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif"
+    : "'Lora', serif"};
+  font-size: 7.5pt;
+  font-weight: 400;
+  color: #aaaaaa;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 9mm;
 }
 
 .toc-entry {
@@ -510,6 +522,7 @@ ${!isKorean ? `
 
 <!-- TABLE OF CONTENTS -->
 <div class="toc-page">
+  <div class="toc-heading">${isKorean ? '목차' : 'Contents'}</div>
   ${tocHTML}
 </div>
 
