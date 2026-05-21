@@ -91,6 +91,27 @@ function convertMarkdown(text) {
     .replace(/\*([^*]+)\*/g, '<em>$1</em>');
 }
 
+// Fetch a URL and return a base64 data URI, or null on failure.
+async function fetchImageAsDataUri(url) {
+  if (!url) return null;
+  try {
+    console.log(`[cover] Fetching cover image: ${url.substring(0, 80)}...`);
+    const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+    if (!res.ok) {
+      console.error(`[cover] HTTP ${res.status} fetching cover image`);
+      return null;
+    }
+    const contentType = res.headers.get('content-type') || 'image/jpeg';
+    const buf = await res.arrayBuffer();
+    const b64 = Buffer.from(buf).toString('base64');
+    console.log(`[cover] Cover image fetched OK — ${buf.byteLength} bytes, type=${contentType}`);
+    return `data:${contentType};base64,${b64}`;
+  } catch (err) {
+    console.error(`[cover] Failed to fetch cover image: ${err.message}`);
+    return null;
+  }
+}
+
 // ── MAIN PDF GENERATION ENDPOINT ──
 app.post('/generate-pdf', async (req, res) => {
   const {
@@ -107,11 +128,18 @@ app.post('/generate-pdf', async (req, res) => {
   let browser;
 
   try {
+    // Pre-fetch cover image to base64 so Puppeteer never hits an external URL
+    // (avoids Ideogram URL expiry and CORS issues in headless Chromium)
+    const coverDataUri = await fetchImageAsDataUri(coverImageUrl);
+    if (coverImageUrl && !coverDataUri) {
+      console.warn('[cover] Cover image could not be fetched — PDF will render without cover image');
+    }
+
     const bookHTML = generateBookHTML({
       bookTitle,
       authorName,
       chapters,
-      coverImageUrl,
+      coverImageUrl: coverDataUri,
       coverDesign,
       language
     });
@@ -140,15 +168,26 @@ app.post('/generate-pdf', async (req, res) => {
     // Wait for all fonts (including Google Fonts) to fully download
     await page.evaluateHandle('document.fonts.ready');
 
-    // Wait for images to load
-    await page.evaluate(() => {
+    // Wait for images to load and log per-image status
+    const imageResults = await page.evaluate(() => {
+      const imgs = Array.from(document.images);
       return Promise.all(
-        Array.from(document.images)
-          .filter(img => !img.complete)
-          .map(img => new Promise(resolve => {
-            img.onload = img.onerror = resolve;
-          }))
+        imgs.map(img => new Promise(resolve => {
+          if (img.complete) {
+            resolve({ src: img.src.substring(0, 60), loaded: img.naturalWidth > 0 });
+          } else {
+            img.onload = () => resolve({ src: img.src.substring(0, 60), loaded: true });
+            img.onerror = () => resolve({ src: img.src.substring(0, 60), loaded: false });
+          }
+        }))
       );
+    });
+    imageResults.forEach(r => {
+      if (r.loaded) {
+        console.log(`[img] loaded OK: ${r.src}`);
+      } else {
+        console.error(`[img] FAILED to load: ${r.src}`);
+      }
     });
 
     // Calculate actual page numbers and update TOC placeholders
@@ -218,7 +257,13 @@ function generateBookHTML({
 
     const paragraphs = (ch.content || '')
       .split('\n')
-      .filter(p => p.trim().length > 0)
+      .filter(p => {
+        const t = p.trim();
+        if (!t) return false;
+        // Strip AI-generated markdown headers (## 챕터 X, ## Chapter X, # Title, etc.)
+        if (/^#{1,6}\s/.test(t)) return false;
+        return true;
+      })
       .map((p, pIndex) => {
         const trimmed = p.trim();
 
