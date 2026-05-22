@@ -290,7 +290,7 @@ function generateBookHTML({
 <meta charset="UTF-8">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Bebas+Neue&family=Montserrat:wght@300;400;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 
 @font-face {
@@ -341,22 +341,28 @@ body {
 }
 
 .cover-title {
-  font-family: 'NotoSansKR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
-  font-size: ${isKorean ? '22pt' : '26pt'};
-  font-weight: 700;
+  font-family: ${isKorean
+    ? "'NotoSansKR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif"
+    : "'Barlow Condensed', 'Bebas Neue', sans-serif"};
+  font-size: ${isKorean ? '22pt' : '34pt'};
+  font-weight: ${isKorean ? '700' : '900'};
   color: #FFFFFF;
-  line-height: 1.25;
+  line-height: ${isKorean ? '1.25' : '1.1'};
+  letter-spacing: ${isKorean ? 'normal' : '1px'};
   text-align: left;
   margin-bottom: 3mm;
 }
 
 .cover-author {
-  font-family: 'NotoSansKR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+  font-family: ${isKorean
+    ? "'NotoSansKR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif"
+    : "'Montserrat', sans-serif"};
   font-size: 10pt;
-  font-weight: 400;
+  font-weight: ${isKorean ? '400' : '400'};
   color: #FFFFFF;
   opacity: 0.85;
-  letter-spacing: 0.05em;
+  letter-spacing: ${isKorean ? '0.05em' : '0.15em'};
+  text-transform: ${isKorean ? 'none' : 'uppercase'};
   text-align: left;
 }
 
