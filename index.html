@@ -1912,6 +1912,8 @@ function renderStep2(body){
     <div class="q-num">STEP 2 / 6</div>
     <h2 class="q-title">주인공에 대해 더 알려주세요</h2>
     <p class="q-sub">알고 있는 것만 적어주세요. 비워도 괜찮아요. 구체적일수록 더 특별한 이야기가 만들어져요.</p>
+    <p class="detail-field-label">💼 직업 (선택사항)</p>
+    <input class="txt-inp" id="inp-occupation" style="margin-bottom:18px;" placeholder="예: 회사원, 카페 사장, 초등학교 교사" value="${ans.occupation||''}">
     <p class="detail-field-label">👥 소중한 사람</p>
     <textarea class="txt-area" id="inp-d1" style="min-height:72px;margin-bottom:18px;" placeholder="예: 10년 지기 친구 민지, 항상 웃게 만들어주는 존재 / 엄마, 말은 없지만 힘들 때 밥을 해줌">${ans.detailPeople||''}</textarea>
     <p class="detail-field-label">🎯 취미나 관심사</p>
@@ -2063,6 +2065,7 @@ function nextStep(){
     ans.name=name;
   }
   if(curStep===2){
+    ans.occupation=(document.getElementById('inp-occupation')?.value||'').trim();
     const d1=(document.getElementById('inp-d1')?.value||'').trim();
     const d2=(document.getElementById('inp-d2')?.value||'').trim();
     const d3=(document.getElementById('inp-d3')?.value||'').trim();
@@ -2115,6 +2118,7 @@ function prevStep(){
   else goHome();
 }
 function skipStep2(){
+  ans.occupation='';
   ans.detailPeople=''; ans.detailHobbies=''; ans.detailPlaces='';
   ans.detailPet=''; ans.detailPersonality=''; ans.detailOther='';
   ans.personalDetails=''; curStep=4; renderStep();
@@ -2380,6 +2384,7 @@ function buildStoryInfo(){
 주인공 이름: ${ans.name}
 주인공 성별: ${ans.gender||'없음'} — 인칭대명사: ${pronouns}
 주인공 나이대: ${ans.ageGroup||'없음'}
+주인공 직업: ${ans.occupation||'미지정 (이야기 맥락에 맞게 자연스럽게 설정)'}
 주인공 관련 정보: ${ans.personalDetails||'없음'}
 이야기 장르/분위기: ${ans.genres?.join(' / ')||'없음'}
 특별 요청 장면: ${ans.specialScenes||'없음'}`;
@@ -2393,10 +2398,11 @@ function buildRules(){
 1. 주인공의 이름(${ans.name})은 모든 챕터에 자연스럽게 등장해야 함
 2. 주인공의 인칭대명사 ${pronouns}를 전체 이야기에 일관되게 사용할 것
 3. 주인공 나이대(${ans.ageGroup||'없음'})에 어울리는 생활 방식, 고민, 감성으로 묘사할 것
-4. 주인공 관련 정보(${ans.personalDetails||'없음'})에 언급된 취미, 장소, 소중한 사람 등을 최소 5개 챕터에 자연스럽게 녹여줄 것
-5. 특별 요청 장면(${ans.specialScenes||'없음'})이 있다면 2-3단락 분량의 온전한 장면으로 묘사
-6. 선택한 장르/분위기(${ans.genres?.join(' / ')||'없음'})를 전체 이야기에 일관되게 유지
-7. 이야기는 반드시 긍정적이고 희망적인 결말로 끝낼 것
+4. 주인공 직업이 '${ans.occupation||'미지정'}'인 경우: 직업이 명시됐다면 그에 맞는 일상 루틴·어휘·주변 인물·내적 고민을 전체 이야기에 자연스럽게 녹여줄 것; 미지정인 경우 이야기 내용과 어울리는 직업을 AI가 설정하고 일관되게 유지할 것
+5. 주인공 관련 정보(${ans.personalDetails||'없음'})에 언급된 취미, 장소, 소중한 사람 등을 최소 5개 챕터에 자연스럽게 녹여줄 것
+6. 특별 요청 장면(${ans.specialScenes||'없음'})이 있다면 2-3단락 분량의 온전한 장면으로 묘사
+7. 선택한 장르/분위기(${ans.genres?.join(' / ')||'없음'})를 전체 이야기에 일관되게 유지
+8. 이야기는 반드시 긍정적이고 희망적인 결말로 끝낼 것
 
 **콘텐츠 규칙:**
 1. 전 연령 대상 콘텐츠 — 성적이거나 성인용 내용 금지
@@ -2551,6 +2557,86 @@ function fmtContent(txt){
     .map(p=>`<p>${renderMarkdown(p.trim())}</p>`).join('');
 }
 
+// ──────────── UNIFIED COVER TEXT PAINTER ────────────
+// Single source of truth for all cover text rendering (thumbnails, preview, any canvas).
+// titleFontStyle: 'italic' or null; titleFontWeight: e.g. '900'; titleFontFamily: full CSS family string.
+function paintCoverTextLayer(ctx, W, H, {
+  titleLines, authorName, titleFontStyle, titleFontWeight, titleFontFamily,
+  authorFontFamily, fontSize, textColor, accentColor,
+  showScrim, titleAlign, letterSpacing, showDivider
+}) {
+  const lineH     = Math.round(fontSize * 1.45);   // 1.45× prevents overlap at any font size
+  const totalH    = titleLines.length * lineH;
+  const startY    = Math.round((H * 0.65 - totalH) / 2 + lineH);
+  const lastPreY  = startY + (titleLines.length - 1) * lineH;
+  const leftPad   = Math.round(W * 0.08);
+  const maxWidth  = W * 0.84;
+  const titleX    = titleAlign === 'center' ? W / 2 : leftPad;
+
+  if (showScrim) {
+    const scrimTop = Math.max(0, startY - Math.round(lineH * 1.1));
+    const scrimBot = Math.min(H, lastPreY + (showDivider
+      ? Math.round(lineH * 0.8)
+      : lineH + Math.round(lineH * 0.8)));
+    const scrim = ctx.createLinearGradient(0, scrimTop, 0, scrimBot);
+    scrim.addColorStop(0,    'rgba(0,0,0,0)');
+    scrim.addColorStop(0.12, 'rgba(0,0,0,0.65)');
+    scrim.addColorStop(0.88, 'rgba(0,0,0,0.65)');
+    scrim.addColorStop(1,    'rgba(0,0,0,0)');
+    ctx.fillStyle = scrim;
+    ctx.fillRect(0, scrimTop, W, scrimBot - scrimTop);
+  }
+
+  const buildFont = sz => titleFontStyle
+    ? `${titleFontStyle} ${titleFontWeight} ${sz}px ${titleFontFamily}`
+    : `${titleFontWeight} ${sz}px ${titleFontFamily}`;
+
+  ctx.fillStyle     = textColor;
+  ctx.textAlign     = titleAlign || 'left';
+  ctx.letterSpacing = letterSpacing || '0px';
+
+  let drawnLastY = startY;
+  titleLines.forEach((line, i) => {
+    let sz = fontSize;
+    ctx.font = buildFont(sz);
+    while (ctx.measureText(line).width > maxWidth && sz > 28) {
+      sz -= 2;
+      ctx.font = buildFont(sz);
+    }
+    drawnLastY = startY + i * lineH;
+    ctx.fillText(line, titleX, drawnLastY);
+  });
+
+  ctx.letterSpacing = '0px';
+  ctx.textAlign     = 'left';
+
+  const divY = drawnLastY + Math.round(H * 0.013);
+
+  if (showDivider) {
+    ctx.globalAlpha = 0.7;
+    ctx.strokeStyle = accentColor || '#C4A882';
+    ctx.lineWidth   = W * 0.002;
+    ctx.beginPath();
+    ctx.moveTo(leftPad, divY);
+    ctx.lineTo(leftPad + Math.round(W * 0.35), divY);
+    ctx.stroke();
+    ctx.globalAlpha = 1.0;
+  }
+
+  const authorSize = Math.round(W * 0.045);
+  const authorY    = showDivider
+    ? divY + Math.round(W * 0.063)
+    : drawnLastY + Math.round(H * 0.04);
+
+  ctx.font          = `400 ${authorSize}px ${authorFontFamily}`;
+  ctx.fillStyle     = textColor;
+  ctx.globalAlpha   = 0.85;
+  ctx.letterSpacing = Math.round(W * 0.005) + 'px';
+  ctx.fillText((authorName || '').toUpperCase(), leftPad, authorY);
+  ctx.globalAlpha   = 1.0;
+  ctx.letterSpacing = '0px';
+}
+
 // ──────────── COMPOSE COVER ────────────
 async function composeCover(imageUrl, coverBrief, title, author) {
   return new Promise((resolve) => {
@@ -2570,47 +2656,23 @@ async function composeCover(imageUrl, coverBrief, title, author) {
 
       const titleLines = (coverBrief.titleLines && coverBrief.titleLines.length > 0)
         ? coverBrief.titleLines : [title];
-      const lineH = 95;
-      const totalTitleH = titleLines.length * lineH;
-      const startY = (H * 0.65 - totalTitleH) / 2 + lineH;
+      const fontSize = korean ? 72 : 90;
 
-      // Dark scrim band behind text — mirrors renderCover
-      const bandTop = Math.max(0, startY - lineH * 1.1);
-      const bandBot = Math.min(H, startY + totalTitleH + 80);
-      const scrim = ctx.createLinearGradient(0, bandTop, 0, bandBot);
-      scrim.addColorStop(0,    'rgba(0,0,0,0)');
-      scrim.addColorStop(0.12, 'rgba(0,0,0,0.65)');
-      scrim.addColorStop(0.88, 'rgba(0,0,0,0.65)');
-      scrim.addColorStop(1,    'rgba(0,0,0,0)');
-      ctx.fillStyle = scrim;
-      ctx.fillRect(0, bandTop, W, bandBot - bandTop);
-
-      const leftPad = W * 0.08;
-      const maxWidth = W * 0.84;
-      ctx.textAlign = 'left';
-      ctx.fillStyle = '#FFFFFF';
-      ctx.globalAlpha = 1;
-
-      let lastY = startY;
-      titleLines.forEach((line, i) => {
-        let sz = korean ? 72 : 90;
-        ctx.font = `900 ${sz}px ${titleFont}`;
-        while (ctx.measureText(line).width > maxWidth && sz > 28) {
-          sz -= 2;
-          ctx.font = `900 ${sz}px ${titleFont}`;
-        }
-        const y = startY + i * lineH;
-        ctx.fillText(line, leftPad, y);
-        lastY = y;
+      paintCoverTextLayer(ctx, W, H, {
+        titleLines,
+        authorName:       author,
+        titleFontStyle:   null,
+        titleFontWeight:  '900',
+        titleFontFamily:  titleFont,
+        authorFontFamily: authorFont,
+        fontSize,
+        textColor:    '#FFFFFF',
+        accentColor:  '#FFFFFF',
+        showScrim:    true,
+        titleAlign:   'left',
+        letterSpacing:'0px',
+        showDivider:  false
       });
-
-      ctx.font = `400 22px ${authorFont}`;
-      ctx.fillStyle = '#FFFFFF';
-      ctx.globalAlpha = 0.85;
-      ctx.letterSpacing = '2px';
-      ctx.fillText(author, leftPad, lastY + 36);
-      ctx.letterSpacing = '0px';
-      ctx.globalAlpha = 1;
     }
 
     const img = new Image();
@@ -2923,73 +2985,27 @@ async function renderCover(canvas, design, bookTitle, authorName, skipBackground
     : bookTitle.split(' ');
   const lines = groupTitleLines(rawLines);
 
-  const leftMargin = W * 0.08;
-  const lineH      = (design.fontStyle === 'DANCING') ? 110 : (layout.titleAlign === 'center' ? 85 : 125);
-  const titleX     = (isKo || layout.titleAlign !== 'center') ? leftMargin : W / 2;
+  const titleFontStyle  = (!isKo && design.fontStyle === 'DANCING') ? 'italic' : null;
+  const titleFontWeight = isKo ? '800' : chosen.weight;
+  const titleFontFamily = isKo
+    ? titleFont
+    : `${chosen.family}, Arial Black, sans-serif`;
 
-  const totalTitleHeight = lines.length * lineH;
-  const startY = (H * 0.65 - totalTitleHeight) / 2 + lineH;
-
-  // Dark scrim band over photo backgrounds so title + author are always legible
-  if (skipBackground) {
-    const scrimDivY  = startY + (lines.length - 1) * lineH + 15;
-    const bandTop    = Math.max(0, startY - lineH * 1.1);
-    const bandBot    = Math.min(H, scrimDivY + 120);
-    const scrimGrad  = ctx.createLinearGradient(0, bandTop, 0, bandBot);
-    scrimGrad.addColorStop(0,    'rgba(0,0,0,0)');
-    scrimGrad.addColorStop(0.12, 'rgba(0,0,0,0.65)');
-    scrimGrad.addColorStop(0.88, 'rgba(0,0,0,0.65)');
-    scrimGrad.addColorStop(1,    'rgba(0,0,0,0)');
-    ctx.fillStyle = scrimGrad;
-    ctx.fillRect(0, bandTop, W, bandBot - bandTop);
-  }
-
-  ctx.fillStyle     = skipBackground ? '#FFFFFF' : (design.textColor || '#F5F0E8');
-  ctx.textAlign     = isKo ? 'left' : layout.titleAlign;
-  ctx.letterSpacing = layout.letterSpacing;
-
-  lines.forEach((line, i) => {
-    if (isKo) {
-      ctx.font = `800 ${fontSize}px ${titleFont}`;
-    } else {
-      let lineFontSize = fontSize;
-      ctx.font = design.fontStyle === 'DANCING'
-        ? `italic ${chosen.weight} ${lineFontSize}px ${chosen.family}, Arial Black, sans-serif`
-        : `${chosen.weight} ${lineFontSize}px ${chosen.family}, Arial Black, sans-serif`;
-      while (ctx.measureText(line).width > W * 0.85 && lineFontSize > 40) {
-        lineFontSize -= 3;
-        ctx.font = design.fontStyle === 'DANCING'
-          ? `italic ${chosen.weight} ${lineFontSize}px ${chosen.family}, Arial Black, sans-serif`
-          : `${chosen.weight} ${lineFontSize}px ${chosen.family}, Arial Black, sans-serif`;
-      }
-    }
-    ctx.fillText(line, titleX, startY + i * lineH);
+  paintCoverTextLayer(ctx, W, H, {
+    titleLines:       lines,
+    authorName,
+    titleFontStyle,
+    titleFontWeight,
+    titleFontFamily,
+    authorFontFamily: bodyFont,
+    fontSize,
+    textColor:     skipBackground ? '#FFFFFF' : (design.textColor || '#F5F0E8'),
+    accentColor:   design.accentColor || '#C4A882',
+    showScrim:     skipBackground,
+    titleAlign:    isKo ? 'left' : layout.titleAlign,
+    letterSpacing: layout.letterSpacing || '0px',
+    showDivider:   true
   });
-  ctx.letterSpacing = '0px';
-  ctx.textAlign     = 'left';
-
-  // 3. Thin divider line — accentColor at 70% opacity
-  const lastLineY = startY + (lines.length - 1) * lineH;
-  const dividerY  = lastLineY + 15;
-  ctx.globalAlpha = 0.7;
-  ctx.strokeStyle = design.accentColor || '#C4A882';
-  ctx.lineWidth   = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(leftMargin, dividerY);
-  ctx.lineTo(leftMargin + W * 0.35, dividerY);
-  ctx.stroke();
-  ctx.globalAlpha = 1.0;
-
-  // 4. Author name — below divider, Montserrat Light uppercase
-  ctx.font          = `400 36px ${bodyFont}`;
-  ctx.fillStyle     = skipBackground ? '#FFFFFF' : (design.textColor || '#F5F0E8');
-  ctx.globalAlpha   = 1.0;
-  ctx.letterSpacing = '5px';
-  ctx.fillText((authorName || '').toUpperCase(), leftMargin, dividerY + 50);
-  ctx.globalAlpha   = 1.0;
-  ctx.letterSpacing = '0px';
-
-  ctx.textAlign = 'left';
 }
 
 // ──────────── FULL COVER GENERATION FLOW ────────────
