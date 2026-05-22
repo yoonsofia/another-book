@@ -48,10 +48,15 @@ app.get('/proxy-image', async (req, res) => {
 
 // ── COVER GENERATION ENDPOINT ──
 app.post('/generate-cover', async (req, res) => {
-  const { prompt } = req.body;
+  const { prompt, language } = req.body;
   if (!process.env.IDEOGRAM_API_KEY) {
     return res.status(500).json({ error: 'IDEOGRAM_API_KEY not configured' });
   }
+  // English covers: Ideogram renders the complete cover including typography, so text is allowed.
+  // Korean covers: no text in image; title/author are overlaid by the app.
+  const negativePrompt = language === 'en'
+    ? 'people, person, human, woman, man, girl, boy, face, hands, body, portrait, photorealistic, hyperrealistic, 3D render, CGI, photograph, photography, realistic photo, watermark'
+    : 'people, person, human, woman, man, girl, boy, face, hands, body, portrait, photorealistic, hyperrealistic, 3D render, CGI, photograph, photography, realistic photo, text, words, letters, typography, numbers, signs, watermark';
   try {
     const response = await fetch('https://api.ideogram.ai/v1/ideogram-v3/generate', {
       method: 'POST',
@@ -61,7 +66,7 @@ app.post('/generate-cover', async (req, res) => {
       },
       body: JSON.stringify({
         prompt: prompt,
-        negative_prompt: 'people, person, human, woman, man, girl, boy, face, hands, body, portrait, photorealistic, hyperrealistic, 3D render, CGI, photograph, photography, realistic photo, text, words, letters, typography, numbers, signs, watermark',
+        negative_prompt: negativePrompt,
         aspect_ratio: '2x3',
         num_images: 1,
         rendering_speed: 'FLASH',
@@ -520,10 +525,10 @@ ${!isKorean ? `
   ${coverImageUrl
     ? `<img class="cover-image" src="${coverImageUrl}" alt="cover" crossorigin="anonymous">`
     : ''}
-  <div class="cover-scrim">
+  ${isKorean ? `<div class="cover-scrim">
     <div class="cover-title">${bookTitle || ''}</div>
     ${authorName ? `<div class="cover-author">${authorName}</div>` : ''}
-  </div>
+  </div>` : ''}
 </div>
 
 <!-- TABLE OF CONTENTS -->

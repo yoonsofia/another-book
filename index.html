@@ -1931,8 +1931,10 @@ function renderStep1(body){
     <div class="q-num">STEP 1 / 6</div>
     <h2 class="q-title">주인공을 소개해주세요</h2>
     <p class="q-sub">이야기의 주인공이 될 분의 이름과 나이대를 알려주세요</p>
-    <input class="txt-inp" id="inp-name" placeholder="이름을 입력해주세요... (예: 지수, 민준, 소연)" value="${ans.name||''}" onkeydown="if(event.key==='Enter')nextStep()">
-    ${ans.language === 'en' ? `<div class="tip-box" style="margin-bottom:16px;line-height:1.7;">💡 <strong>영어 소설을 선택하셨나요?</strong><br>한국 이름 입력 시 AI가 자동으로 영어식으로 표기해요.<br><span style="color:var(--txt-md)">예: 지수 → Jisoo, 민준 → Minjun, 서연 → Seoyeon</span><br><br>원하는 영어 표기가 따로 있다면 영어로 직접 입력하는 것을 추천해요!<br><span style="color:var(--txt-md)">예: "Ji-su", "Jay", "Sophia"</span></div>` : ''}
+    <input class="txt-inp" id="inp-name"
+      placeholder="${ans.language === 'en' ? '예: Ji-hyun, Sarah, Min-jun — 책에 표기될 이름을 입력해주세요' : '이름을 입력해주세요... (예: 지수, 민준, 소연)'}"
+      value="${ans.name||''}" onkeydown="if(event.key==='Enter')nextStep()">
+    ${ans.language === 'en' ? `<div class="tip-box" style="margin-bottom:16px;line-height:1.7;">💡 <strong>영어 소설 — 주인공 이름 (영문)</strong><br>책에 실제로 표기될 이름을 영문으로 직접 입력해주세요.<br><span style="color:var(--txt-md)">예: Ji-hyun, Sarah, Min-jun, Alex, Su-jin</span></div>` : ''}
     <div class="field-label">성별을 선택해주세요</div>
     <div class="card-grid" id="gender-grid">
       <button class="card-option${ans.gender==='여성'?' sel':''}" data-value="여성" onclick="pickGender('여성')">👩 여성</button>
@@ -2308,7 +2310,7 @@ async function generateStory(){
     ? `IMPORTANT: Write the ENTIRE story in Korean (한국어) as the primary language. All narrative and descriptions must be in Korean.\nHowever, you MAY use English words or sentences naturally when:\n- A character is speaking English in the scene\n- A character is learning English and practices it\n- English words appear naturally in Korean daily life (e.g. 카페, 오케이, Fighting!)\n- Signs, menus, or text in the story are in English\nThis mirrors how real Korean literary fiction is written — Korean-first but naturally incorporating English where it fits the story organically.`
     : `IMPORTANT: Write the ENTIRE story in English only. All narrative and dialogue must be in English. Keep Korean proper nouns romanized (e.g. Gangneung, Seo-yeon, doenjang jjigae) but do not write any Korean characters anywhere in the story.`;
   const writerRole = isEnglish
-    ? `You are a bestselling English novelist.\nStyle: Literary commercial fiction, warm and emotional tone.\nVocabulary: Natural adult English, accessible but sophisticated.\nProtagonist: ${ans.name}\n\nFormatting: You may use *italic* sparingly for emphasis (internal thoughts, a single stressed word). Never use **bold** — bold markdown is unprofessional in literary fiction body text and must not appear anywhere in the story.\n\nYou may naturally include Korean words and phrases where they feel authentic to the story.\nROMANIZED Korean words are ALWAYS fine: names (eomma, appa, unnie, oppa, sunbae), food (japchae, kimbap, tteokbokki, samgyeopsal), places (Hongdae, Sinchon, Yeouido), expressions (daebak, aigoo, fighting).\nHANGUL SCRIPT is also fine to use naturally: pet names (뭉치), affectionate calls (지수야, 엄마), money amounts (30억 원), signs/menus, brief Korean dialogue when a character speaks Korean.\nUse both romanized and Hangul naturally as a skilled literary author would.\n\nThis is an English language book. Write everything in English only. No Korean characters anywhere in the story text. Character names should be romanized (e.g. Mongchi not 몽치). Cultural terms should be translated or explained in English.`
+    ? `You are a bestselling English novelist.\nStyle: Literary commercial fiction, warm and emotional tone.\nVocabulary: Natural adult English, accessible but sophisticated.\nProtagonist: ${ans.name}\n\nFormatting: You may use *italic* sparingly for emphasis (internal thoughts, a single stressed word). Never use **bold** — bold markdown is unprofessional in literary fiction body text and must not appear anywhere in the story.\n\nSTRICT LANGUAGE RULE — NO KOREAN CHARACTERS: Write everything in English only. Never use Korean characters (한글/Hangul) anywhere in the story — not in character names, places, food, money, expressions, or dialogue.\nAlways use romanized or English equivalents:\n- Names: 지현 → Ji-hyun, 민준 → Min-jun, 수진 → Su-jin, 뭉치 → Mongchi\n- Places: 강남 → Gangnam, 홍대 → Hongdae, 부산 → Busan\n- Food/terms: 김치 → kimchi, 된장찌개 → doenjang jjigae, 삼겹살 → samgyeopsal\n- Money: 30억 원 → 3 billion won\n- Affectionate terms: 엄마 → Mom (or eomma), 오빠 → oppa, 언니 → unni\nIf a character speaks Korean in a scene, write their words in English with a brief note that it was spoken in Korean.`
     : '당신은 한국어 베스트셀러 소설 작가입니다.\n형식: *이탤릭체*는 강조에 드물게 사용할 수 있습니다(예: 내면의 생각, 강조할 단어). **굵은 글씨**는 절대 사용하지 마세요 — 문학 소설 본문에 볼드체는 적합하지 않습니다.';
   const storyInfo = buildStoryInfo();
   const rules = buildRules();
@@ -2370,8 +2372,11 @@ ${languageInstruction}
 
     const storySummary = ch1Content.slice(0, 500);
     const genreStyle = (ans.genres || []).map(g => genreStyleMap[g]).filter(Boolean).join(', ') || 'cinematic mood, beautiful scene';
+    const coverBriefPrompt = isEnglish
+      ? `You are creating image prompts for an English book cover. Ideogram AI will render the COMPLETE cover including title and author name as part of the image — do NOT add any "no text" constraints.\n\nBook title (spell character-by-character, exactly): "${outline.title}"\nAuthor name (spell exactly): "${ans.authorDisplay}"\n\nGenerate 4 COMPLETELY DIFFERENT image prompts for a modern professional English book cover.\n\nREQUIRED in every prompt:\n1. The title text "${outline.title}" must appear prominently — large, at the top or center. Spell it exactly, character by character.\n2. The author name "${ans.authorDisplay}" must appear below the title, smaller.\n3. Include this design direction: modern book cover, professional typography integrated into design, clean layout, title text large and prominent, author name smaller below title, contemporary commercial fiction design\n\nRules:\n- Max 65 words per prompt\n- No human faces, no people, no body parts\n- Each prompt must show a DIFFERENT visual concept (not the same scene at different angles)\n- End each prompt with: ${genreStyle}, professional book cover design\n\nReturn ONLY this JSON:\n{"cover1":"prompt 1","cover2":"prompt 2","cover3":"prompt 3","cover4":"prompt 4"}\n\nStory summary: ${storySummary.slice(0, 200)}`
+      : `Based on this story's theme and genre, generate 4 COMPLETELY DIFFERENT short image prompts for a book cover. Each must show a different scene/object.\n\nSTYLE REQUIREMENT — every prompt must produce: minimalistic digital illustration, vector art style, flat or semi-flat design, clean limited color palette, symbolic or metaphorical imagery. No photorealism, no 3D rendering, no photography.\n\nRules:\n- Each prompt max 40 words\n- No people, no faces, no human figures\n- No text, no words, no letters\n- Different subject for each (not just a different angle of the same thing)\n- End each prompt with: ${genreStyle}, minimalistic vector illustration, flat design\n\nReturn ONLY this JSON:\n{"cover1": "40-word prompt, scene 1", "cover2": "40-word prompt, scene 2", "cover3": "40-word prompt, scene 3", "cover4": "40-word prompt, scene 4"}\n\nStory summary: ${storySummary.slice(0, 200)}\nGenre style: ${genreStyle}`;
     const coverBriefRaw = await apiCall(
-      `Based on this story's theme and genre, generate 4 COMPLETELY DIFFERENT short image prompts for a book cover. Each must show a different scene/object.\n\nSTYLE REQUIREMENT — every prompt must produce: minimalistic digital illustration, vector art style, flat or semi-flat design, clean limited color palette, symbolic or metaphorical imagery. No photorealism, no 3D rendering, no photography.\n\nRules:\n- Each prompt max 40 words\n- No people, no faces, no human figures\n- No text, no words, no letters\n- Different subject for each (not just a different angle of the same thing)\n- End each prompt with: ${genreStyle}, minimalistic vector illustration, flat design\n\nReturn ONLY this JSON:\n{"cover1": "40-word prompt, scene 1", "cover2": "40-word prompt, scene 2", "cover3": "40-word prompt, scene 3", "cover4": "40-word prompt, scene 4"}\n\nStory summary: ${storySummary.slice(0, 200)}\nGenre style: ${genreStyle}`,
+      coverBriefPrompt,
       600,
       'You are a book cover art director. Return ONLY valid JSON in English.'
     );
@@ -2697,6 +2702,8 @@ async function composeCover(imageUrl, coverBrief, title, author) {
       ctx.fillStyle = '#1B2A4A';
       ctx.fillRect(0, 0, W, H);
       if (loadedImg) ctx.drawImage(loadedImg, 0, 0, W, H);
+
+      if (selectedLang === 'en') return; // English: Ideogram image is the complete cover, no text overlay
 
       const titleLines = (coverBrief.titleLines && coverBrief.titleLines.length > 0)
         ? coverBrief.titleLines : [title];
@@ -3097,7 +3104,10 @@ async function generateFullCover(){
         canvas.width = 800; canvas.height = 1200;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        await renderCover(canvas, coverDesign, bookTitle, authorName, true);
+        if (selectedLang !== 'en') {
+          // English: Ideogram already rendered complete cover with text; skip overlay
+          await renderCover(canvas, coverDesign, bookTitle, authorName, true);
+        }
         res();
       };
       img.onerror = async () => { await renderCover(canvas, coverDesign, bookTitle, authorName); res(); };
@@ -3141,7 +3151,7 @@ async function confirmCoverAndMakePDF(){
         ? `IMPORTANT: Write the ENTIRE story in Korean (한국어) as the primary language. All narrative and descriptions must be in Korean.\nHowever, you MAY use English words or sentences naturally when:\n- A character is speaking English in the scene\n- A character is learning English and practices it\n- English words appear naturally in Korean daily life (e.g. 카페, 오케이, Fighting!)\n- Signs, menus, or text in the story are in English\nThis mirrors how real Korean literary fiction is written — Korean-first but naturally incorporating English where it fits the story organically.`
         : `IMPORTANT: Write the ENTIRE story in English only. All narrative and dialogue must be in English. Keep Korean proper nouns romanized (e.g. Gangneung, Seo-yeon, doenjang jjigae) but do not write any Korean characters anywhere in the story.`;
       const writerRole = isEnglish
-        ? `You are a bestselling English novelist.\nStyle: Literary commercial fiction, warm and emotional tone.\nVocabulary: Natural adult English, accessible but sophisticated.\nProtagonist: ${ans.name}\n\nFormatting: You may use *italic* sparingly for emphasis (internal thoughts, a single stressed word). Never use **bold** — bold markdown is unprofessional in literary fiction body text and must not appear anywhere in the story.\n\nYou may naturally include Korean words and phrases where they feel authentic to the story.\nROMANIZED Korean words are ALWAYS fine: names (eomma, appa, unnie, oppa, sunbae), food (japchae, kimbap, tteokbokki, samgyeopsal), places (Hongdae, Sinchon, Yeouido), expressions (daebak, aigoo, fighting).\nHANGUL SCRIPT is also fine to use naturally: pet names (뭉치), affectionate calls (지수야, 엄마), money amounts (30억 원), signs/menus, brief Korean dialogue when a character speaks Korean.\nUse both romanized and Hangul naturally as a skilled literary author would.\n\nThis is an English language book. Write everything in English only. No Korean characters anywhere in the story text. Character names should be romanized (e.g. Mongchi not 몽치). Cultural terms should be translated or explained in English.`
+        ? `You are a bestselling English novelist.\nStyle: Literary commercial fiction, warm and emotional tone.\nVocabulary: Natural adult English, accessible but sophisticated.\nProtagonist: ${ans.name}\n\nFormatting: You may use *italic* sparingly for emphasis (internal thoughts, a single stressed word). Never use **bold** — bold markdown is unprofessional in literary fiction body text and must not appear anywhere in the story.\n\nSTRICT LANGUAGE RULE — NO KOREAN CHARACTERS: Write everything in English only. Never use Korean characters (한글/Hangul) anywhere in the story — not in character names, places, food, money, expressions, or dialogue.\nAlways use romanized or English equivalents:\n- Names: 지현 → Ji-hyun, 민준 → Min-jun, 수진 → Su-jin, 뭉치 → Mongchi\n- Places: 강남 → Gangnam, 홍대 → Hongdae, 부산 → Busan\n- Food/terms: 김치 → kimchi, 된장찌개 → doenjang jjigae, 삼겹살 → samgyeopsal\n- Money: 30억 원 → 3 billion won\n- Affectionate terms: 엄마 → Mom (or eomma), 오빠 → oppa, 언니 → unni\nIf a character speaks Korean in a scene, write their words in English with a brief note that it was spoken in Korean.`
         : '당신은 한국어 베스트셀러 소설 작가입니다.\n형식: *이탤릭체*는 강조에 드물게 사용할 수 있습니다(예: 내면의 생각, 강조할 단어). **굵은 글씨**는 절대 사용하지 마세요 — 문학 소설 본문에 볼드체는 적합하지 않습니다.';
       const rules = buildRules();
       const lotteryRule = buildLotteryRule();
@@ -3950,7 +3960,7 @@ async function generateBookCover(coverBrief) {
       return fetch(`${window.PDF_SERVER_URL}/generate-cover`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, negative_prompt: COVER_NEGATIVE_PROMPT, magic_prompt_option: 'ON' })
+        body: JSON.stringify({ prompt, language: selectedLang, magic_prompt_option: 'ON' })
       }).then(r => r.json()).then(data => data.data[0].url);
     })
   );
