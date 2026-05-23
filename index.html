@@ -3422,9 +3422,10 @@ async function generatePDF(sp) {
 
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
+    const sanitize = s => (s || '').replace(/[\s/\\:*?"<>|]+/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '') || 'untitled';
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${bookTitle}.pdf`;
+    a.download = `anotherbook_${sanitize(bookTitle)}_${sanitize(authorName)}.pdf`;
     a.click();
 
     hideLoading();
@@ -3502,13 +3503,18 @@ async function generatePDFPrimary(sp) {
   const isKorean = selectedLang === 'ko';
   const {jsPDF} = window.jspdf;
 
-  // Page dimensions and margins
-  const PW   = isKorean ? 148   : 127;
-  const PH   = isKorean ? 210   : 188;
-  const mL   = isKorean ? 24.9  : 25;
-  const mR   = isKorean ? 24.9  : 25;
-  const mTop = isKorean ? 24.9  : 15;
-  const mBot = isKorean ? 40.1  : 18;
+  // Page dimensions and margins — symmetric for digital, mirrored inside/outside for physical
+  const isPhysical = selectedProduct === 'physical';
+  const PW   = isKorean ? 148 : 127;
+  const PH   = isKorean ? 210 : 188;
+  const mTop = 18;
+  const mBot = 18;
+  // Inside (spine) margin is wider on physical; symmetric on digital
+  const mInside  = isPhysical ? 22 : 18;
+  const mOutside = isPhysical ? 15 : 18;
+  // For jsPDF we use left/right as if opening to a right-hand page (odd pages use mInside on left)
+  const mL = mInside;
+  const mR = mOutside;
   const textW = PW - mL - mR;
 
   const doc = new jsPDF({orientation:'portrait', unit:'mm', format:[PW,PH], compress:true});
@@ -3580,180 +3586,110 @@ async function generatePDFPrimary(sp) {
     }
   }
 
-  // Publication info page (Korean only, page 2 — no page number)
-  if (isKorean) {
-    doc.addPage();
+  // ── Page 2: Copyright (no page number) ──
+  doc.addPage();
+  {
     const today = new Date();
-    const publishDate = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
-    const copyrightYear = today.getFullYear();
+    const yr = today.getFullYear();
+    const publishDate = `${yr}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
+    const cx = PW / 2;
 
-    // 책 제목 — centered, 16pt, 50mm from top
     doc.setFont(bodyFont, 'normal');
-    doc.setFontSize(16);
+    doc.setFontSize(14);
     doc.setTextColor(0, 0, 0);
-    doc.text(story.title || '', PW / 2, 50, {align: 'center'});
+    const titleLines = splitKoreanText(story.title || '', 20);
+    doc.text(titleLines, cx, 55, {align: 'center'});
 
-    // 정보 테이블 — 30mm from left, starting at 80mm, 10mm line spacing
     doc.setFont(bodyFont, 'normal');
-    doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0);
-    const tableX = 30;
-    const tableRows = [
-      `발 행 │ ${publishDate}`,
-      `저 자 │ ${ans.authorDisplay || ''}`,
-      `펴낸곳 │ 어나더북`,
-      `이메일 │ hello@anotherbook.ai`,
+    doc.setFontSize(9.5);
+    doc.setTextColor(100, 100, 100);
+    const tableX = PW / 2 - 18;
+    const rows = [
+      ['발행', publishDate],
+      ['저자', ans.authorDisplay || ''],
+      ['펴낸곳', '어나더북'],
     ];
-    tableRows.forEach((row, i) => {
-      doc.text(row, tableX, 80 + i * 10);
+    rows.forEach(([label, val], i) => {
+      doc.text(`${label}  │  ${val}`, tableX, 85 + i * 9);
     });
 
-    // 설명 텍스트 — centered, 9pt, 140mm from top
     doc.setFont(bodyFont, 'normal');
-    doc.setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text('이 책은 어나더북(AnotherBook)이 제작한', PW / 2, 140, {align: 'center'});
-    doc.text('세상에 하나뿐인 맞춤형 소설입니다.', PW / 2, 148, {align: 'center'});
-
-    // 저작권 — centered, 9pt, 160mm from top
-    doc.text(`© ${copyrightYear} AnotherBook. All rights reserved.`, PW / 2, 160, {align: 'center'});
+    doc.setFontSize(8.5);
+    doc.setTextColor(130, 130, 130);
+    doc.text('이 책은 어나더북(AnotherBook)의 AI 작가와 함께 쓴', cx, 130, {align: 'center'});
+    doc.text('세상에 하나뿐인 맞춤형 소설입니다.', cx, 138, {align: 'center'});
+    doc.text(`© ${yr} 어나더북. All rights reserved.`, cx, 152, {align: 'center'});
   }
 
-  let globalPage = 1;
+  // ── Front matter pages 3–N per tier, then TOC ──
+  // Digital:  Pg3=TOC  Pg4=Blank → Ch1 starts pg5 (odd ✓)
+  // Physical: Pg3=Blank Pg4=Blank Pg5=TOC Pg6=Blank → Ch1 starts pg7 (odd ✓)
+  if (isPhysical) {
+    doc.addPage(); // blank pg3
+    doc.addPage(); // blank pg4
+  }
+
+  // TOC page
+  doc.addPage();
+  doc.setFont(bodyFont, 'normal');
+  doc.setFontSize(14);
+  doc.setTextColor(0, 0, 0);
+  doc.text('목  차', PW / 2, mTop + 8, {align: 'center'});
+  doc.setFont(bodyFont, 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(60, 60, 60);
+  story.chapters.forEach((ch, i) => {
+    doc.text(`${ch.number}　${ch.title}`, mL, mTop + 24 + i * 10);
+  });
+
+  // Blank page after TOC (ensures Ch1 lands on odd page)
+  doc.addPage();
+
+  // ── Body page counter: starts at 1 on Chapter 1 opener ──
+  let bodyPageNum = 1;
 
   const drawPageNum = () => {
-    doc.setFont(bodyFont,'normal');
+    doc.setFont(bodyFont, 'normal');
     doc.setFontSize(9);
-    doc.setTextColor(136,136,136);
-    doc.text(`— ${globalPage} —`, PW/2, PH - (isKorean ? 6 : 5), {align:'center'});
+    doc.setTextColor(170, 170, 170);
+    doc.text(`${bodyPageNum}`, PW / 2, PH - 6, {align: 'center'});
   };
-
-  if (isKorean) {
-    // ── Page 3: Conditional — gift → dedication, else → blank ──
-    doc.addPage();
-    if (selectedProduct === 'gift') {
-      doc.setFont(bodyFont, 'normal');
-      doc.setFontSize(11);
-      doc.setTextColor(0, 0, 0);
-      doc.text(
-        ['이 이야기를 읽을 당신에게.', '당신의 이야기이니까요.'],
-        PW / 2, PH / 2,
-        {align: 'center'}
-      );
-    }
-
-    // ── Page 4: Blank (always) ──
-    doc.addPage();
-
-    // ── Page 5: 목차 ──
-    doc.addPage();
-    doc.setFont(bodyFont, 'normal');
-    doc.setFontSize(16);
-    doc.setTextColor(0, 0, 0);
-    doc.text('차 례', PW / 2, 40, {align: 'center'});
-    doc.setFont(bodyFont, 'normal');
-    doc.setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    story.chapters.forEach((ch, i) => {
-      doc.text(`${ch.number}　${ch.title}`, mL, 60 + i * 12);
-    });
-
-  } else {
-    // ── English: pre-calculate TOC page numbers ──
-    const AVG_CHARS_PER_LINE  = 67;
-    const LINES_PER_BODY_PAGE = 21;
-    const FIRST_PAGE_LINES    = 15;
-    const chapStartPages = [];
-    let estPage = 3;
-    for (const ch of story.chapters) {
-      chapStartPages.push(estPage);
-      const totalLines = Math.ceil(ch.content.length / AVG_CHARS_PER_LINE);
-      const totalPages = 1 + Math.max(0, Math.ceil((totalLines - FIRST_PAGE_LINES) / LINES_PER_BODY_PAGE));
-      estPage += totalPages;
-    }
-
-    // ── English TOC page ──
-    doc.addPage();
-    globalPage++;
-    let tocY = mTop + 12;
-
-    doc.setFont(bodyFont,'bold');
-    doc.setFontSize(26);
-    doc.setTextColor(61,90,71);
-    doc.text('Contents', PW/2, tocY, {align:'center'});
-    tocY += 12;
-
-    doc.setDrawColor(196,168,130);
-    doc.setLineWidth(0.4);
-    doc.line((PW-50)/2, tocY, (PW+50)/2, tocY);
-    tocY += 10;
-
-    for (let i = 0; i < story.chapters.length; i++) {
-      const ch = story.chapters[i];
-      const pgNum = chapStartPages[i];
-      const entryY = tocY + i * 12;
-
-      doc.setFont(bodyFont,'normal');
-      doc.setFontSize(12);
-      doc.setTextColor(196,168,130);
-      doc.text(`${ch.number}.`, mL + 5, entryY, {align:'right'});
-
-      doc.setFont(bodyFont,'normal');
-      doc.setFontSize(13);
-      doc.setTextColor(44,44,44);
-      const maxChars = 28;
-      const titleShort = ch.title.length > maxChars ? ch.title.substring(0, maxChars-1)+'…' : ch.title;
-      const titleEndX = mL + 8 + doc.getTextWidth(titleShort) + 2;
-      doc.text(titleShort, mL + 8, entryY);
-
-      doc.setFont(bodyFont,'normal');
-      doc.setFontSize(11);
-      doc.setTextColor(136,136,136);
-      const pgNumStr = String(pgNum);
-      const pgNumW = doc.getTextWidth(pgNumStr);
-      const pgStartX = PW - mR - pgNumW - 2;
-      doc.text(pgNumStr, PW - mR, entryY, {align:'right'});
-
-      if (pgStartX > titleEndX + 4) {
-        try {
-          doc.setDrawColor(200,200,200);
-          doc.setLineWidth(0.1);
-          doc.setLineDashPattern([0.5, 2], 0);
-          doc.line(titleEndX, entryY - 1.2, pgStartX, entryY - 1.2);
-          doc.setLineDashPattern([], 0);
-        } catch(e3) {}
-      }
-    }
-  }
 
   // Chapter pages
   for(let ci=0; ci<story.chapters.length; ci++){
     const ch = story.chapters[ci];
     sp(65 + Math.round((ci+1)/story.chapters.length*30), `챕터 ${ch.number} PDF 작성 중...`);
+
+    // Chapters 2+ must start on a right (odd) page — insert blank if currently on an even page
+    if (ci > 0) {
+      const currentPdfPage = doc.internal.getCurrentPageInfo().pageNumber;
+      if (currentPdfPage % 2 === 1) { // odd = right page, so we just finished on a right page → insert blank left
+        doc.addPage();
+        bodyPageNum++;
+        drawPageNum(); // blank page still gets a number
+      }
+    }
+
     doc.addPage();
-    globalPage++;
     ch.pageNumber = doc.internal.getCurrentPageInfo().pageNumber;
 
     if (isKorean) {
       // ── Korean chapter layout ──
-      // Chapter number: centered, 16pt, 60mm from top
       doc.setFont(bodyFont, 'normal');
       doc.setFontSize(16);
       doc.setTextColor(0, 0, 0);
-      doc.text(String(ch.number), PW / 2, 60, {align: 'center'});
+      doc.text(String(ch.number), PW / 2, 52, {align: 'center'});
 
-      // Chapter title: centered, 14pt, 72mm from top
       doc.setFont(bodyFont, 'normal');
       doc.setFontSize(14);
       doc.setTextColor(0, 0, 0);
       const koTitleLines = splitKoreanText(ch.title, 22);
-      doc.text(koTitleLines, PW / 2, 72, {align: 'center'});
+      doc.text(koTitleLines, PW / 2, 64, {align: 'center'});
 
-      // Body text: starts at 90mm from top, 10.5pt, 7mm line height, no indent
-      let y = 90;
-      const lineHeight = 7;
-      const bottomMargin = PH - 25; // 185mm — 25mm from bottom of A5 page
-      const maxWidth = PW - mL - mR;
+      // Body text starts at 80mm, 10.5pt, 6.5mm line height
+      let y = 80;
+      const lineHeight = 6.5;
+      const bottomMargin = PH - mBot - 6; // leave room for page number
       doc.setFont(bodyFont, 'normal');
       doc.setFontSize(10.5);
       doc.setTextColor(0, 0, 0);
@@ -3768,31 +3704,30 @@ async function generatePDFPrimary(sp) {
         const lines = splitKoreanText(cleanPara, 22);
         for (const line of lines) {
           if (y > bottomMargin) {
+            drawPageNum();
+            bodyPageNum++;
             doc.addPage();
-            doc.setFontSize(9);
-            doc.text(String(globalPage), PW / 2, PH - 8, { align: 'center' });
-            globalPage++;
             doc.setFont(bodyFont, 'normal');
             doc.setFontSize(10.5);
             doc.setTextColor(0, 0, 0);
-            y = 20;
+            y = mTop + 6;
           }
           doc.text(line, mL, y);
           y += lineHeight;
         }
         y += 3;
         if (y > bottomMargin) {
+          drawPageNum();
+          bodyPageNum++;
           doc.addPage();
-          doc.setFontSize(9);
-          doc.text(String(globalPage), PW / 2, PH - 8, { align: 'center' });
-          globalPage++;
           doc.setFont(bodyFont, 'normal');
           doc.setFontSize(10.5);
           doc.setTextColor(0, 0, 0);
-          y = 20;
+          y = mTop + 6;
         }
       }
       drawPageNum();
+      bodyPageNum++;
 
     } else {
       // ── English chapter layout (unchanged) ──
@@ -3832,8 +3767,8 @@ async function generatePDFPrimary(sp) {
 
         if (y + 14 > PH - mBot) {
           drawPageNum();
+          bodyPageNum++;
           doc.addPage();
-          globalPage++;
           y = mTop + 8;
           doc.setFont(bodyFont,'normal');
           doc.setFontSize(11);
@@ -3853,8 +3788,8 @@ async function generatePDFPrimary(sp) {
             const firstLine = lines[0] || '';
             if (y + 7 > PH - mBot) {
               drawPageNum();
+              bodyPageNum++;
               doc.addPage();
-              globalPage++;
               y = mTop + 8;
               doc.setFont(bodyFont,'normal');
               doc.setFontSize(11);
@@ -3865,8 +3800,8 @@ async function generatePDFPrimary(sp) {
             for (const line of lines.slice(1)) {
               if (y + 7 > PH - mBot) {
                 drawPageNum();
+                bodyPageNum++;
                 doc.addPage();
-                globalPage++;
                 y = mTop + 8;
                 doc.setFont(bodyFont,'normal');
                 doc.setFontSize(11);
@@ -3880,8 +3815,8 @@ async function generatePDFPrimary(sp) {
             for (const line of lines) {
               if (y + 7 > PH - mBot) {
                 drawPageNum();
+                bodyPageNum++;
                 doc.addPage();
-                globalPage++;
                 y = mTop + 8;
                 doc.setFont(bodyFont,'normal');
                 doc.setFontSize(11);
@@ -3896,11 +3831,14 @@ async function generatePDFPrimary(sp) {
         isFirstParagraph = false;
       }
       drawPageNum();
+      bodyPageNum++;
     }
   }
 
   sp(96,'저장 중...');
-  doc.save(`${story.title}.pdf`);
+  const safeTitle = (story.title || 'untitled').replace(/[\s/\\:*?"<>|]+/g, '_').replace(/_+/g, '_');
+  const safeAuthor = (ans.authorDisplay || '').replace(/[\s/\\:*?"<>|]+/g, '_').replace(/_+/g, '_');
+  doc.save(`anotherbook_${safeTitle}_${safeAuthor || 'author'}.pdf`);
   sp(100,'완료!');
 
   setTimeout(()=>{
