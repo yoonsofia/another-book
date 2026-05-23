@@ -1,6 +1,3 @@
-# API keys — never push index.html with keys embedded
-index.html
-
 # Node / env
 node_modules/
 .env
