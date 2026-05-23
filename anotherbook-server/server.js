@@ -374,8 +374,8 @@ body {
 /* ── TOC PAGE ── */
 .toc-page {
   width: auto;
-  min-height: 155mm;
-  padding: 15mm 0 20mm;
+  min-height: 140mm;
+  padding: 12mm 0 15mm;
   page-break-after: always;
   display: flex;
   flex-direction: column;
@@ -390,14 +390,14 @@ body {
   color: #aaaaaa;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  margin-bottom: 9mm;
+  margin-bottom: 7mm;
 }
 
 .toc-entry {
   display: flex;
   align-items: baseline;
   gap: 4mm;
-  margin-bottom: 6mm;
+  margin-bottom: 4mm;
 }
 
 .toc-num {
@@ -417,7 +417,7 @@ body {
     : "'Lora', serif"};
   color: #1a1a1a;
   font-size: 10.5pt;
-  line-height: 1.45;
+  line-height: 1.3;
   flex-shrink: 1;
 }
 
