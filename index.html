@@ -1436,6 +1436,166 @@ em{font-style:italic;color:inherit;}
   transition:background .2s;
 }
 .dev-modal-close:hover{background:#333;}
+
+/* ── COMING SOON PRICE CARD ── */
+.lp-price-card.lp-coming-soon {
+  background: #f6f6f4;
+  border-color: #ddd;
+  opacity: 0.82;
+}
+.lp-price-card.lp-coming-soon:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.05);
+}
+.lp-price-card.lp-coming-soon .lp-price-name,
+.lp-price-card.lp-coming-soon .lp-price-icon { opacity: 0.7; }
+.lp-coming-soon-badge {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #888;
+  color: white;
+  padding: 5px 18px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Noto Sans KR', sans-serif;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+.lp-btn-notify {
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Noto Sans KR', sans-serif;
+  cursor: pointer;
+  transition: all 0.28s;
+  border: 2px solid #888;
+  background: transparent;
+  color: #666;
+}
+.lp-btn-notify:hover { background: #888; color: white; }
+.price-card.coming-soon {
+  background: #f8f8f6;
+  border-color: #ddd;
+  opacity: 0.8;
+}
+.price-card.coming-soon .price-name,
+.price-card.coming-soon .price-type { color: #aaa; }
+
+/* ── NOTIFY MODAL ── */
+#notify-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+#notify-modal.open { display: flex; }
+.notify-card {
+  background: white;
+  border-radius: 22px;
+  padding: 40px 36px;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.18);
+  position: relative;
+}
+.notify-card-close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #aaa;
+  line-height: 1;
+}
+.notify-card-close:hover { color: #444; }
+.notify-icon { font-size: 42px; margin-bottom: 10px; display: block; }
+.notify-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #2C2C2C;
+  margin-bottom: 6px;
+}
+.notify-sub {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 28px;
+  line-height: 1.7;
+}
+.notify-field {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1.5px solid #ddd;
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #333;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+.notify-field:focus { outline: none; border-color: #888; }
+.notify-select {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1.5px solid #ddd;
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #555;
+  margin-bottom: 22px;
+  box-sizing: border-box;
+  background: white;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  cursor: pointer;
+}
+.notify-select:focus { outline: none; border-color: #888; }
+.notify-submit {
+  width: 100%;
+  padding: 15px;
+  border-radius: 50px;
+  border: none;
+  background: #3D5A47;
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'Noto Sans KR', sans-serif;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+.notify-submit:hover { background: #2d4435; }
+.notify-success {
+  display: none;
+  padding: 16px 0 4px;
+}
+.notify-success-icon { font-size: 48px; display: block; margin-bottom: 10px; }
+.notify-success-msg {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #3D5A47;
+  margin-bottom: 6px;
+}
+.notify-success-sub {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  color: #888;
+}
 </style>
 </head>
 <body>
@@ -1531,7 +1691,7 @@ em{font-style:italic;color:inherit;}
           <span class="lp-price-icon">📱</span>
           <div class="lp-price-name">디지털 PDF</div>
           <div class="lp-price-desc">전체 10챕터 즉시 다운로드</div>
-          <div class="lp-price-amt">₩9,900</div>
+          <div class="lp-price-amt">₩14,900</div>
           <button class="lp-btn-price lp-btn-price-outline" onclick="showCoverSelect()">PDF 다운로드</button>
         </div>
 
@@ -1544,12 +1704,12 @@ em{font-style:italic;color:inherit;}
           <button class="lp-btn-price lp-btn-price-solid" onclick="showToast()">나만의 책 주문하기</button>
         </div>
 
-        <div class="lp-price-card">
+        <div class="lp-price-card lp-coming-soon">
+          <div class="lp-coming-soon-badge">Coming Soon</div>
           <span class="lp-price-icon">🎁</span>
           <div class="lp-price-name">프리미엄 박스</div>
           <div class="lp-price-desc">실물 책 + 디지털 PDF + 특별 패키지</div>
-          <div class="lp-price-amt">₩89,900</div>
-          <button class="lp-btn-price lp-btn-price-outline" onclick="showToast()">프리미엄으로 받기</button>
+          <button class="lp-btn-notify" onclick="showNotifyModal()">출시 알림 받기</button>
         </div>
       </div>
 
@@ -1665,7 +1825,7 @@ em{font-style:italic;color:inherit;}
           <div class="price-type">디지털 다운로드</div>
           <div class="price-name">디지털 PDF</div>
           <div class="price-desc">전체 10챕터 즉시 다운로드</div>
-          <div class="price-amt">₩9,900</div>
+          <div class="price-amt">₩14,900</div>
           <button class="btn-price btn-p2" onclick="showCoverSelect('digital')">PDF로 받기</button>
         </div>
 
@@ -1678,12 +1838,12 @@ em{font-style:italic;color:inherit;}
           <button class="btn-price btn-p1" onclick="showCoverSelect('physical')">책으로 받기</button>
         </div>
 
-        <div class="price-card">
-          <div class="price-type">선물 박스</div>
-          <div class="price-name">선물 박스</div>
+        <div class="price-card coming-soon" style="position:relative;padding-top:38px;">
+          <div class="pop-badge" style="background:#888;">Coming Soon</div>
+          <div class="price-type" style="color:#aaa;">프리미엄 박스</div>
+          <div class="price-name">프리미엄 박스</div>
           <div class="price-desc">실물 책 + PDF + 특별 패키징</div>
-          <div class="price-amt">₩59,900</div>
-          <button class="btn-price btn-p2" onclick="showCoverSelect('gift')">선물로 받기</button>
+          <button class="btn-price btn-p2" style="border-color:#bbb;color:#999;" onclick="showNotifyModal()">출시 알림 받기</button>
         </div>
 
       </div>
@@ -1696,6 +1856,33 @@ em{font-style:italic;color:inherit;}
   </div>
 
   <footer class="footer"><p>© 2026 어나더북. 모든 이야기는 AI에 의해 생성됩니다.</p></footer>
+</div>
+
+<!-- Notify Modal -->
+<div id="notify-modal" onclick="if(event.target===this)closeNotifyModal()">
+  <div class="notify-card">
+    <button class="notify-card-close" onclick="closeNotifyModal()">×</button>
+    <div id="notify-form-view">
+      <span class="notify-icon">🎁</span>
+      <div class="notify-title">프리미엄 박스 출시 알림</div>
+      <div class="notify-sub">출시되면 가장 먼저 알려드릴게요.<br>얼리버드 특별 혜택도 드려요!</div>
+      <input class="notify-field" id="notify-name" type="text" placeholder="이름" />
+      <input class="notify-field" id="notify-email" type="email" placeholder="이메일 주소" />
+      <select class="notify-select" id="notify-interest">
+        <option value="" disabled selected>관심도를 알려주세요</option>
+        <option value="very">꼭 사고 싶어요!</option>
+        <option value="likely">아마 살 것 같아요</option>
+        <option value="maybe">가격에 따라 다를 것 같아요</option>
+        <option value="curious">그냥 궁금해서요</option>
+      </select>
+      <button class="notify-submit" onclick="submitNotify()">출시 알림 신청하기</button>
+    </div>
+    <div class="notify-success" id="notify-success-view">
+      <span class="notify-success-icon">🎉</span>
+      <div class="notify-success-msg">신청 완료!</div>
+      <div class="notify-success-sub">출시되면 가장 먼저 알려드릴게요.<br>기대해주세요!</div>
+    </div>
+  </div>
 </div>
 
 <!-- Toast -->
@@ -2322,14 +2509,14 @@ async function generateStory(){
     const outlinePrompt = isEnglish
       ? `${languageInstruction}
 
-${writerRole} Based on the information below, create the title and 10 chapter titles for a 10-chapter novel.
+${writerRole} Based on the information below, create the title and 16 chapter titles with a story beat for each chapter of a 16-chapter novel. Each chapter's "beat" is one sentence describing the key narrative event or emotional turning point that MUST happen in that chapter.
 
 ${storyInfo}
 
 ${languageInstruction}
 
 Output ONLY pure JSON, no other text:
-{"title":"novel title","subtitle":"subtitle","chapters":[{"number":1,"title":"chapter title"},{"number":2,"title":"chapter title"},{"number":3,"title":"chapter title"},{"number":4,"title":"chapter title"},{"number":5,"title":"chapter title"},{"number":6,"title":"chapter title"},{"number":7,"title":"chapter title"},{"number":8,"title":"chapter title"},{"number":9,"title":"chapter title"},{"number":10,"title":"chapter title"}]}`
+{"title":"novel title","subtitle":"subtitle","chapters":[{"number":1,"title":"chapter title","beat":"one-sentence story goal"},{"number":2,"title":"chapter title","beat":"one-sentence story goal"},{"number":3,"title":"chapter title","beat":"one-sentence story goal"},{"number":4,"title":"chapter title","beat":"one-sentence story goal"},{"number":5,"title":"chapter title","beat":"one-sentence story goal"},{"number":6,"title":"chapter title","beat":"one-sentence story goal"},{"number":7,"title":"chapter title","beat":"one-sentence story goal"},{"number":8,"title":"chapter title","beat":"one-sentence story goal"},{"number":9,"title":"chapter title","beat":"one-sentence story goal"},{"number":10,"title":"chapter title","beat":"one-sentence story goal"},{"number":11,"title":"chapter title","beat":"one-sentence story goal"},{"number":12,"title":"chapter title","beat":"one-sentence story goal"},{"number":13,"title":"chapter title","beat":"one-sentence story goal"},{"number":14,"title":"chapter title","beat":"one-sentence story goal"},{"number":15,"title":"chapter title","beat":"one-sentence story goal"},{"number":16,"title":"chapter title","beat":"one-sentence story goal"}]}`
       : `${languageInstruction}
 
 당신은 한국어 베스트셀러 소설 작가입니다. 아래 정보를 바탕으로 10챕터 소설의 제목과 각 챕터 제목을 만들어주세요.
@@ -2341,7 +2528,7 @@ ${languageInstruction}
 반드시 순수 JSON만 출력, 다른 텍스트 없이:
 {"title":"소설 제목","subtitle":"부제목","chapters":[{"number":1,"title":"챕터 제목"},{"number":2,"title":"챕터 제목"},{"number":3,"title":"챕터 제목"},{"number":4,"title":"챕터 제목"},{"number":5,"title":"챕터 제목"},{"number":6,"title":"챕터 제목"},{"number":7,"title":"챕터 제목"},{"number":8,"title":"챕터 제목"},{"number":9,"title":"챕터 제목"},{"number":10,"title":"챕터 제목"}]}`;
 
-    const outlineRaw = await apiCall(outlinePrompt, 800);
+    const outlineRaw = await apiCall(outlinePrompt, 1400);
     const outline = extractJSON(outlineRaw);
     markLoadStep('ls1');
 
@@ -2353,6 +2540,7 @@ ${languageInstruction}
     // ── Step 3: Write Chapter 1 ──
     setLoadMsg('✍️ 챕터 1을 집필하고 있어요...');
     const ch1Title = outline.chapters[0].title;
+    const ch1Beat = outline.chapters[0].beat;
 
     const chapterSysPrompt = buildChapterSystemPrompt({
       isEnglish,
@@ -2364,7 +2552,7 @@ ${languageInstruction}
     });
 
     const ch1Raw = await apiCall(
-      buildChapterUserPrompt({ chNum: 1, chTitle: ch1Title, isEnglish, isLast: false, prevTail: null }),
+      buildChapterUserPrompt({ chNum: 1, chTitle: ch1Title, chBeat: ch1Beat, isEnglish, isLast: false, prevTail: null }),
       6000,
       chapterSysPrompt
     );
@@ -2480,10 +2668,12 @@ function buildLotteryRule(){
 
 // ──────────── CHAPTER GENERATION HELPERS ────────────
 
-// Returns a system-prompt array with cache_control — reused (and cached) across all 10 chapter calls.
+// Returns a system-prompt array with cache_control — reused (and cached) across all chapter calls.
 function buildChapterSystemPrompt({ isEnglish, outline, languageInstruction, writerRole, rules, lotteryRule }) {
   const outlineLines = outline.map(c =>
-    isEnglish ? `Chapter ${c.number}: ${c.title}` : `챕터 ${c.number}: ${c.title}`
+    isEnglish
+      ? `Chapter ${c.number}: ${c.title}${c.beat ? ` — ${c.beat}` : ''}`
+      : `챕터 ${c.number}: ${c.title}`
   ).join('\n');
   const body = [
     languageInstruction,
@@ -2500,7 +2690,7 @@ function buildChapterSystemPrompt({ isEnglish, outline, languageInstruction, wri
 }
 
 // Returns the user-message prompt for a single-call, complete-arc chapter.
-function buildChapterUserPrompt({ chNum, chTitle, isEnglish, isLast, prevTail }) {
+function buildChapterUserPrompt({ chNum, chTitle, chBeat, isEnglish, isLast, prevTail }) {
   const prevCtx = prevTail
     ? (isEnglish
         ? `**End of Chapter ${chNum - 1} — continue the story from here:**\n${prevTail}\n\n`
@@ -2508,9 +2698,10 @@ function buildChapterUserPrompt({ chNum, chTitle, isEnglish, isLast, prevTail })
     : '';
 
   if (isEnglish) {
+    const beatLine = chBeat ? `\n**This chapter's mandatory story goal:** ${chBeat}\n` : '';
     return `${prevCtx}Write Chapter ${chNum}: "${chTitle}"
-
-Write a complete, self-contained chapter of approximately 1,400 words.
+${beatLine}
+Write a complete, self-contained chapter of approximately 2,200 words.
 
 Structure the chapter as a full narrative arc:
 - Opening: Begin in a specific scene or moment that immediately pulls the reader in
@@ -2542,10 +2733,10 @@ IMPORTANT: 반드시 완전한 문장과 적절한 마무리로 끝내주세요.
   }
 }
 
-// Returns the last ~300 characters of a chapter for narrative thread continuity.
+// Returns the last ~600 characters of a chapter for narrative thread continuity.
 function getChapterTail(content) {
   const trimmed = (content || '').trim();
-  return trimmed.length > 300 ? '...' + trimmed.slice(-300) : trimmed;
+  return trimmed.length > 600 ? '...' + trimmed.slice(-600) : trimmed;
 }
 
 // ──────────── DISPLAY STORY ────────────
@@ -3140,8 +3331,8 @@ async function confirmCoverAndMakePDF(){
   const sp=(pct,txt)=>{ barEl.style.width=pct+'%'; msgEl.textContent=txt; };
 
   try {
-    // ── Phase 1: Generate chapters 2–10 if not already done ──
-    if(story.chapters.length < 10){
+    // ── Phase 1: Generate chapters 2–16 if not already done ──
+    if(story.chapters.length < 16){
       if(titleEl) titleEl.textContent='나머지 챕터를 생성하고 있어요...';
       if(iconEl) iconEl.textContent='📖';
       sp(0,'준비 중...');
@@ -3166,15 +3357,16 @@ async function confirmCoverAndMakePDF(){
         lotteryRule
       });
 
-      for(let i=1; i<10; i++){
+      for(let i=1; i<16; i++){
         const chNum = i+1;
         const chTitle = outline[i].title;
-        const isLast = chNum===10;
-        sp(Math.round(i/9*58), `챕터 ${chNum} 작성 중... (${chNum}/10)`);
+        const chBeat = outline[i].beat;
+        const isLast = chNum===16;
+        sp(Math.round(i/15*58), `챕터 ${chNum} 작성 중... (${chNum}/16)`);
 
         const prevTail = getChapterTail(story.chapters[story.chapters.length - 1].content);
         const chRaw = await apiCall(
-          buildChapterUserPrompt({ chNum, chTitle, isEnglish, isLast, prevTail }),
+          buildChapterUserPrompt({ chNum, chTitle, chBeat, isEnglish, isLast, prevTail }),
           6000,
           chapterSysPrompt
         );
@@ -3932,6 +4124,37 @@ function showToast(msg){
   if(msg) t.textContent=msg;
   t.style.display='block';
   setTimeout(()=>t.style.display='none',3200);
+}
+
+function showNotifyModal(){
+  const modal=document.getElementById('notify-modal');
+  document.getElementById('notify-form-view').style.display='block';
+  document.getElementById('notify-success-view').style.display='none';
+  document.getElementById('notify-name').value='';
+  document.getElementById('notify-email').value='';
+  document.getElementById('notify-interest').value='';
+  modal.classList.add('open');
+}
+function closeNotifyModal(){
+  document.getElementById('notify-modal').classList.remove('open');
+}
+function submitNotify(){
+  const name=document.getElementById('notify-name').value.trim();
+  const email=document.getElementById('notify-email').value.trim();
+  const interest=document.getElementById('notify-interest').value;
+  if(!email){
+    document.getElementById('notify-email').focus();
+    return;
+  }
+  // Store locally and show success
+  try{
+    const list=JSON.parse(localStorage.getItem('premiumNotifyList')||'[]');
+    list.push({name,email,interest,ts:new Date().toISOString()});
+    localStorage.setItem('premiumNotifyList',JSON.stringify(list));
+  }catch(e){}
+  document.getElementById('notify-form-view').style.display='none';
+  document.getElementById('notify-success-view').style.display='block';
+  setTimeout(closeNotifyModal,2800);
 }
 
 // Close modal on overlay click
