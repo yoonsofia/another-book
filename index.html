@@ -1960,12 +1960,12 @@ em{font-style:italic;color:inherit;}
 window.IDEOGRAM_API_KEY = '';
 
 // ──────────── DEV MODE ────────────
-// Set to true to bypass chapter lock and show all 10 chapters without payment.
+// Set to true to bypass chapter lock and show all 14 chapters without payment.
 // Set to false before shipping to production.
 const DEV_MODE = false;
 
 // Set to true to generate ONLY Chapter 1 (3 parts) for quality testing.
-// Set to false to generate all 10 chapters normally.
+// Set to false to generate all 14 chapters normally.
 const TEST_CH1_ONLY = false;
 
 const PDF_SERVER_URL = 'https://anotherbook-server-production.up.railway.app';
@@ -2482,6 +2482,7 @@ function setLoadMsg(msg){
 
 // ──────────── GENERATE ────────────
 async function generateStory(){
+  story = null;
   await resolveAuthorDisplay();
   showPage('page-loading');
   ['ls1','ls2','ls3','ls4'].forEach((id,i)=>{
@@ -2509,27 +2510,31 @@ async function generateStory(){
     const outlinePrompt = isEnglish
       ? `${languageInstruction}
 
-${writerRole} Based on the information below, create the title and 16 chapter titles with a story beat for each chapter of a 16-chapter novel. Each chapter's "beat" is one sentence describing the key narrative event or emotional turning point that MUST happen in that chapter.
+${writerRole} Based on the information below, create the title and 14 chapter titles with a story beat for each chapter of a 14-chapter novel. Each chapter's "beat" is one sentence describing the key narrative event or emotional turning point that MUST happen in that chapter.
 
 ${storyInfo}
 
 ${languageInstruction}
 
 Output ONLY pure JSON, no other text:
-{"title":"novel title","subtitle":"subtitle","chapters":[{"number":1,"title":"chapter title","beat":"one-sentence story goal"},{"number":2,"title":"chapter title","beat":"one-sentence story goal"},{"number":3,"title":"chapter title","beat":"one-sentence story goal"},{"number":4,"title":"chapter title","beat":"one-sentence story goal"},{"number":5,"title":"chapter title","beat":"one-sentence story goal"},{"number":6,"title":"chapter title","beat":"one-sentence story goal"},{"number":7,"title":"chapter title","beat":"one-sentence story goal"},{"number":8,"title":"chapter title","beat":"one-sentence story goal"},{"number":9,"title":"chapter title","beat":"one-sentence story goal"},{"number":10,"title":"chapter title","beat":"one-sentence story goal"},{"number":11,"title":"chapter title","beat":"one-sentence story goal"},{"number":12,"title":"chapter title","beat":"one-sentence story goal"},{"number":13,"title":"chapter title","beat":"one-sentence story goal"},{"number":14,"title":"chapter title","beat":"one-sentence story goal"},{"number":15,"title":"chapter title","beat":"one-sentence story goal"},{"number":16,"title":"chapter title","beat":"one-sentence story goal"}]}`
+{"title":"novel title","subtitle":"subtitle","chapters":[{"number":1,"title":"chapter title","beat":"one-sentence story goal"},{"number":2,"title":"chapter title","beat":"one-sentence story goal"},{"number":3,"title":"chapter title","beat":"one-sentence story goal"},{"number":4,"title":"chapter title","beat":"one-sentence story goal"},{"number":5,"title":"chapter title","beat":"one-sentence story goal"},{"number":6,"title":"chapter title","beat":"one-sentence story goal"},{"number":7,"title":"chapter title","beat":"one-sentence story goal"},{"number":8,"title":"chapter title","beat":"one-sentence story goal"},{"number":9,"title":"chapter title","beat":"one-sentence story goal"},{"number":10,"title":"chapter title","beat":"one-sentence story goal"},{"number":11,"title":"chapter title","beat":"one-sentence story goal"},{"number":12,"title":"chapter title","beat":"one-sentence story goal"},{"number":13,"title":"chapter title","beat":"one-sentence story goal"},{"number":14,"title":"chapter title","beat":"one-sentence story goal"}]}`
       : `${languageInstruction}
 
-당신은 한국어 베스트셀러 소설 작가입니다. 아래 정보를 바탕으로 10챕터 소설의 제목과 각 챕터 제목을 만들어주세요.
+당신은 한국어 베스트셀러 소설 작가입니다. 아래 정보를 바탕으로 14챕터 소설의 제목과 각 챕터 제목을 만들어주세요.
 
 ${storyInfo}
 
 ${languageInstruction}
 
 반드시 순수 JSON만 출력, 다른 텍스트 없이:
-{"title":"소설 제목","subtitle":"부제목","chapters":[{"number":1,"title":"챕터 제목"},{"number":2,"title":"챕터 제목"},{"number":3,"title":"챕터 제목"},{"number":4,"title":"챕터 제목"},{"number":5,"title":"챕터 제목"},{"number":6,"title":"챕터 제목"},{"number":7,"title":"챕터 제목"},{"number":8,"title":"챕터 제목"},{"number":9,"title":"챕터 제목"},{"number":10,"title":"챕터 제목"}]}`;
+{"title":"소설 제목","subtitle":"부제목","chapters":[{"number":1,"title":"챕터 제목"},{"number":2,"title":"챕터 제목"},{"number":3,"title":"챕터 제목"},{"number":4,"title":"챕터 제목"},{"number":5,"title":"챕터 제목"},{"number":6,"title":"챕터 제목"},{"number":7,"title":"챕터 제목"},{"number":8,"title":"챕터 제목"},{"number":9,"title":"챕터 제목"},{"number":10,"title":"챕터 제목"},{"number":11,"title":"챕터 제목"},{"number":12,"title":"챕터 제목"},{"number":13,"title":"챕터 제목"},{"number":14,"title":"챕터 제목"}]}`;
 
     const outlineRaw = await apiCall(outlinePrompt, 1400);
     const outline = extractJSON(outlineRaw);
+    console.log('Fix 2a reached, outline.chapters.length =', outline.chapters.length);
+    if(!Array.isArray(outline.chapters) || outline.chapters.length !== 14){
+      throw new Error(`Outline malformed — expected 14 chapters, got ${Array.isArray(outline.chapters) ? outline.chapters.length : 'non-array'}.`);
+    }
     markLoadStep('ls1');
 
     // ── Step 2: Chapter titles complete ──
@@ -2607,7 +2612,7 @@ ${languageInstruction}
 
   } catch(err){
     stopLoading();
-    alert(`오류가 발생했습니다:\n${err.message}\n\nAPI 키를 확인하고 다시 시도해주세요.`);
+    alert(`오류가 발생했습니다: ${err.message}\nAPI 키를 확인하고 다시 시도해주세요.\n\nSomething went wrong: ${err.message}\nPlease check your API key and try again.`);
     showPage('page-questions');
   }
 }
@@ -2701,7 +2706,7 @@ function buildChapterUserPrompt({ chNum, chTitle, chBeat, isEnglish, isLast, pre
     const beatLine = chBeat ? `\n**This chapter's mandatory story goal:** ${chBeat}\n` : '';
     return `${prevCtx}Write Chapter ${chNum}: "${chTitle}"
 ${beatLine}
-Write a complete, self-contained chapter of approximately 2,200 words.
+Write a complete, self-contained chapter of approximately 1,400 words.
 
 Structure the chapter as a full narrative arc:
 - Opening: Begin in a specific scene or moment that immediately pulls the reader in
@@ -2760,7 +2765,7 @@ function displayStory(d){
     </div>
     <div class="ch-content">${fmtContent(ch1.content)}</div>`;
 
-  // Section B: TOC (all 10 chapters)
+  // Section B: TOC (all 14 chapters)
   const tocEl = document.getElementById('toc-list');
   tocEl.innerHTML = '';
   d.allChapterTitles.forEach((ch, i)=>{
@@ -3322,6 +3327,11 @@ function regenerateCover(){
 // ──────────── PDF GENERATION (jsPDF text-based) ────────────
 async function confirmCoverAndMakePDF(){
   if(!story) return;
+  console.log('Fix 1b reached, allChapterTitles =', story.allChapterTitles);
+  if(!Array.isArray(story.allChapterTitles) || story.allChapterTitles.length !== 14){
+    showToast('책 생성 중 문제가 발생했습니다. 다시 시작해주세요. / Something went wrong generating the book. Please start over.');
+    return;
+  }
   const overlay = document.getElementById('pdf-progress-overlay');
   const barEl   = document.getElementById('pdf-progress-bar');
   const msgEl   = document.getElementById('pdf-progress-msg');
@@ -3331,8 +3341,8 @@ async function confirmCoverAndMakePDF(){
   const sp=(pct,txt)=>{ barEl.style.width=pct+'%'; msgEl.textContent=txt; };
 
   try {
-    // ── Phase 1: Generate chapters 2–16 if not already done ──
-    if(story.chapters.length < 16){
+    // ── Phase 1: Generate chapters 2–14 if not already done ──
+    if(story.chapters.length < 14){
       if(titleEl) titleEl.textContent='나머지 챕터를 생성하고 있어요...';
       if(iconEl) iconEl.textContent='📖';
       sp(0,'준비 중...');
@@ -3357,12 +3367,13 @@ async function confirmCoverAndMakePDF(){
         lotteryRule
       });
 
-      for(let i=1; i<16; i++){
+      for(let i=1; i<14; i++){
         const chNum = i+1;
+        console.log('loop iteration', i, outline.length, JSON.stringify(outline));
         const chTitle = outline[i].title;
         const chBeat = outline[i].beat;
-        const isLast = chNum===16;
-        sp(Math.round(i/15*58), `챕터 ${chNum} 작성 중... (${chNum}/16)`);
+        const isLast = chNum===14;
+        sp(Math.round(i/13*58), `챕터 ${chNum} 작성 중... (${chNum}/14)`);
 
         const prevTail = getChapterTail(story.chapters[story.chapters.length - 1].content);
         const chRaw = await apiCall(
