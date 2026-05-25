@@ -210,10 +210,12 @@ app.post('/generate-pdf', async (req, res) => {
 
     await browser.close();
 
-    const filename = `anotherbook_${sanitizeFilename(bookTitle)}_${sanitizeFilename(authorName)}.pdf`;
+    const fullFilename = `anotherbook_${sanitizeFilename(bookTitle)}_${sanitizeFilename(authorName)}.pdf`;
+    const safeName = fullFilename.replace(/[^\x20-\x7E]/g, '_');
+    const encodedName = encodeURIComponent(fullFilename);
     res.set({
       'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
+      'Content-Disposition': `attachment; filename="${safeName}"; filename*=UTF-8''${encodedName}`,
       'Content-Length': pdfBuffer.length
     });
 
