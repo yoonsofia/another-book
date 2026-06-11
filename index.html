@@ -1597,6 +1597,48 @@ em{font-style:italic;color:inherit;}
   color: #888;
 }
 </style>
+<style>
+/* ===== Questionnaire restyle — match the landing (larger type) ===== */
+:root{
+  --burg:#B36C72; --burg-dk:#97545A; --burg-md:#9E5239; --burg-lt:#C28088;
+  --gold:#9E5239; --gold-lt:#B36C72; --gold-dk:#7D4230;
+  --cream:#F6F1E6; --cream-dk:#EFE6D5; --cream-dp:#E3D8C5;
+  --txt:#2A2620; --txt-md:#6A5F52; --txt-lt:#998C7B;
+}
+.page{ background:var(--cream); }
+.q-body{ font-family:'Pretendard Variable',Pretendard,-apple-system,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
+.q-num,.q-title,.q-sub,.field-label,.detail-field-label,.tip-box,.card-option,.opt-card,.age-card,.lang-card,.genre-chip,.txt-inp,.txt-area{ word-break:keep-all; }
+.q-num{ font-family:'Pretendard Variable',Pretendard,sans-serif; font-size:13px; letter-spacing:.18em; text-transform:uppercase; }
+.q-title{ font-family:'Gowun Batang','Nanum Myeongjo',serif; font-size:clamp(30px,6.2vw,40px); font-weight:700; color:var(--txt); line-height:1.3; }
+.q-sub{ font-family:'Pretendard Variable',Pretendard,sans-serif; font-size:17px; line-height:1.8; color:var(--txt-md); }
+.field-label,.detail-field-label{ font-family:'Pretendard Variable',Pretendard,sans-serif; font-size:16px; }
+.txt-inp,.txt-area{ font-family:'Pretendard Variable',Pretendard,sans-serif; font-size:17.5px; border-radius:14px; border:1.5px solid var(--cream-dp); background:#FBF8F1; color:var(--txt); }
+.txt-inp::placeholder,.txt-area::placeholder{ color:#A99C8C; }
+.txt-inp:focus,.txt-area:focus{ border-color:var(--burg); box-shadow:0 0 0 3px rgba(179,108,114,.14); }
+.card-option,.age-card,.opt-card,.lang-card{ font-family:'Pretendard Variable',Pretendard,sans-serif; border-radius:14px; background:#FBF8F1; }
+.card-option,.opt-card{ font-size:17px; }
+.opt-em{ font-size:1.4em; }
+.card-option:hover,.age-card:hover,.opt-card:hover,.lang-card:hover{ border-color:var(--burg); background:rgba(179,108,114,.06); }
+.card-option.sel,.age-card.sel,.opt-card.sel,.lang-card.sel{ border-color:var(--burg); background:rgba(179,108,114,.12); box-shadow:0 0 0 1px var(--burg); color:var(--burg); }
+.lang-name{ font-family:'Gowun Batang','Nanum Myeongjo',serif; font-size:20px; }
+.btn-next,.btn-submit,.btn-gold{ font-family:'Pretendard Variable',Pretendard,sans-serif; font-size:17px; border-radius:100px; }
+.btn-next:hover,.btn-submit:hover,.btn-gold:hover{ box-shadow:0 10px 28px -8px rgba(151,84,90,.5); }
+.btn-back,.btn-skip{ font-family:'Pretendard Variable',Pretendard,sans-serif; font-size:15px; }
+.tip-box{ font-family:'Pretendard Variable',Pretendard,sans-serif; background:rgba(179,108,114,.10); border:1px solid rgba(179,108,114,.22); border-radius:14px; color:var(--txt-md); font-size:15px; }
+.prog-fill{ background:var(--burg); }
+.q-logo{ font-family:'Gowun Batang','Nanum Myeongjo',serif; }
+.story-main-title,.load-title,.price-title,.toc-title{ font-family:'Gowun Batang','Nanum Myeongjo',serif; }
+.genre-chips{ display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin:0 auto 8px; max-width:580px; }
+.genre-chip{ font-family:'Gowun Batang','Nanum Myeongjo',serif; font-size:17px; color:var(--txt); background:linear-gradient(#FFFDF8,#FBF5EB); border:1px solid var(--cream-dp); border-radius:100px; padding:14px 24px; cursor:pointer; display:inline-flex; align-items:center; gap:7px; box-shadow:0 4px 14px -8px rgba(42,38,32,.25); transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s,background .3s,color .3s,border-color .3s; }
+.genre-chip::before{ content:'\2713'; font-family:sans-serif; font-size:12px; font-weight:700; width:0; opacity:0; overflow:hidden; transition:width .3s,opacity .3s; }
+.genre-chip:hover{ transform:translateY(-2px); border-color:var(--burg); box-shadow:0 10px 22px -10px rgba(42,38,32,.32); }
+.genre-chip.sel{ background:var(--burg); border-color:var(--burg); color:#FFF8F4; box-shadow:0 10px 26px -10px rgba(151,84,90,.6); }
+.genre-chip.sel::before{ width:14px; opacity:1; }
+.genre-chip.custom{ border-style:dashed; border-color:var(--burg); color:var(--burg); background:rgba(179,108,114,.06); box-shadow:none; }
+.genre-chip.custom:hover{ background:rgba(179,108,114,.12); }
+.genre-chip.custom.sel{ border-style:solid; background:var(--burg); color:#FFF8F4; }
+#inp-author{ font-family:'Gowun Batang','Nanum Myeongjo',serif; font-size:18px; text-align:center; }
+</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Fraunces:ital,opsz,wght@1,9..144,400;0,9..144,500&family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
@@ -2404,20 +2446,26 @@ const COVER_NEGATIVE_CONSTRAINTS = 'no people, no person, no human figures, no f
 
 // ──────────── QUESTIONNAIRE DATA ────────────
 const TOPICS = [
-  {e:'💰',l:'복권 당첨'},
-  {e:'🏋️',l:'다이어트 성공'},
-  {e:'🚀',l:'성공적인 사업 시작'},
+  {e:'❤️',l:'진정한 사랑 찾기'},
+  {e:'💞',l:'첫사랑과의 재회'},
+  {e:'💫',l:'운명적인 사랑'},
+  {e:'🤝',l:'잊지 못할 우정'},
   {e:'🌍',l:'세계 여행'},
+  {e:'🌱',l:'인생의 새로운 시작'},
+  {e:'💰',l:'복권 당첨'},
+  {e:'🚀',l:'성공적인 사업 시작'},
   {e:'💼',l:'꿈의 직장 취업'},
   {e:'🏠',l:'꿈의 집 구매'},
+  {e:'🏋️',l:'다이어트 성공'},
   {e:'💪',l:'큰 도전 극복하기'},
-  {e:'👨‍👩‍👧',l:'완벽한 가족 찾기'},
-  {e:'🎓',l:'학교로 돌아가기'},
-  {e:'❤️',l:'진정한 사랑 찾기'},
-  {e:'🧬',l:'숨겨진 과거 발견'},
   {e:'🏆',l:'대회에서 우승'},
   {e:'🌟',l:'나만의 재능으로 빛나기'},
-  {e:'💫',l:'운명적인 사랑'},
+  {e:'👨‍👩‍👧',l:'완벽한 가족 찾기'},
+  {e:'🐾',l:'반려동물과의 특별한 이야기'},
+  {e:'🎓',l:'학교로 돌아가기'},
+  {e:'🧬',l:'숨겨진 과거 발견'},
+  {e:'⏳',l:'과거로의 시간 여행'},
+  {e:'✨',l:'마법 같은 모험'},
   {e:'✏️',l:'직접 주제 입력하기',custom:true}
 ];
 const GENRES = [
@@ -2543,22 +2591,10 @@ function renderStep1(body){
 function renderStep2(body){
   body.innerHTML = `
     <div class="q-num">STEP 2 / 6</div>
-    <h2 class="q-title">주인공에 대해 더 알려주세요</h2>
-    <p class="q-sub">알고 있는 것만 적어주세요. 비워도 괜찮아요. 구체적일수록 더 특별한 이야기가 만들어져요.</p>
-    <p class="detail-field-label">💼 직업 (선택사항)</p>
-    <input class="txt-inp" id="inp-occupation" style="margin-bottom:18px;" placeholder="예: 회사원, 카페 사장, 초등학교 교사" value="${ans.occupation||''}">
-    <p class="detail-field-label">👥 소중한 사람</p>
-    <textarea class="txt-area" id="inp-d1" style="min-height:72px;margin-bottom:18px;" placeholder="예: 10년 지기 친구 민지, 항상 웃게 만들어주는 존재 / 엄마, 말은 없지만 힘들 때 밥을 해줌">${ans.detailPeople||''}</textarea>
-    <p class="detail-field-label">🎯 취미나 관심사</p>
-    <textarea class="txt-area" id="inp-d2" style="min-height:72px;margin-bottom:18px;" placeholder="예: 새벽 산책, 필사, 식물 키우기, 오래된 책방 구경, 요리">${ans.detailHobbies||''}</textarea>
-    <p class="detail-field-label">📍 좋아하는 장소</p>
-    <textarea class="txt-area" id="inp-d3" style="min-height:72px;margin-bottom:18px;" placeholder="예: 집 근처 작은 카페, 한강 벤치, 강릉 바닷가, 동네 헌책방">${ans.detailPlaces||''}</textarea>
-    <p class="detail-field-label">🐾 반려동물</p>
-    <textarea class="txt-area" id="inp-d4" style="min-height:72px;margin-bottom:18px;" placeholder="예: 하얀 고양이 눈송이 14살, 골든리트리버 버터, 없음">${ans.detailPet||''}</textarea>
-    <p class="detail-field-label">🧠 성격 / MBTI</p>
-    <textarea class="txt-area" id="inp-d5" style="min-height:72px;margin-bottom:18px;" placeholder="예: INFJ, 조용하지만 한번 웃으면 온 방이 밝아짐, 걱정이 많지만 남 앞에서는 티 안 냄">${ans.detailPersonality||''}</textarea>
-    <p class="detail-field-label">💭 기타 꼭 넣고 싶은 것</p>
-    <textarea class="txt-area" id="inp-d6" style="min-height:72px;margin-bottom:18px;" placeholder="예: 꼭 나오는 대사, 실제 있었던 일, 특별한 물건, 좋아하는 음식">${ans.detailOther||''}</textarea>
+    <h2 class="q-title">주인공에 대해 들려주세요</h2>
+    <p class="q-sub">아는 만큼, 떠오르는 대로 자유롭게 적어주세요.<br>자세할수록 더 '나다운' 이야기가 완성돼요. 비워두면 AI가 알아서 채워요 😊</p>
+    <div class="tip-box" style="margin-bottom:14px;line-height:1.8;text-align:left;">💡 <strong>이런 것들을 자유롭게 섞어서 적어보세요</strong><br>직업 · 소중한 사람 · 취미와 관심사 · 자주 가는 장소 · 반려동물 · 성격 · 잊지 못할 추억 · 꼭 넣고 싶은 디테일<br><span style="color:var(--txt-md);display:block;margin-top:10px;"><strong>예시)</strong> 동네에서 작은 카페를 운영하고 있어요. 10년 지기 친구 민지와 매주 토요일 동네 헌책방에 가요. 새벽 산책과 필사를 좋아하고, 14살 된 하얀 고양이 '눈송이'를 키워요. 조용하지만 한번 웃으면 방 전체가 환해진다는 말을 들어요. 할머니가 끓여주시던 미역국 냄새를 아직도 기억해요.</span></div>
+    <textarea class="txt-area" id="inp-about" style="min-height:220px;margin-bottom:6px;" placeholder="떠오르는 대로 편하게 적어주세요. 한 문장도 좋고, 여러 줄도 좋아요.">${ans.personalDetails||''}</textarea>
     <div class="q-nav">
       <button class="btn-back" onclick="prevStep()">← 이전</button>
       <div class="step-nav-right">
@@ -2569,17 +2605,13 @@ function renderStep2(body){
 }
 
 function renderGenreStep(body){
-  const cards = GENRES.map(g=>`
-    <div class="opt-card${ans.genres?.includes(g.l)?' sel':''}" onclick="pickGenre('${g.l}')" data-val="${g.l}">
-      <span class="opt-em">${g.e}</span>
-      <span class="opt-lbl">${g.l}</span>
-    </div>`).join('');
+  const cards = GENRES.map(g=>`<button type="button" class="genre-chip${ans.genres?.includes(g.l)?' sel':''}" onclick="pickGenre('${g.l}')" data-val="${g.l}">${g.l}</button>`).join('');
   body.innerHTML = `
     <div class="q-num">STEP 3 / 6</div>
     <h2 class="q-title">어떤 분위기의 이야기를 원하세요?</h2>
-    <p class="q-sub">주인공의 이야기가 담길 장르와 감성을 선택해주세요</p>
-    <p class="q-sub" style="font-size:13px;margin-bottom:20px;">💡 최대 2개까지 선택할 수 있어요</p>
-    <div class="cards-grid two-col" id="genre-cards">${cards}</div>
+    <p class="q-sub">주인공의 이야기에 담길 장르와 감성을 골라주세요.</p>
+    <p class="q-sub" style="font-size:14px;margin-bottom:26px;color:var(--burg);">최대 2개까지 선택할 수 있어요</p>
+    <div class="genre-chips" id="genre-cards">${cards}</div>
     <div class="q-nav">
       <button class="btn-back" onclick="prevStep()">← 이전</button>
       <button class="btn-next" onclick="nextStep()">다음 →</button>
@@ -2587,17 +2619,13 @@ function renderGenreStep(body){
 }
 
 function renderStep3(body){
-  const cards = TOPICS.map((t,i)=>`
-    <div class="opt-card${ans.topicIdx===i?' sel':''}" onclick="pickTopic(${i})">
-      <span class="opt-em">${t.e}</span>
-      <span class="opt-lbl">${t.l}</span>
-    </div>`).join('');
+  const cards = TOPICS.map((t,i)=>`<button type="button" class="genre-chip${t.custom?' custom':''}${ans.topicIdx===i?' sel':''}" onclick="pickTopic(${i})">${t.custom?'+ ':''}${t.l}</button>`).join('');
   body.innerHTML = `
     <div class="q-num">STEP 4 / 6</div>
     <h2 class="q-title">어떤 이야기를 원하시나요?</h2>
     <p class="q-sub">주인공이 경험하게 될 이야기의 주제를 선택해주세요</p>
-    <div class="cards-grid">${cards}</div>
-    <div class="custom-box" id="custom-box" style="${ans.topicIdx===14?'display:block':''}">
+    <div class="genre-chips" id="topic-cards">${cards}</div>
+    <div class="custom-box" id="custom-box" style="${(ans.topicIdx!==undefined && TOPICS[ans.topicIdx] && TOPICS[ans.topicIdx].custom)?'display:block':''}">
       <input class="txt-inp" id="custom-inp" style="margin-bottom:0" placeholder="직접 입력해주세요..." value="${ans.topicCustom||''}">
     </div>
     <div class="q-nav">
@@ -2610,16 +2638,10 @@ function renderStep3(body){
 function renderStep5(body){
   body.innerHTML = `
     <div class="q-num">STEP 5 / 6</div>
-    <h2 class="q-title">특별히 넣고 싶은 장면이 있나요? ✨</h2>
-    <p class="q-sub">기억에 남기고 싶은 장면을 자유롭게 적어주세요. 비워도 괜찮아요.</p>
-    <p class="detail-field-label">📍 장소</p>
-    <textarea class="txt-area" id="inp-s1" style="min-height:72px;margin-bottom:18px;" placeholder="예: 파리 에펠탑 앞, 제주 성산일출봉, 강릉 바닷가, 우리가 처음 만난 카페">${ans.scenePlaces||''}</textarea>
-    <p class="detail-field-label">👥 사람</p>
-    <textarea class="txt-area" id="inp-s2" style="min-height:72px;margin-bottom:18px;" placeholder="예: 첫사랑과의 재회, 오랜 친구와의 만남, 돌아가신 할머니와의 추억">${ans.scenePeople||''}</textarea>
-    <p class="detail-field-label">✨ 특별한 순간</p>
-    <textarea class="txt-area" id="inp-s3" style="min-height:72px;margin-bottom:18px;" placeholder="예: 깜짝 프로포즈, 뜻밖의 선물, 생일 파티, 졸업식날">${ans.sceneMoments||''}</textarea>
-    <p class="detail-field-label">💬 꼭 나왔으면 하는 대사</p>
-    <textarea class="txt-area" id="inp-s4" style="min-height:72px;margin-bottom:18px;" placeholder="예: &quot;괜찮아, 네 편이야&quot;, &quot;늦었지만 미안해&quot;, &quot;사랑해&quot;">${ans.sceneDialogue||''}</textarea>
+    <h2 class="q-title">이야기에 꼭 담고 싶은 장면이 있나요? ✨</h2>
+    <p class="q-sub">기억에 남기고 싶은 장면이나 순간을 자유롭게 적어주세요. 비워두면 AI가 알아서 채워요.</p>
+    <div class="tip-box" style="margin-bottom:14px;line-height:1.8;text-align:left;">💡 <strong>장소 · 함께한 사람 · 특별한 순간 · 꼭 나왔으면 하는 대사</strong>를 한 번에 적어도 좋아요.<br><span style="color:var(--txt-md);display:block;margin-top:10px;"><strong>예시)</strong> 벚꽃이 흩날리던 4월, 한강 벤치에서 오랜 친구 수아와 다시 만나는 장면이 꼭 들어갔으면 해요. 서로에게 “늦었지만, 정말 보고 싶었어”라고 말하는 순간이요.</span></div>
+    <textarea class="txt-area" id="inp-scenes" style="min-height:200px;margin-bottom:6px;" placeholder="떠오르는 장면을 편하게 적어주세요. 장소, 사람, 순간, 대사 무엇이든 좋아요.">${ans.specialScenes||''}</textarea>
     <div class="q-nav">
       <button class="btn-back" onclick="prevStep()">← 이전</button>
       <div class="step-nav-right">
@@ -2672,7 +2694,7 @@ function updateStep2Next(){
 }
 function pickTopic(i){
   ans.topicIdx=i;
-  document.querySelectorAll('#q-body .opt-card').forEach((c,idx)=>c.classList.toggle('sel',idx===i));
+  document.querySelectorAll('#topic-cards .genre-chip').forEach((c,idx)=>c.classList.toggle('sel',idx===i));
   const box=document.getElementById('custom-box');
   if(box) box.style.display=TOPICS[i].custom?'block':'none';
   if(TOPICS[i].custom) setTimeout(()=>document.getElementById('custom-inp')?.focus(),60);
@@ -2682,7 +2704,7 @@ function pickGenre(l){
   const idx=ans.genres.indexOf(l);
   if(idx>-1){ ans.genres.splice(idx,1); }
   else { if(ans.genres.length>=2) return; ans.genres.push(l); }
-  document.querySelectorAll('#genre-cards .opt-card').forEach(c=>c.classList.toggle('sel',ans.genres.includes(c.dataset.val)));
+  document.querySelectorAll('#genre-cards [data-val]').forEach(c=>c.classList.toggle('sel',ans.genres.includes(c.dataset.val)));
 }
 
 // ──────────── STEP NAVIGATION ────────────
@@ -2698,24 +2720,7 @@ function nextStep(){
     ans.name=name;
   }
   if(curStep===2){
-    ans.occupation=(document.getElementById('inp-occupation')?.value||'').trim();
-    const d1=(document.getElementById('inp-d1')?.value||'').trim();
-    const d2=(document.getElementById('inp-d2')?.value||'').trim();
-    const d3=(document.getElementById('inp-d3')?.value||'').trim();
-    const d4=(document.getElementById('inp-d4')?.value||'').trim();
-    const d5=(document.getElementById('inp-d5')?.value||'').trim();
-    const d6=(document.getElementById('inp-d6')?.value||'').trim();
-    ans.detailPeople=d1; ans.detailHobbies=d2; ans.detailPlaces=d3;
-    ans.detailPet=d4; ans.detailPersonality=d5; ans.detailOther=d6;
-    const parts=[
-      d1&&`소중한 사람: ${d1}`,
-      d2&&`취미/관심사: ${d2}`,
-      d3&&`좋아하는 장소: ${d3}`,
-      d4&&`반려동물: ${d4}`,
-      d5&&`성격/MBTI: ${d5}`,
-      d6&&`기타: ${d6}`
-    ].filter(Boolean);
-    ans.personalDetails=parts.join('\n')||'';
+    ans.personalDetails=(document.getElementById('inp-about')?.value||'').trim();
   }
   if(curStep===3){
     if(!ans.genres||ans.genres.length===0){alert('장르를 최소 1개 선택해주세요.');return;}
@@ -2731,18 +2736,7 @@ function nextStep(){
     }
   }
   if(curStep===5){
-    const s1=(document.getElementById('inp-s1')?.value||'').trim();
-    const s2=(document.getElementById('inp-s2')?.value||'').trim();
-    const s3=(document.getElementById('inp-s3')?.value||'').trim();
-    const s4=(document.getElementById('inp-s4')?.value||'').trim();
-    ans.scenePlaces=s1; ans.scenePeople=s2; ans.sceneMoments=s3; ans.sceneDialogue=s4;
-    const parts=[
-      s1&&`장소: ${s1}`,
-      s2&&`사람: ${s2}`,
-      s3&&`특별한 순간: ${s3}`,
-      s4&&`대사: ${s4}`
-    ].filter(Boolean);
-    ans.specialScenes=parts.join('\n')||'';
+    ans.specialScenes=(document.getElementById('inp-scenes')?.value||'').trim();
   }
   if(curStep<6){curStep++;renderStep();}
 }
