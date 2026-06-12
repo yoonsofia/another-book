@@ -1638,6 +1638,54 @@ em{font-style:italic;color:inherit;}
 .genre-chip.custom:hover{ background:rgba(179,108,114,.12); }
 .genre-chip.custom.sel{ border-style:solid; background:var(--burg); color:#FFF8F4; }
 #inp-author{ font-family:'Gowun Batang','Nanum Myeongjo',serif; font-size:18px; text-align:center; }
+
+/* ===== Finished book — reading design ===== */
+.story-hdr{ background:linear-gradient(180deg,#FCF8F0,#F4EEE2); padding:64px 24px 50px; border-bottom:1px solid var(--cream-dp); }
+.story-hdr::before{ display:none; }
+.story-badge2{ background:rgba(179,108,114,.10); border:1px solid rgba(179,108,114,.28); color:var(--burg-dk); font-family:'Pretendard Variable',Pretendard,sans-serif; letter-spacing:.14em; }
+.story-main-title{ font-family:'Gowun Batang','Nanum Myeongjo',serif; font-weight:700; color:var(--txt); font-size:clamp(30px,5.6vw,52px); }
+.story-author-line{ font-family:'Gowun Batang','Nanum Myeongjo',serif; color:var(--txt-md); font-style:italic; font-size:17px; }
+.toc-title{ font-family:'Gowun Batang','Nanum Myeongjo',serif; color:var(--txt); font-size:22px; border-bottom:1px solid var(--cream-dp); }
+.toc-row{ border-bottom:1px solid var(--cream-dk); padding:13px 0; }
+.toc-num{ color:var(--burg); font-family:'Gowun Batang','Nanum Myeongjo',serif; font-size:15px; }
+.toc-ch-title{ font-family:'Gowun Batang','Nanum Myeongjo',serif; color:var(--txt); font-size:16px; }
+.toc-status.toc-free{ color:var(--burg); font-weight:700; }
+.toc-cta-msg{ background:var(--burg); border-radius:16px; font-family:'Pretendard Variable',Pretendard,sans-serif; }
+.ch-hdr{ text-align:center; margin:6px auto 28px; max-width:680px; }
+.ch-label{ font-family:'Gowun Batang','Nanum Myeongjo',serif; font-style:italic; color:var(--burg); font-size:15px; letter-spacing:.03em; }
+.ch-title{ font-family:'Gowun Batang','Nanum Myeongjo',serif; font-weight:700; color:var(--txt); font-size:clamp(24px,4.6vw,33px); margin-top:6px; line-height:1.3; }
+.ch-content{ max-width:680px; margin:0 auto; font-family:'Gowun Batang','Nanum Myeongjo',serif; font-size:18px; line-height:2.0; color:var(--txt); word-break:keep-all; }
+.ch-content p{ margin-bottom:20px; }
+.ch-content p:first-of-type::first-letter{ float:left; font-size:58px; line-height:.82; padding:8px 12px 0 0; color:var(--burg); font-weight:700; font-family:'Gowun Batang','Nanum Myeongjo',serif; }
+.ch-content em{ font-style:italic; color:var(--txt-md); }
+
+/* ===== Loading / generating screen ===== */
+.loading-page{ background:var(--cream); }
+.load-title{ font-family:'Gowun Batang','Nanum Myeongjo',serif; color:var(--txt); font-size:clamp(24px,5vw,32px); }
+.load-sub{ font-family:'Pretendard Variable',Pretendard,sans-serif; color:var(--txt-md); font-size:16px; }
+.load-msg{ font-family:'Pretendard Variable',Pretendard,sans-serif; color:var(--burg); font-size:15px; }
+.load-prog-fill{ background:var(--burg); }
+.load-prog-txt{ font-family:'Pretendard Variable',Pretendard,sans-serif; color:var(--txt-md); }
+.load-step{ font-family:'Pretendard Variable',Pretendard,sans-serif; }
+.load-step.done,.load-step.active{ color:var(--burg); }
+
+/* ===== Result-page purchase section ===== */
+.price-sec{ background:var(--cream-dk); }
+.price-title{ font-family:'Gowun Batang','Nanum Myeongjo',serif; color:var(--txt); font-size:clamp(26px,5vw,38px); }
+.price-sub{ font-family:'Pretendard Variable',Pretendard,sans-serif; color:var(--txt-md); font-size:16px; }
+.price-card{ background:#FBF8F1; border:1px solid var(--cream-dp); border-radius:18px; }
+.price-card.pop{ border:1.6px solid var(--burg); box-shadow:0 26px 54px -26px rgba(151,84,90,.4); }
+.pop-badge{ background:var(--burg); font-family:'Pretendard Variable',Pretendard,sans-serif; }
+.price-type{ font-family:'Pretendard Variable',Pretendard,sans-serif; color:var(--burg-dk); letter-spacing:.04em; }
+.price-name{ font-family:'Gowun Batang','Nanum Myeongjo',serif; color:var(--txt); font-size:22px; }
+.price-desc{ font-family:'Pretendard Variable',Pretendard,sans-serif; color:var(--txt-md); }
+.price-amt{ font-family:'Gowun Batang','Nanum Myeongjo',serif; color:var(--txt); font-size:30px; }
+.price-note{ font-family:'Pretendard Variable',Pretendard,sans-serif; color:var(--txt-lt); }
+.btn-price{ font-family:'Pretendard Variable',Pretendard,sans-serif; font-size:16px; border-radius:100px; padding:14px 24px; cursor:pointer; transition:transform .3s,box-shadow .3s,background .3s; }
+.btn-price.btn-p1{ background:var(--burg); color:#FFF8F4; border:none; box-shadow:0 10px 26px -10px rgba(151,84,90,.55); }
+.btn-price.btn-p1:hover{ transform:translateY(-2px); }
+.btn-price.btn-p2{ background:transparent; color:var(--burg); border:1.5px solid var(--burg); }
+.btn-price.btn-p2:hover{ background:rgba(179,108,114,.08); transform:translateY(-2px); }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -3150,7 +3198,7 @@ function displayStory(d){
   // Section A: Chapter 1
   const ch1Section = document.getElementById('ch1-section');
   ch1Section.innerHTML = `
-    <div style="background:#f9f5f0;border:1px solid #e8e0d5;border-radius:8px;padding:12px 16px;margin-bottom:20px;text-align:center;font-size:14px;color:#666;">
+    <div style="background:rgba(179,108,114,.08);border:1px solid rgba(179,108,114,.2);border-radius:12px;padding:13px 18px;margin-bottom:24px;text-align:center;font-size:14px;color:#6A5F52;font-family:'Pretendard Variable',Pretendard,sans-serif;">
       📖 1장 미리보기 · 다 읽으신 후 아래에서 원하시는 옵션을 선택해주세요 ↓
     </div>
     <div class="ch-hdr">
@@ -3336,6 +3384,7 @@ async function composeCover(imageUrl, coverBrief, title, author) {
 
 // ──────────── COVER SELECTION MODAL ────────────
 async function showCoverSelection(imageUrls, coverBrief, title, author) {
+  document.getElementById('cover-selection-modal')?.remove();
   const composedCovers = await Promise.all(
     imageUrls.map(url => composeCover(url, coverBrief, title, author))
   );
@@ -3420,8 +3469,14 @@ async function showCoverSelection(imageUrls, coverBrief, title, author) {
 
   document.body.appendChild(modal);
 
-  let selectedIndex = null;
-  let selectedImageUrl = null;
+  let selectedIndex = 0;
+  let selectedImageUrl = imageUrls[0] || null;
+  (function(){
+    const first = modal.querySelector('.cover-option');
+    if(first) first.style.borderColor = '#FFD600';
+    const ub = modal.querySelector('#use-cover-btn');
+    if(ub){ ub.style.opacity = '1'; ub.style.pointerEvents = 'auto'; }
+  })();
 
   modal.querySelectorAll('.cover-option').forEach(option => {
     option.addEventListener('click', function() {
@@ -3432,14 +3487,14 @@ async function showCoverSelection(imageUrls, coverBrief, title, author) {
       selectedIndex = parseInt(this.dataset.index);
       selectedImageUrl = this.dataset.ideogramUrl || imageUrls[selectedIndex];
       console.log('Selected cover index:', selectedIndex, '| Ideogram URL:', selectedImageUrl);
-      const btn = document.getElementById('use-cover-btn');
+      const btn = modal.querySelector('#use-cover-btn');
       btn.style.opacity = '1';
       btn.style.pointerEvents = 'auto';
     });
   });
 
   return new Promise((resolve) => {
-    document.getElementById('use-cover-btn').addEventListener('click', function() {
+    modal.querySelector('#use-cover-btn').addEventListener('click', function() {
       modal.remove();
       resolve(selectedImageUrl);
     });
