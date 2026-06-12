@@ -3252,76 +3252,60 @@ function paintCoverTextLayer(ctx, W, H, {
   authorFontFamily, fontSize, textColor, accentColor,
   showScrim, titleAlign, letterSpacing, showDivider
 }) {
-  const lineH     = Math.round(fontSize * 1.45);   // 1.45× prevents overlap at any font size
-  const totalH    = titleLines.length * lineH;
-  const startY    = Math.round((H * 0.65 - totalH) / 2 + lineH);
-  const lastPreY  = startY + (titleLines.length - 1) * lineH;
-  const leftPad   = Math.round(W * 0.08);
-  const maxWidth  = W * 0.84;
-  const titleX    = titleAlign === 'center' ? W / 2 : leftPad;
+  const cx = W / 2;
+  const lineH = Math.round(fontSize * 1.32);
+  const titleTop = Math.round(H * 0.18);
+  const maxWidth = W * 0.82;
 
-  if (showScrim) {
-    const scrimTop = Math.max(0, startY - Math.round(lineH * 1.1));
-    const scrimBot = Math.min(H, lastPreY + (showDivider
-      ? Math.round(lineH * 0.8)
-      : lineH + Math.round(lineH * 0.8)));
-    const scrim = ctx.createLinearGradient(0, scrimTop, 0, scrimBot);
-    scrim.addColorStop(0,    'rgba(0,0,0,0)');
-    scrim.addColorStop(0.12, 'rgba(0,0,0,0.65)');
-    scrim.addColorStop(0.88, 'rgba(0,0,0,0.65)');
-    scrim.addColorStop(1,    'rgba(0,0,0,0)');
-    ctx.fillStyle = scrim;
-    ctx.fillRect(0, scrimTop, W, scrimBot - scrimTop);
-  }
+  // legibility scrims: soft dark fade at top (title) and bottom (author)
+  let g = ctx.createLinearGradient(0, 0, 0, Math.round(H * 0.44));
+  g.addColorStop(0, 'rgba(0,0,0,0.55)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, Math.round(H * 0.44));
+  g = ctx.createLinearGradient(0, Math.round(H * 0.76), 0, H);
+  g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,0.62)');
+  ctx.fillStyle = g; ctx.fillRect(0, Math.round(H * 0.76), W, Math.round(H * 0.24));
 
   const buildFont = sz => titleFontStyle
     ? `${titleFontStyle} ${titleFontWeight} ${sz}px ${titleFontFamily}`
     : `${titleFontWeight} ${sz}px ${titleFontFamily}`;
 
-  ctx.fillStyle     = textColor;
-  ctx.textAlign     = titleAlign || 'left';
+  // title — centered near the top
+  ctx.textAlign = 'center';
+  ctx.fillStyle = textColor;
+  ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 2;
   ctx.letterSpacing = letterSpacing || '0px';
-
-  let drawnLastY = startY;
+  let lastY = titleTop;
   titleLines.forEach((line, i) => {
-    let sz = fontSize;
-    ctx.font = buildFont(sz);
-    while (ctx.measureText(line).width > maxWidth && sz > 28) {
-      sz -= 2;
-      ctx.font = buildFont(sz);
-    }
-    drawnLastY = startY + i * lineH;
-    ctx.fillText(line, titleX, drawnLastY);
+    let sz = fontSize; ctx.font = buildFont(sz);
+    while (ctx.measureText(line).width > maxWidth && sz > 30) { sz -= 2; ctx.font = buildFont(sz); }
+    lastY = titleTop + i * lineH;
+    ctx.fillText(line, cx, lastY);
   });
-
+  ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
   ctx.letterSpacing = '0px';
-  ctx.textAlign     = 'left';
 
-  const divY = drawnLastY + Math.round(H * 0.013);
+  // short centered rule under the title
+  const divY = lastY + Math.round(H * 0.03);
+  ctx.globalAlpha = 0.8;
+  ctx.strokeStyle = accentColor || '#FFFFFF';
+  ctx.lineWidth = Math.max(1, W * 0.0025);
+  ctx.beginPath();
+  ctx.moveTo(cx - Math.round(W * 0.085), divY);
+  ctx.lineTo(cx + Math.round(W * 0.085), divY);
+  ctx.stroke();
+  ctx.globalAlpha = 1.0;
 
-  if (showDivider) {
-    ctx.globalAlpha = 0.7;
-    ctx.strokeStyle = accentColor || '#C4A882';
-    ctx.lineWidth   = W * 0.002;
-    ctx.beginPath();
-    ctx.moveTo(leftPad, divY);
-    ctx.lineTo(leftPad + Math.round(W * 0.35), divY);
-    ctx.stroke();
-    ctx.globalAlpha = 1.0;
-  }
-
-  const authorSize = Math.round(W * 0.045);
-  const authorY    = showDivider
-    ? divY + Math.round(W * 0.063)
-    : drawnLastY + Math.round(H * 0.04);
-
-  ctx.font          = `400 ${authorSize}px ${authorFontFamily}`;
-  ctx.fillStyle     = textColor;
-  ctx.globalAlpha   = 0.85;
-  ctx.letterSpacing = Math.round(W * 0.005) + 'px';
-  ctx.fillText((authorName || '').toUpperCase(), leftPad, authorY);
-  ctx.globalAlpha   = 1.0;
-  ctx.letterSpacing = '0px';
+  // author — centered at the bottom, clearly separated
+  const authorSize = Math.round(W * 0.042);
+  ctx.font = `400 ${authorSize}px ${authorFontFamily}`;
+  ctx.fillStyle = textColor;
+  ctx.textAlign = 'center';
+  ctx.globalAlpha = 0.95;
+  ctx.letterSpacing = Math.round(W * 0.014) + 'px';
+  ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 8;
+  ctx.fillText((authorName || '').toUpperCase(), cx, Math.round(H * 0.93));
+  ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
+  ctx.globalAlpha = 1.0; ctx.letterSpacing = '0px'; ctx.textAlign = 'left';
 }
 
 // ──────────── COMPOSE COVER ────────────
@@ -3351,7 +3335,7 @@ async function composeCover(imageUrl, coverBrief, title, author) {
         titleLines,
         authorName:       author,
         titleFontStyle:   null,
-        titleFontWeight:  '900',
+        titleFontWeight:  '700',
         titleFontFamily:  titleFont,
         authorFontFamily: authorFont,
         fontSize,
