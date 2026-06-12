@@ -2474,18 +2474,18 @@ let selectedCoverImage = null;
 let storedCoverBrief = null;
 
 const genreStyleMap = {
-  '따뜻하고 감동적인': 'warm editorial illustration, soft muted palette, gentle grain texture, tender negative space',
-  '유쾌하고 재미있는': 'playful editorial illustration, bright refined palette, bold simple shapes, screen-print texture',
-  '영감을 주는': 'minimal editorial illustration, clean geometric composition, confident negative space, two-tone palette',
-  '감성적이고 깊은': 'moody minimalist editorial illustration, muted desaturated palette, poetic negative space, fine grain',
-  '로맨틱한': 'romantic editorial illustration, soft dusty palette, delicate botanical motif, refined risograph texture',
-  '드라마틱한': 'dramatic editorial illustration, high-contrast duotone, bold graphic composition, cinematic negative space',
-  '스릴러 / 서스펜스': 'noir editorial illustration, high-contrast duotone, dramatic negative space, screen-print texture, restrained palette',
-  '공포 / 호러': 'eerie minimalist editorial illustration, dark restrained palette, unsettling negative space, fine grain texture',
-  'SF / 판타지': 'refined sci-fi editorial illustration, cosmic limited palette, geometric symbolic shapes, subtle grain',
-  '미스터리 / 추리': 'vintage editorial mystery illustration, muted two-tone palette, intriguing negative space, screen-print texture',
-  '힐링 / 잔잔한': 'serene editorial illustration, soft natural palette, calm negative space, gentle grain texture',
-  '가족 / 세대 이야기': 'nostalgic editorial illustration, warm muted palette, tender symbolic composition, soft grain'
+  '따뜻하고 감동적인': 'warm minimal illustration, two soft colors, single simple symbol, lots of negative space',
+  '유쾌하고 재미있는': 'playful minimal illustration, two bright colors, one bold simple shape, negative space',
+  '영감을 주는': 'minimal geometric illustration, two-tone, single symbol, clean negative space',
+  '감성적이고 깊은': 'moody minimal illustration, muted two-tone, single motif, large negative space',
+  '로맨틱한': 'romantic minimal illustration, soft two-tone, one simple botanical symbol, negative space',
+  '드라마틱한': 'dramatic minimal illustration, high-contrast two-tone, single bold shape, negative space',
+  '스릴러 / 서스펜스': 'noir minimal illustration, two-tone duotone, single ominous symbol, heavy negative space',
+  '공포 / 호러': 'eerie minimal illustration, dark two-tone, single unsettling symbol, empty negative space',
+  'SF / 판타지': 'minimal sci-fi illustration, two-tone, single geometric symbol, vast negative space',
+  '미스터리 / 추리': 'minimal mystery illustration, muted two-tone, single clue symbol, negative space',
+  '힐링 / 잔잔한': 'serene minimal illustration, soft two-tone, single calm symbol, lots of negative space',
+  '가족 / 세대 이야기': 'warm minimal illustration, muted two-tone, single tender symbol, negative space'
 };
 
 const COVER_NEGATIVE_PROMPT = 'people, person, human, woman, man, girl, boy, face, hands, body, statue, sculpture, text, words, letters, typography, numbers, signs';
@@ -3008,7 +3008,7 @@ ${languageInstruction}
     const genreStyle = (ans.genres || []).map(g => genreStyleMap[g]).filter(Boolean).join(', ') || 'cinematic mood, beautiful scene';
     const coverBriefPrompt = isEnglish
       ? `You are creating image prompts for an English book cover. Ideogram AI will render the COMPLETE cover including title and author name as part of the image — do NOT add any "no text" constraints.\n\nBook title (spell character-by-character, exactly): "${outline.title}"\nAuthor name (spell exactly): "${ans.authorDisplay}"\n\nGenerate 4 COMPLETELY DIFFERENT image prompts for a modern professional English book cover.\n\nREQUIRED in every prompt:\n1. The title text "${outline.title}" must appear prominently — large, at the top or center. Spell it exactly, character by character.\n2. The author name "${ans.authorDisplay}" must appear below the title, smaller.\n3. Include this design direction: modern book cover, professional typography integrated into design, clean layout, title text large and prominent, author name smaller below title, contemporary commercial fiction design\n\nRules:\n- Max 65 words per prompt\n- No human faces, no people, no body parts\n- Each prompt must show a DIFFERENT visual concept (not the same scene at different angles)\n- End each prompt with: ${genreStyle}, professional book cover design\n\nReturn ONLY this JSON:\n{"cover1":"prompt 1","cover2":"prompt 2","cover3":"prompt 3","cover4":"prompt 4"}\n\nStory summary: ${storySummary.slice(0, 200)}`
-      : `Based on this story's theme and genre, generate 4 COMPLETELY DIFFERENT short image prompts for a book cover. Each must show a different scene/object.\n\nSTYLE REQUIREMENT — every prompt must produce: elegant editorial book-cover illustration, refined flat vector art with subtle paper grain and risograph texture, sophisticated limited palette of 2-3 colors, strong negative space, bold simple symbolic composition, award-winning contemporary literary cover aesthetic. No photorealism, no 3D rendering, no photography, no clutter.\n\nRules:\n- Each prompt max 40 words\n- No people, no faces, no human figures\n- No text, no words, no letters\n- Different subject for each (not just a different angle of the same thing)\n- End each prompt with: ${genreStyle}, refined editorial illustration, sophisticated limited palette, contemporary literary book cover\n\nReturn ONLY this JSON:\n{"cover1": "40-word prompt, scene 1", "cover2": "40-word prompt, scene 2", "cover3": "40-word prompt, scene 3", "cover4": "40-word prompt, scene 4"}\n\nStory summary: ${storySummary.slice(0, 200)}\nGenre style: ${genreStyle}`;
+      : `Based on this story's theme and genre, generate 4 COMPLETELY DIFFERENT short image prompts for a book cover. Each must show a different scene/object.\n\nSTYLE REQUIREMENT — every prompt must produce: minimalist literary book-cover illustration. STRICT: use ONLY 2-3 flat colors total, large areas of empty negative space, ONE single simple central symbol or shape, calm restrained composition. NO detailed scenes, NO busy or complex backgrounds, NO rainbow palettes, NO photorealism, NO 3D, NO photography. NO text, letters, numbers or written characters anywhere; NEVER depict clocks, calendars, signs, phone screens, or any object that would show letters or numbers.\n\nRules:\n- Each prompt max 40 words\n- No people, no faces, no human figures\n- No text, no words, no letters\n- Different subject for each (not just a different angle of the same thing)\n- End each prompt with: ${genreStyle}, minimalist flat illustration, only 2-3 colors, lots of negative space, single simple symbol, absolutely no text or numbers\n\nReturn ONLY this JSON:\n{"cover1": "40-word prompt, scene 1", "cover2": "40-word prompt, scene 2", "cover3": "40-word prompt, scene 3", "cover4": "40-word prompt, scene 4"}\n\nStory summary: ${storySummary.slice(0, 200)}\nGenre style: ${genreStyle}`;
     const coverBriefRaw = await apiCall(
       coverBriefPrompt,
       600,
