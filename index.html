@@ -3286,15 +3286,17 @@ function paintCoverTextLayer(ctx, W, H, {
   ctx.letterSpacing = '0px';
 
   // short centered rule under the title
-  const divY = lastY + Math.round(H * 0.03);
-  ctx.globalAlpha = 0.8;
-  ctx.strokeStyle = accentColor || '#FFFFFF';
-  ctx.lineWidth = Math.max(1, W * 0.0025);
-  ctx.beginPath();
-  ctx.moveTo(cx - Math.round(W * 0.085), divY);
-  ctx.lineTo(cx + Math.round(W * 0.085), divY);
-  ctx.stroke();
-  ctx.globalAlpha = 1.0;
+  if (showDivider) {
+    const divY = lastY + Math.round(H * 0.03);
+    ctx.globalAlpha = 0.8;
+    ctx.strokeStyle = accentColor || '#FFFFFF';
+    ctx.lineWidth = Math.max(1, W * 0.0025);
+    ctx.beginPath();
+    ctx.moveTo(cx - Math.round(W * 0.085), divY);
+    ctx.lineTo(cx + Math.round(W * 0.085), divY);
+    ctx.stroke();
+    ctx.globalAlpha = 1.0;
+  }
 
   // author — centered at the bottom, clearly separated
   const authorSize = Math.round(W * 0.042);
@@ -3325,6 +3327,17 @@ const KO_TITLE_STYLES = {
   '가족 / 세대 이야기': { family:"'Nanum Myeongjo', serif", weight:'700', size:74, ls:'0px' }
 };
 
+// Returns genre-resolved Korean title style scaled to canvasH (base: 900px).
+function koTitleStyle(genre, canvasH) {
+  const scale = canvasH / 900;
+  const def = { family: "'Noto Serif KR', serif", weight: '700', size: 72, ls: '0px' };
+  const st = KO_TITLE_STYLES[genre] || def;
+  const scaledLs = (!st.ls || st.ls === '0px')
+    ? '0px'
+    : (Math.round(parseFloat(st.ls) * scale * 10) / 10) + 'px';
+  return { family: st.family, weight: st.weight, size: Math.round(st.size * scale), ls: scaledLs };
+}
+
 async function composeCover(imageUrl, coverBrief, title, author) {
   return new Promise((resolve) => {
     const W = 600, H = 900;
@@ -3339,8 +3352,8 @@ async function composeCover(imageUrl, coverBrief, title, author) {
     let koTitleLS = '0px';
     if (korean) {
       const g = (typeof ans !== 'undefined' && ans.genres && ans.genres[0]) || '';
-      const st = KO_TITLE_STYLES[g];
-      if (st) { titleFont = st.family; titleWeight = st.weight; koTitleSize = st.size; koTitleLS = st.ls; }
+      const st = koTitleStyle(g, H);
+      titleFont = st.family; titleWeight = st.weight; koTitleSize = st.size; koTitleLS = st.ls;
     }
     const authorFont = korean ? "'Noto Sans KR', sans-serif" : "'Montserrat', sans-serif";
 
@@ -3368,7 +3381,7 @@ async function composeCover(imageUrl, coverBrief, title, author) {
         showScrim:    true,
         titleAlign:   'left',
         letterSpacing:korean ? koTitleLS : '0px',
-        showDivider:  false
+        showDivider:  true
       });
     }
 
@@ -3557,8 +3570,8 @@ async function renderCover(canvas, design, bookTitle, authorName, skipBackground
   if (!skipBackground) { canvas.width = W; canvas.height = H; }
   const ctx = canvas.getContext('2d');
   const isKo = selectedLang === 'ko';
-  const titleFont = isKo ? '"Noto Sans KR",sans-serif' : '"Bebas Neue",sans-serif';
-  const bodyFont  = '"Montserrat",sans-serif';
+  const bodyFont     = '"Montserrat",sans-serif';
+  const koAuthorFont = "'Noto Sans KR', sans-serif";
 
   const fontMap = {
     'BEBAS':     { family: "'Bebas Neue'",        weight: '400', size: 120 },
@@ -3582,12 +3595,15 @@ async function renderCover(canvas, design, bookTitle, authorName, skipBackground
     'STACKED_MID':      { fontSize: 110, titleAlign: 'left',   letterSpacing: '0px' }
   };
   const layout   = layoutMap[design.layoutStyle] || layoutMap['STACKED_MID'];
-  const fontSize = isKo ? 88 : layout.fontSize;
+  const koStyle  = isKo
+    ? koTitleStyle((typeof ans !== 'undefined' && ans.genres && ans.genres[0]) || '', H)
+    : null;
+  const fontSize = isKo ? koStyle.size : layout.fontSize;
 
   try {
     await Promise.all([
       isKo
-        ? document.fonts.load(`900 130px ${titleFont}`)
+        ? document.fonts.load(`${koStyle.weight} ${koStyle.size}px ${koStyle.family}`)
         : document.fonts.load(`${chosen.weight} ${fontSize}px ${chosen.family}`),
       document.fonts.load(`400 16px ${bodyFont}`)
     ]);
@@ -3691,9 +3707,9 @@ async function renderCover(canvas, design, bookTitle, authorName, skipBackground
   const lines = groupTitleLines(rawLines);
 
   const titleFontStyle  = (!isKo && design.fontStyle === 'DANCING') ? 'italic' : null;
-  const titleFontWeight = isKo ? '800' : chosen.weight;
+  const titleFontWeight = isKo ? koStyle.weight : chosen.weight;
   const titleFontFamily = isKo
-    ? titleFont
+    ? koStyle.family
     : `${chosen.family}, Arial Black, sans-serif`;
 
   paintCoverTextLayer(ctx, W, H, {
@@ -3702,13 +3718,13 @@ async function renderCover(canvas, design, bookTitle, authorName, skipBackground
     titleFontStyle,
     titleFontWeight,
     titleFontFamily,
-    authorFontFamily: bodyFont,
+    authorFontFamily: isKo ? koAuthorFont : bodyFont,
     fontSize,
     textColor:     skipBackground ? '#FFFFFF' : (design.textColor || '#F5F0E8'),
     accentColor:   design.accentColor || '#C4A882',
     showScrim:     skipBackground,
     titleAlign:    isKo ? 'left' : layout.titleAlign,
-    letterSpacing: layout.letterSpacing || '0px',
+    letterSpacing: isKo ? koStyle.ls : (layout.letterSpacing || '0px'),
     showDivider:   true
   });
 }
