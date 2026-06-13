@@ -3255,7 +3255,7 @@ function paintCoverTextLayer(ctx, W, H, {
 }) {
   const cx = W / 2;
   const lineH = Math.round(fontSize * 1.32);
-  const titleTop = Math.round(H * 0.18);
+  const titleTop = Math.round(H * 0.14);
   const maxWidth = W * 0.82;
 
   // legibility scrims: soft dark fade at top (title) and bottom (author)
@@ -3582,7 +3582,7 @@ async function renderCover(canvas, design, bookTitle, authorName, skipBackground
     'STACKED_MID':      { fontSize: 110, titleAlign: 'left',   letterSpacing: '0px' }
   };
   const layout   = layoutMap[design.layoutStyle] || layoutMap['STACKED_MID'];
-  const fontSize = isKo ? 120 : layout.fontSize;
+  const fontSize = isKo ? 88 : layout.fontSize;
 
   try {
     await Promise.all([
