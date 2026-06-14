@@ -127,19 +127,23 @@ app.post('/generate-pdf', async (req, res) => {
     bookTitle,
     authorName,
     chapters,        // array of { title, content }
-    coverImageUrl,   // DALL-E image URL or null
+    coverImageUrl,   // DALL-E image URL, data URI, or null
     coverDesign,     // { coverColor, textColor,
                      //   accentColor, layout }
     language,        // 'ko' or 'en'
-    selectedProduct  // 'digital', 'physical', 'gift'
+    selectedProduct, // 'digital', 'physical', 'gift'
+    titleInImage     // true when client has baked title/author into the image
   } = req.body;
 
   let browser;
 
   try {
-    // Pre-fetch cover image to base64 so Puppeteer never hits an external URL
-    // (avoids Ideogram URL expiry and CORS issues in headless Chromium)
-    const coverDataUri = await fetchImageAsDataUri(coverImageUrl);
+    // If the client already sent a data URI (Korean canvas), use it directly;
+    // otherwise fetch the external URL to avoid Ideogram expiry / CORS issues.
+    const isDataUri = coverImageUrl && coverImageUrl.startsWith('data:');
+    const coverDataUri = isDataUri
+      ? coverImageUrl
+      : await fetchImageAsDataUri(coverImageUrl);
     if (coverImageUrl && !coverDataUri) {
       console.warn('[cover] Cover image could not be fetched — PDF will render without cover image');
     }
@@ -151,7 +155,8 @@ app.post('/generate-pdf', async (req, res) => {
       coverImageUrl: coverDataUri,
       coverDesign,
       language,
-      selectedProduct
+      selectedProduct,
+      titleInImage
     });
 
     const isLinux = process.platform === 'linux';
@@ -240,13 +245,13 @@ function generateBookHTML({
   coverImageUrl,
   coverDesign,
   language,
-  selectedProduct
+  selectedProduct,
+  titleInImage
 }) {
   const isKorean = language === 'ko';
   const tier = selectedProduct === 'physical' ? 'physical' : 'digital';
   const coverBg = coverDesign?.coverColor || '#3D5A47';
 
-  const coverAuthor = hasKorean(authorName) ? stripKorean(authorName) : (authorName || '');
   const esc = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
   const today = new Date();
@@ -371,23 +376,6 @@ ${marginCSS}
   page: cover-page; page-break-after: always;
 }
 .cover-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.cover-scrim {
-  position: absolute; left: 0; right: 0; top: 22%;
-  padding: 10mm 10mm 14mm;
-  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,.68) 12%, rgba(0,0,0,.68) 80%, rgba(0,0,0,0) 100%);
-}
-.cover-title {
-  font-family: ${isKorean ? "'NotoSansKR','Malgun Gothic',sans-serif" : "'Barlow Condensed','Bebas Neue',sans-serif"};
-  font-size: ${isKorean ? '22pt' : '34pt'}; font-weight: ${isKorean ? '700' : '900'};
-  color: #fff; line-height: ${isKorean ? '1.25' : '1.1'};
-  letter-spacing: ${isKorean ? 'normal' : '1px'}; margin-bottom: 3mm;
-}
-.cover-author {
-  font-family: ${isKorean ? "'NotoSansKR',sans-serif" : "'Montserrat',sans-serif"};
-  font-size: 10pt; color: #fff; opacity: .85;
-  letter-spacing: ${isKorean ? '.05em' : '.15em'};
-  text-transform: ${isKorean ? 'none' : 'uppercase'};
-}
 
 /* ── COPYRIGHT ── */
 .copyright-page {
@@ -411,8 +399,8 @@ ${marginCSS}
   page: front-matter; page-break-after: always;
   display: flex; flex-direction: column;
 }
-.toc-heading { font-family: ${bodyFont}; font-size: 7.5pt; color: #aaa; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 7mm; }
-.toc-entry   { display: flex; align-items: baseline; gap: 4mm; margin-bottom: 4mm; }
+.toc-heading { font-family: ${bodyFont}; font-size: 7.5pt; color: #aaa; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 5mm; }
+.toc-entry   { display: flex; align-items: baseline; gap: 4mm; margin-bottom: 2.5mm; }
 .toc-num     { font-family: ${bodyFont}; font-size: 9pt; color: #999; min-width: 5mm; flex-shrink: 0; }
 .toc-title   { font-family: ${bodyFont}; color: #1a1a1a; font-size: 10.5pt; line-height: 1.3; }
 
@@ -459,10 +447,6 @@ ${!isKorean ? `.chapter-body p.first-para::first-letter {
 
 <div class="cover-page">
   ${coverImageUrl ? `<img class="cover-image" src="${coverImageUrl}" alt="cover">` : ''}
-  ${isKorean ? `<div class="cover-scrim">
-    <div class="cover-title">${esc(bookTitle)}</div>
-    ${coverAuthor ? `<div class="cover-author">${esc(coverAuthor)}</div>` : ''}
-  </div>` : ''}
 </div>
 
 ${copyrightHTML}

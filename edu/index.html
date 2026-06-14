@@ -3269,7 +3269,7 @@ async function generatePDF(sp) {
         bookTitle: bookTitle,
         authorName: authorName,
         chapters: story.chapters,
-        coverImageUrl: selectedCoverImage,
+        coverImageUrl: selectedLang !== 'en' ? (() => { try { return document.getElementById('cover-canvas').toDataURL('image/jpeg', 0.95); } catch (e) { console.error('cover-canvas toDataURL failed, falling back', e); return selectedCoverImage; } })() : selectedCoverImage,
         coverDesign: coverDesign,
         language: selectedLang,
         selectedProduct: selectedProduct
